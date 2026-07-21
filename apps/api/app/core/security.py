@@ -1,8 +1,9 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer
-from jose import jwt
+from jose import JWTError,jwt
 from app.core.config import settings
-
+from app.schemas.auth import CurrentUser
+from .supabase import supabase
 security = HTTPBearer()
 
 async def get_current_user(credentials=Depends(security)):
@@ -15,16 +16,29 @@ async def get_current_user(credentials=Depends(security)):
     # Return authenticated user
 
 
-def verify_token(token):
+def verify_token(token: str) -> dict:
+    try:
+        # payload = jwt.decode(
+        #         token,
+        #         settings.SUPABASE_JWT_SECRET,
+        #         algorithms=["HS256"],
+        #         audience="authenticated",  # if your Supabase project uses audience
+        #     )
+        # return CurrentUser(
+        #         id=payload["sub"],
+        #         email=payload.get("email"),
+        #     )
+    
+        user = supabase.auth.get_user(token)
 
-    payload = jwt.decode(
+        if not user.user:
+            raise HTTPException(401)
 
-        token,
+        return user.user
 
-        settings.SUPABASE_JWT_SECRET,
-
-        algorithms=["HS256"]
-
-    )
-
-    return payload    
+    except JWTError:
+        raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired access token",
+            )
+    

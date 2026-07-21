@@ -1,14 +1,6 @@
-from app.core.database import SessionLocal
 from fastapi import Depends
 from fastapi.security import HTTPBearer
-from core.security import verify_token
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
+from app.core.security import verify_token
 
 security = HTTPBearer()
 

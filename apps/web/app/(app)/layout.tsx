@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import Sidebar from "@/components/dashboard/Sidebar";
 import Navbar from "@/components/dashboard/Navbar";
-
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 export default async function DashboardLayout({
   children,
 }: Readonly<{
@@ -27,7 +27,9 @@ export default async function DashboardLayout({
         <Navbar user={user} />
 
         <main className="flex-1 p-8">
-          {children}
+          <ReactQueryProvider>
+            {children}
+          </ReactQueryProvider>
         </main>
       </div>
     </div>

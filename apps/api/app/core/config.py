@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
 
-    SECRET_KEY: str
+    SUPABASE_JWT_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     REDIS_URL: str

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-
+from uuid import UUID
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -23,3 +23,8 @@ class AuthResponse(BaseModel):
     message: str
 
     user: dict | None = None
+
+
+class CurrentUser(BaseModel):
+    id: UUID
+    email: str | None = None    
