@@ -20,6 +20,8 @@ import { updateProfile } from "@/lib/api/profile";
 import { TOTAL_STEPS } from "./constants";
 
 import { OnboardingForm } from "./types";
+import { generateRoadmap } from "@/services/roadmap";
+import {useRouter} from "next/navigation";
 
 const initialData: OnboardingForm = {
 
@@ -48,9 +50,14 @@ export default function OnboardingPage() {
   const [data, setData] =
     useState(initialData);
 
+  const router = useRouter();
   const updateProfileMutation = useMutation({
     mutationFn: updateProfile,
   });
+
+  const generateRoadmapMutation = useMutation({
+    mutationFn: generateRoadmap,
+});
 
   const updateData = (
     values: Partial<OnboardingForm>
@@ -74,6 +81,11 @@ export default function OnboardingPage() {
     try {
 
         await updateProfileMutation.mutateAsync(data);
+
+        const roadmap =
+        await generateRoadmapMutation.mutateAsync();
+
+        router.push(`/roadmap/${roadmap.data.id}`);
 
         next();
 

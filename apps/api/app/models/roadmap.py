@@ -1,8 +1,7 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base_model import BaseModel
-from app.models.enums import RoadmapStatus
 
 
 class Roadmap(BaseModel):
@@ -12,14 +11,21 @@ class Roadmap(BaseModel):
         ForeignKey("profiles.id")
     )
 
-    career_id: Mapped[str] = mapped_column(
-        ForeignKey("careers.id")
+    title: Mapped[str] = mapped_column(
+        String(255)
     )
 
-    status: Mapped[RoadmapStatus]
+    description: Mapped[str] = mapped_column(
+        String(1000)
+    )
 
-    # phases = relationship(
-    #     "RoadmapPhase",
-    #     back_populates="roadmap",
-    #     cascade="all, delete-orphan",
-    # )
+    status: Mapped[str] = mapped_column(
+        String(20),
+        default="completed",
+    )
+    
+    phases = relationship(
+        "RoadmapPhase",
+        back_populates="roadmap",
+        cascade="all, delete-orphan"
+    )    

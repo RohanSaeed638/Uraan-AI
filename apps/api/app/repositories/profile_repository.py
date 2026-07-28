@@ -17,10 +17,12 @@ class ProfileRepository:
         result = await self.db.execute(
             select(Profile).where(
                 Profile.auth_user_id == auth_user_id
-            )
+            ).order_by(
+                    Profile.created_at.desc()   
+                    )
         )
 
-        return result.scalar_one_or_none()
+        return result.scalars().first()
 
     async def create(
         self,
