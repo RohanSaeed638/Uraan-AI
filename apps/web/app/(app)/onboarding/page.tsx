@@ -79,7 +79,7 @@ export default function OnboardingPage() {
 
   const onSubmit = async () => {
     try {
-
+        next();
         await updateProfileMutation.mutateAsync(data);
 
         const roadmap =
@@ -87,7 +87,6 @@ export default function OnboardingPage() {
 
         router.push(`/roadmap/${roadmap.data.id}`);
 
-        next();
 
     } catch (error) {
 

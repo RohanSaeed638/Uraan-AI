@@ -1,3 +1,4 @@
+from app.models.enums import RoadmapStatus
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -21,7 +22,7 @@ class Roadmap(BaseModel):
 
     status: Mapped[str] = mapped_column(
         String(20),
-        default="completed",
+        default=RoadmapStatus.GENERATING.value,
     )
     
     phases = relationship(

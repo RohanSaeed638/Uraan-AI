@@ -20,13 +20,14 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="h-screen flex overflow-hidden bg-background">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col">
-        <Navbar user={user} />
-
-        <main className="flex-1 p-8">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="sticky top-0 z-20 bg-background border-b">
+          <Navbar user={user} />
+        </div>
+        <main className="flex-1 overflow-y-auto p-8">
           <ReactQueryProvider>
             {children}
           </ReactQueryProvider>

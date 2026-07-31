@@ -1,5 +1,7 @@
+from datetime import datetime
 from uuid import UUID
 
+from app.models.enums import RoadmapStatus
 from pydantic import BaseModel
 
 
@@ -39,3 +41,29 @@ class RoadmapResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UpdateTaskRequest(BaseModel):
+    completed: bool        
+
+
+class RoadmapSummaryResponse(BaseModel):
+
+    id: UUID
+
+    title: str
+
+    description: str
+
+    status: RoadmapStatus
+
+    progress: int
+
+    completed_tasks: int
+
+    total_tasks: int
+
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }    

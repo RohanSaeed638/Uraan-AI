@@ -1,6 +1,6 @@
-from unittest import result
 from uuid import UUID
 
+from app.models.enums import RoadmapStatus
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -124,3 +124,53 @@ class RoadmapRepository:
         )
 
         return result.scalars().first()
+    
+    async def get_by_id(  
+        self,
+        roadmap_id: UUID,
+        user_id: UUID,
+    ):
+
+        result = await self.db.execute(
+            select(Roadmap)
+            .options(
+            selectinload(Roadmap.phases)
+            .selectinload(RoadmapPhase.tasks)
+            )
+            .where(
+                Roadmap.id == roadmap_id,
+                Roadmap.profile_id == user_id
+            )
+        )
+
+        return result.scalar_one_or_none()
+
+    async def update_status(
+    self,
+    roadmap_id: UUID,
+    status: RoadmapStatus,
+    ):
+        result = await self.db.execute(
+                select(Roadmap).where(
+                Roadmap.id == roadmap_id
+            )
+        )
+
+        roadmap = result.scalars().first()
+
+        if roadmap:
+            roadmap.status = status
+            await self.db.commit()
+
+    async def get_all_by_user(
+        self,
+        user_id: UUID,
+    ) -> list[Roadmap]:
+
+        result = await self.db.execute(
+            select(Roadmap)
+            .where(Roadmap.profile_id == user_id)
+            .order_by(Roadmap.updated_at.desc())
+        )
+
+        return result.scalars().all()        

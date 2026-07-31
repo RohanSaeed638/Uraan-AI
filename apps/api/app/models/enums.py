@@ -1,5 +1,6 @@
-from enum import Enum
+# from sqlalchemy import Enum as SQLEnum
 
+from enum import Enum
 
 class SkillLevel(str, Enum):
     BEGINNER = "beginner"
@@ -38,3 +39,16 @@ class ResourceType(str, Enum):
     COURSE = "course"
     BOOK = "book"
 
+class RoadmapStatus(str, Enum):
+    GENERATING = "generating"
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+    FAILED = "failed"
+
+class CareerStage(str, Enum):
+    BEGINNER = "beginner"
+    JOB_READY = "job_ready"
+    STUDENT = "student"
+    PROFESSIONAL = "professional"
+    CAREER_SWITCHER = "career_switcher"

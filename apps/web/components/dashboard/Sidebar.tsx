@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import {
   Home,
@@ -18,8 +18,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "Roadmap",
-    href: "/roadmap",
+    title: "Roadmaps",
+    href: "/roadmaps",
     icon: Target,
   },
   {
@@ -51,9 +51,12 @@ const items = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-72 border-r bg-card p-6">
+    <aside className="sticky top-0 h-screen w-72 shrink-0 border-r bg-card p-6">
       <h1 className="text-2xl font-bold text-violet-600">
-        Uraan AI
+        {/* <Image src="/logo-whitebg.png" alt="Uraan AI" width={32} height={32} className="w-32 h-32" /> */}
+        <a href="/">
+          <img src="/logo-whitebg.png" alt="Uraan AI" width={64} height={42} className="w-64 h-42" />
+        </a>
       </h1>
 
       <nav className="mt-10 space-y-2">
