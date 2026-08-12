@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import get_db
 from app.api.dependencies import get_current_user
 
-from app.schemas.roadmap import RoadmapResponse, UpdateTaskRequest, TaskResponse, RoadmapSummaryResponse
+from app.schemas.roadmap import RoadmapResponse, UpdateTaskRequest, TaskResponse, RoadmapSummaryResponse, RoadmapGenerateRequest
 
 from app.services.roadmap_service import RoadmapService
 
@@ -22,6 +22,7 @@ router = APIRouter(
     response_model=RoadmapResponse,
 )
 async def generate_roadmap(
+    data: RoadmapGenerateRequest,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -29,7 +30,9 @@ async def generate_roadmap(
     service = RoadmapService(db)
 
     return await service.generate(
-        current_user.id
+        current_user.id,
+        data=data,
+
     )
 
 @router.get(
@@ -72,11 +75,13 @@ async def get_roadmap(
 async def update_task(
     task_id: UUID,
     payload: UpdateTaskRequest,
+    current_user=Depends(get_current_user),
     service: RoadmapService = Depends(get_roadmap_service),
 ):
     return await service.update_task_completion(
-        task_id,
-        payload.completed,
+        task_id=task_id,
+        completed=payload.completed,
+        auth_user_id=current_user.id,
     )
 
 @router.get(

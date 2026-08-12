@@ -17,22 +17,40 @@ class RoadmapGenerator:
     async def generate(
         self,
         profile,
+        data
     ) -> RoadmapOutput:
 
-        prompt = ROADMAP_PROMPT.format(
+        # prompt = ROADMAP_PROMPT.format(
 
+        #     name=profile.full_name,
+
+        #     career=profile.career_slug,
+
+        #     skill=profile.skill_level,
+
+        #     learning_style=profile.learning_style,
+
+        #     daily_hours=profile.daily_hours,
+
+        #     duration=profile.target_duration,
+
+        # )
+        prompt = ROADMAP_PROMPT.format(
             name=profile.full_name,
 
-            career=profile.career_slug,
+            career=data.career_slug,
 
-            skill=profile.skill_level,
+            career_stage=data.career_stage,
 
-            learning_style=profile.learning_style,
+            skill=data.skill_level,
 
-            daily_hours=profile.daily_hours,
+            learning_goal=data.learning_goal,
 
-            duration=profile.target_duration,
+            learning_style=data.learning_style,
 
+            daily_hours=data.daily_hours,
+
+            duration=data.target_duration,
         )
 
         response = await client.chat.completions.create(

@@ -57,6 +57,7 @@ class RoadmapRepository:
                     phase_id=phase.id,
                     title=task_data["title"],
                     description=task_data.get("description"),
+                    resource_links=task_data.get("resource_links", []),
                     estimated_hours=task_data.get(
                         "estimated_hours"
                     ),
@@ -110,7 +111,6 @@ class RoadmapRepository:
                 selectinload(Roadmap.phases)
 
                 .selectinload(RoadmapPhase.tasks)
-
             )
 
             .where(
@@ -158,9 +158,12 @@ class RoadmapRepository:
 
         roadmap = result.scalars().first()
 
-        if roadmap:
-            roadmap.status = status
-            await self.db.commit()
+        if not roadmap:
+           return None
+
+        roadmap.status = status
+
+        return roadmap
 
     async def get_all_by_user(
         self,

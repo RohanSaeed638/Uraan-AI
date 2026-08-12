@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from app.models.roadmap_phase import RoadmapPhase
+from app.models.roadmap import Roadmap
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy import func
@@ -24,6 +25,21 @@ class RoadmapTaskRepository:
 
         return task
 
+    async def get_by_id(
+    self,
+        task_id: UUID,
+    ) -> RoadmapTask | None:
+
+        result = await self.db.execute(
+            select(RoadmapTask)
+            .options(
+                selectinload(RoadmapTask.phase)
+            )
+            .where(RoadmapTask.id == task_id)
+        )
+
+        return result.scalar_one_or_none()
+
     async def update_task_completion(
         self,
         task_id: UUID,
@@ -33,8 +49,9 @@ class RoadmapTaskRepository:
         result = await self.db.execute(
             select(RoadmapTask)
             .options(
-        selectinload(RoadmapTask.phase)
-        ).where(
+                selectinload(RoadmapTask.phase)
+            )
+            .where(
                 RoadmapTask.id == task_id
             )
         )
@@ -75,3 +92,24 @@ class RoadmapTaskRepository:
             "total": total or 0,
             "completed": completed or 0,
         }
+
+    async def get_task_for_user(
+        self,
+        task_id: UUID,
+        profile_id: UUID,
+    ) -> RoadmapTask | None:
+
+        result = await self.db.execute(
+            select(RoadmapTask)
+            .join(RoadmapPhase)
+            .join(Roadmap)
+            .options(
+                selectinload(RoadmapTask.phase)
+            )
+            .where(
+                RoadmapTask.id == task_id,
+                Roadmap.profile_id == profile_id,
+            )
+        )
+
+        return result.scalars().first()

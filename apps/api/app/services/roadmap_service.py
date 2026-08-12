@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.schemas.roadmap import RoadmapGenerateRequest
 from app.ai.services.roadmap_generator import RoadmapGenerator
 from app.repositories.profile_repository import ProfileRepository
 from app.repositories.roadmap_repository import RoadmapRepository
@@ -26,13 +26,14 @@ class RoadmapService:
     async def generate(
     self,
     auth_user_id,
+    data: RoadmapGenerateRequest,
     ):
         profile = await self.profile_repository.get_by_auth_user_id(auth_user_id)
 
         if not profile:
             raise ValueError("Profile not found for the given user ID.")
 
-        roadmap_data = await self.generator.generate(profile)
+        roadmap_data = await self.generator.generate(profile, data)
 
         roadmap = await self.roadmap_repository.create(
             profile=profile,
@@ -53,10 +54,11 @@ class RoadmapService:
         if profile is None:
             raise Exception("Profile not found")
 
-        return await self.roadmap_repository.get_latest(
+        roadmap = await self.roadmap_repository.get_latest(
             profile.id
         )    
-
+        return roadmap
+    
     async def get_by_id(
         self,
         roadmap_id: UUID,
@@ -81,11 +83,21 @@ class RoadmapService:
         self,
         task_id: UUID,
         completed: bool,
+        auth_user_id: UUID,
     ):
+        profile = await self.profile_repository.get_by_auth_user_id(
+            auth_user_id
+        )
 
-        task = await self.roadmap_task_repository.update_task_completion(
-            task_id,
-            completed,
+        if not profile:
+            raise HTTPException(
+                status_code=404,
+                detail="Profile not found",
+            )
+
+        task = await self.roadmap_task_repository.get_task_for_user(
+            task_id=task_id,
+            profile_id=profile.id,
         )
 
         if not task:
@@ -94,19 +106,28 @@ class RoadmapService:
                 detail="Task not found",
             )
 
+        task.completed = completed
+
+        await self.db.flush()
+
         progress = await self.roadmap_task_repository.get_roadmap_progress(
             task.phase.roadmap_id,
         )
 
-        if (
-            progress["total"] > 0
-            and progress["completed"] == progress["total"]
-        ):
+        if progress["total"] > 0:
+            if progress["completed"] == progress["total"]:
+                status = RoadmapStatus.COMPLETED
+            else:
+                status = RoadmapStatus.ACTIVE
+  
+
             await self.roadmap_repository.update_status(
                 task.phase.roadmap_id,
-                RoadmapStatus.COMPLETED,
+                status,
             )
-
+        await self.db.commit()
+        await self.db.refresh(task)
+        
         return task    
 
     async def get_all(

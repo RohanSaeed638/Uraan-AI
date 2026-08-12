@@ -1,0 +1,3 @@
+tasks should be marked complete live on frontend rather than after reloading 
+roadmap progress should be updated 
+update task completed api should be checked against different user id so that other users can not change task status of current user

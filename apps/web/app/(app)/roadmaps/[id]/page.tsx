@@ -47,18 +47,38 @@ export default async function RoadmapDetailPage({
   }
 
 
-  function calculateProgress(phases: RoadmapPhase[]) {
-    const tasks = phases.flatMap((phase) => phase.tasks);
+  // function calculateProgress(phases: RoadmapPhase[]) {
+  //   const tasks = phases.flatMap((phase) => phase.tasks);
 
-    const completed = tasks.filter(
-      (task) => task.completed
-    ).length;
+  //   const completed = tasks.filter(
+  //     (task) => task.completed
+  //   ).length;
 
-    return Math.round(
-      (completed / tasks.length) * 100
-    );
+  //   return Math.round(
+  //     (completed / tasks.length) * 100
+  //   );
+  // }
+
+  
+  function calculateProgress(
+  phases: RoadmapPhase[]
+) {
+  const tasks = phases.flatMap(
+    (phase) => phase.tasks
+  );
+
+  if (tasks.length === 0) {
+    return 0;
   }
 
+  const completed = tasks.filter(
+    (task) => task.completed
+  ).length;
+
+  return Math.round(
+    (completed / tasks.length) * 100
+  );
+}
 
   const { id } = await params;
 
@@ -82,9 +102,10 @@ export default async function RoadmapDetailPage({
           total:number,
           task:any
         ) =>
-          total + task.estimated_hours,
+          total + (task.estimated_hours ?? 0),
         0
       );
+
 
 
   return (

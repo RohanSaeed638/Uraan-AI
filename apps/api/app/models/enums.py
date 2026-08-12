@@ -1,5 +1,3 @@
-# from sqlalchemy import Enum as SQLEnum
-
 from enum import Enum
 
 class SkillLevel(str, Enum):
@@ -16,9 +14,11 @@ class LearningStyle(str, Enum):
 
 
 class RoadmapStatus(str, Enum):
-    DRAFT = "draft"
+    PENDING = "pending"
+    GENERATING = "generating"
     ACTIVE = "active"
     COMPLETED = "completed"
+    ARCHIVED = "archived"
 
 
 class LessonStatus(str, Enum):

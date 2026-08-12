@@ -7,6 +7,8 @@ class TaskOutput(BaseModel):
 
     description: str
 
+    resource_links: list[str]
+
     difficulty: str
 
     estimated_hours: int
