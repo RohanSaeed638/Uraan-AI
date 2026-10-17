@@ -2,6 +2,7 @@
 
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
+import TargetIllustration from "@/components/illustrations/TargetIllustration";
 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -20,17 +21,15 @@ export default function TargetDurationStep({
     <OnboardingCard
       title="When do you want to become job ready?"
       subtitle="Choose a realistic goal."
+      illustration={<TargetIllustration />}
     >
       <div className="space-y-8">
-
         <div className="text-center">
-          <h2 className="text-5xl font-bold text-purple-600">
+          <h2 className="text-5xl font-bold text-brand-violet">
             {data.target_duration}
           </h2>
 
-          <p className="mt-2 text-muted-foreground">
-            Months
-          </p>
+          <p className="mt-2 text-muted-foreground">Months</p>
         </div>
 
         <Slider
@@ -40,7 +39,7 @@ export default function TargetDurationStep({
           step={3}
           onValueChange={(value) =>
             updateData({
-              target_duration: value[0],
+              target_duration: Array.isArray(value) ? value[0] : value,
             })
           }
         />
@@ -49,11 +48,7 @@ export default function TargetDurationStep({
           {DURATIONS.map((duration) => (
             <Button
               key={duration}
-              variant={
-                duration === data.target_duration
-                  ? "default"
-                  : "outline"
-              }
+              variant={duration === data.target_duration ? "default" : "outline"}
               onClick={() =>
                 updateData({
                   target_duration: duration,
@@ -64,14 +59,9 @@ export default function TargetDurationStep({
             </Button>
           ))}
         </div>
-
       </div>
 
-      <NavigationButtons
-        showBack
-        onBack={previous}
-        onNext={next}
-      />
+      <NavigationButtons showBack onBack={previous} onNext={next} />
     </OnboardingCard>
   );
 }

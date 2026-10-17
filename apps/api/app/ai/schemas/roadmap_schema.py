@@ -34,3 +34,17 @@ class RoadmapOutput(BaseModel):
     description: str
 
     phases: list[PhaseOutput]
+
+class LearningUnitOutput(BaseModel):
+    day: int
+    order: int
+    type: str
+    title: str
+    description: str
+    content: str | None = None
+    resource_url: str | None = None
+    estimated_minutes: int
+
+class TaskLearningPlanOutput(BaseModel):
+    learning_units: list[LearningUnitOutput]
+      

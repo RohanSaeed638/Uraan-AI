@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4.1-mini"
 
     SUPABASE_JWT_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60

@@ -13,5 +13,10 @@ export const registerSchema = loginSchema.extend({
   message: "Passwords do not match",
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.email("Invalid email address"),
+});
+
 export type LoginForm = z.infer<typeof loginSchema>;
 export type RegisterForm = z.infer<typeof registerSchema>;
+export type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;

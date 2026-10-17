@@ -18,6 +18,7 @@ import { authService } from "@/services/auth/auth";
 
 import AuthCard from "./AuthCard";
 import AuthHeader from "./AuthHeader";
+import OAuthButtons from "./OAuthButtons";
 import PasswordInput from "@/components/shared/PasswordInput";
 import LoadingButton from "@/components/shared/LoadingButton";
 
@@ -74,72 +75,81 @@ export default function LoginForm() {
   return (
     <AuthCard>
       <AuthHeader
-        title="Welcome Back 👋"
-        subtitle="Sign in to continue your learning journey."
+        title="Welcome back!"
+        subtitle="Sign in to continue your journey."
       />
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-5"
-      >
-        <div>
-          <Label>Email</Label>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="email">Email address</Label>
 
           <Input
+            id="email"
             type="email"
             placeholder="you@example.com"
             {...register("email")}
           />
 
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-sm text-destructive">
               {errors.email.message}
             </p>
           )}
         </div>
 
-        <div>
-          <Label>Password</Label>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-brand-violet hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           <PasswordInput
-            placeholder="••••••••"
+            id="password"
+            placeholder="Enter your password"
             {...register("password")}
           />
 
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-sm text-destructive">
               {errors.password.message}
             </p>
           )}
-        </div>
-
-        <div className="flex justify-end">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-violet-600 hover:underline"
-          >
-            Forgot password?
-          </Link>
         </div>
 
         <LoadingButton
           type="submit"
           loading={loading}
           className="w-full"
+          size="lg"
         >
-          Login
+          Sign In
         </LoadingButton>
       </form>
 
-      <div className="mt-8 text-center text-sm">
-        Don't have an account?{" "}
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">
+          or continue with
+        </span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <OAuthButtons />
+
+      <p className="mt-7 text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="font-medium text-violet-600 hover:underline"
+          className="font-medium text-brand-violet hover:underline"
         >
-          Register
+          Sign up
         </Link>
-      </div>
+      </p>
     </AuthCard>
   );
 }

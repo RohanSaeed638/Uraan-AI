@@ -1,13 +1,15 @@
 from uuid import UUID
 
 from app.models.enums import RoadmapStatus
-from sqlalchemy import select
+from app.schemas import roadmap
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.roadmap import Roadmap
 from app.models.roadmap_phase import RoadmapPhase
 from app.models.roadmap_task import RoadmapTask
+from app.models.profile import Profile
 
 class RoadmapRepository:
 
@@ -111,6 +113,7 @@ class RoadmapRepository:
                 selectinload(Roadmap.phases)
 
                 .selectinload(RoadmapPhase.tasks)
+                .selectinload(RoadmapTask.learning_units)
             )
 
             .where(
@@ -136,6 +139,7 @@ class RoadmapRepository:
             .options(
             selectinload(Roadmap.phases)
             .selectinload(RoadmapPhase.tasks)
+            .selectinload(RoadmapTask.learning_units)
             )
             .where(
                 Roadmap.id == roadmap_id,
@@ -177,3 +181,108 @@ class RoadmapRepository:
         )
 
         return result.scalars().all()        
+
+    async def get_roadmap_for_progress(
+        self,
+        db: AsyncSession,
+        roadmap_id: UUID,
+        user_id: UUID,
+    ) -> Roadmap | None:
+
+        stmt = (
+            select(Roadmap)
+            .where(
+                Roadmap.id == roadmap_id,
+                Roadmap.user_id == user_id,
+            )
+            .options(
+                selectinload(Roadmap.phases)
+                .selectinload(RoadmapPhase.tasks)
+                .selectinload(RoadmapTask.learning_units)
+            )
+        )
+
+        result = await db.execute(stmt)
+
+        return result.scalar_one_or_none()
+
+    async def get_owned_roadmap(
+        db: AsyncSession,
+        user_id: UUID,
+        roadmap_id: UUID,
+    ):
+        stmt = select(Roadmap).where(
+            Roadmap.id == roadmap_id,
+            Roadmap.user_id == user_id,
+        )
+
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def lock_profile(self, profile_id: UUID) -> None:
+        stmt = (
+            select(Profile.id)
+            .where(Profile.id == profile_id)
+            .with_for_update()
+        )
+
+        await self.db.execute(stmt)
+
+    async def get_by_id_for_profile(
+        self,
+        roadmap_id: UUID,
+        profile_id: UUID,
+    ) -> Roadmap | None:
+
+        stmt = (
+            select(Roadmap)
+            .where(
+                Roadmap.id == roadmap_id,
+                Roadmap.profile_id == profile_id,
+            )
+        )
+
+        result = await self.db.execute(stmt)
+
+        return result.scalar_one_or_none()    
+
+    async def archive_active_roadmaps(
+        self,
+        profile_id: UUID,
+    ) -> None:
+
+        stmt = (
+            update(Roadmap)
+            .where(
+                Roadmap.profile_id == profile_id,
+                Roadmap.status == RoadmapStatus.ACTIVE,
+            )
+            .values(status=RoadmapStatus.ARCHIVED)
+            .execution_options(synchronize_session="fetch")
+        )
+
+        await self.db.execute(stmt)
+
+    async def get_active_for_profile(
+        self,
+        profile_id: UUID,
+    ) -> Roadmap | None:
+
+        stmt = (
+            select(Roadmap)
+            .where(
+                Roadmap.profile_id == profile_id,
+                Roadmap.status == RoadmapStatus.ACTIVE,
+            )
+        )
+
+        result = await self.db.execute(stmt)
+
+        return result.scalar_one_or_none()    
+
+    async def delete_roadmap(
+        self,
+        roadmap: Roadmap,
+    ) -> None:
+        await self.db.delete(roadmap)
+        await self.db.flush()

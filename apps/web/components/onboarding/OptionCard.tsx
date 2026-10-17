@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OptionCardProps {
@@ -23,27 +24,36 @@ export default function OptionCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "w-full rounded-xl border p-5 transition-all text-left",
-        "hover:shadow-lg hover:-translate-y-1",
+        "relative w-full rounded-2xl border p-5 text-left transition-all",
+        "hover:-translate-y-0.5 hover:shadow-md",
         selected
-          ? "border-purple-600 bg-purple-50 ring-2 ring-purple-400"
-          : "border-gray-200 bg-white"
+          ? "border-brand-violet bg-brand-violet/10 ring-2 ring-brand-violet/40"
+          : "border-border bg-card"
       )}
     >
+      {selected && (
+        <span className="absolute right-4 top-4 flex size-5 items-center justify-center rounded-full bg-brand-violet text-white">
+          <Check size={12} strokeWidth={3} />
+        </span>
+      )}
+
       {icon && (
-        <div className="mb-4 text-purple-600">
+        <div
+          className={cn(
+            "mb-4 flex size-10 items-center justify-center rounded-xl",
+            selected
+              ? "bg-brand-violet text-white"
+              : "bg-brand-violet/10 text-brand-violet"
+          )}
+        >
           {icon}
         </div>
       )}
 
-      <h3 className="font-semibold text-lg">
-        {title}
-      </h3>
+      <h3 className="pr-6 font-semibold">{title}</h3>
 
       {description && (
-        <p className="mt-2 text-sm text-gray-500">
-          {description}
-        </p>
+        <p className="mt-1.5 text-sm text-muted-foreground">{description}</p>
       )}
     </button>
   );

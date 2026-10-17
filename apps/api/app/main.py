@@ -2,8 +2,17 @@ from fastapi import FastAPI
 from app.api.routes.auth import router as auth_router
 from app.api.routes.profile import router as profile_router
 from app.api.routes.roadmap import router as roadmap_router
+from app.api.routes.task import router as task_router
+from app.api.routes.learning_unit import router as learning_unit_router
+from app.api.routes.dashboard import router as dashboard_router
+from app.api.routes.learning import router as learning_router
+from app.api.routes.progress import router as progress_router
+from app.api.routes.projects import router as projects_router
+from app.api.routes.quizzes import router as quizzes_router
+from app.api.routes.settings import router as settings_router
 from app.core.exceptions import global_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(title="Uraan AI")
 
@@ -22,6 +31,14 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(roadmap_router)
+app.include_router(task_router)
+app.include_router(learning_unit_router)
+app.include_router(dashboard_router)
+app.include_router(learning_router)
+app.include_router(progress_router)
+app.include_router(projects_router)
+app.include_router(quizzes_router)
+app.include_router(settings_router)
 app.add_exception_handler(
     Exception,
     global_exception_handler

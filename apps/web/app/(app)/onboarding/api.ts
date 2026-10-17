@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 
-import { OnboardingForm } from "./schema";
+import { OnboardingForm } from "./types";
 
 export async function updateProfile(
   body: OnboardingForm

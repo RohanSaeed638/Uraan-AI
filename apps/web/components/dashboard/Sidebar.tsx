@@ -1,77 +1,72 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  Home,
-  Target,
-  Calendar,
-  Briefcase,
-  Bot,
-  User,
+  BookOpen,
+  CheckSquare,
+  FolderKanban,
+  LayoutGrid,
   Settings,
+  Sparkles,
+  Target,
+  TrendingUp,
+  User,
 } from "lucide-react";
 
+import Logo from "@/components/shared/Logo";
+import { cn } from "@/lib/utils";
+
 const items = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Roadmaps",
-    href: "/roadmaps",
-    icon: Target,
-  },
-  {
-    title: "Careers",
-    href: "/careers",
-    icon: Briefcase,
-  },
-  {
-    title: "Schedule",
-    href: "/schedule",
-    icon: Calendar,
-  },
-  {
-    title: "AI Mentor",
-    href: "/mentor",
-    icon: Bot,
-  },
-  {
-    title: "Profile",
-    href: "/profile",
-    icon: User,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
+  { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+  { title: "My Roadmaps", href: "/roadmaps", icon: Target },
+  { title: "Learning", href: "/learning", icon: BookOpen },
+  { title: "Tasks", href: "/tasks", icon: CheckSquare },
+  { title: "Projects", href: "/projects", icon: FolderKanban },
+  { title: "Progress", href: "/progress", icon: TrendingUp },
+  { title: "Profile", href: "/profile", icon: User },
+  { title: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
-    <aside className="sticky top-0 h-screen w-72 shrink-0 border-r bg-card p-6">
-      <h1 className="text-2xl font-bold text-violet-600">
-        {/* <Image src="/logo-whitebg.png" alt="Uraan AI" width={32} height={32} className="w-32 h-32" /> */}
-        <a href="/">
-          <img src="/logo-whitebg.png" alt="Uraan AI" width={64} height={42} className="w-64 h-42" />
-        </a>
-      </h1>
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-5">
+      <div className="px-2 py-2">
+        <Logo variant="full" size={28} />
+      </div>
 
-      <nav className="mt-10 space-y-2">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="flex items-center gap-3 rounded-lg p-3 hover:bg-muted transition"
-          >
-            <item.icon size={18} />
+      <nav className="mt-8 flex flex-col gap-1">
+        {items.map((item) => {
+          const active =
+            pathname === item.href || pathname.startsWith(item.href + "/");
 
-            {item.title}
-          </Link>
-        ))}
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition",
+                active
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <item.icon size={18} strokeWidth={2} />
+              {item.title}
+            </Link>
+          );
+        })}
       </nav>
+
+      <div className="mt-auto rounded-2xl bg-gradient-to-br from-brand-violet to-indigo-900 p-4 text-white">
+        <Sparkles size={18} className="text-brand-gold-light" />
+        <p className="mt-2 text-sm font-semibold">Upgrade to Pro</p>
+        <p className="mt-1 text-xs text-white/70">
+          Unlock advanced roadmaps and AI features.
+        </p>
+      </div>
     </aside>
   );
 }

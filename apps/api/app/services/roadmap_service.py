@@ -7,6 +7,7 @@ from app.repositories.profile_repository import ProfileRepository
 from app.repositories.roadmap_repository import RoadmapRepository
 from app.models.enums import RoadmapStatus
 from app.repositories.roadmap_task_repository import RoadmapTaskRepository
+from app.schemas.roadmap import RoadmapActivateResponse
 
 class RoadmapService:
 
@@ -180,3 +181,139 @@ class RoadmapService:
             )
 
         return summaries
+
+    async def activate_roadmap(
+        self,
+        roadmap_id: UUID,
+        auth_user_id: UUID,
+    ) -> RoadmapActivateResponse:
+
+        profile = await (
+            self.profile_repository
+            .get_by_auth_user_id(auth_user_id)
+        )
+
+        if not profile:
+            raise HTTPException(
+                status_code=404,
+                detail="Profile not found",
+            )
+
+        try:
+            # Prevent concurrent activation requests for this profile.
+            await self.roadmap_repository.lock_profile(
+                profile_id=profile.id,
+            )
+
+            # Validate ownership.
+            roadmap = await (
+                self.roadmap_repository
+                .get_by_id_for_profile(
+                    roadmap_id=roadmap_id,
+                    profile_id=profile.id,
+                )
+            )
+
+            if not roadmap:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Roadmap not found",
+                )
+
+            # Only archived and active roadmaps are eligible.
+            if roadmap.status not in (
+                RoadmapStatus.ARCHIVED,
+                RoadmapStatus.ACTIVE,
+            ):
+                raise HTTPException(
+                    status_code=409,
+                    detail=(
+                        f"Cannot activate a roadmap with "
+                        f"status '{roadmap.status.value}'"
+                    ),
+                )
+
+            # Idempotent: activating an already active roadmap
+            # doesn't change its status.
+            if roadmap.status == RoadmapStatus.ACTIVE:
+                return RoadmapActivateResponse(
+                    id=roadmap.id,
+                    title=roadmap.title,
+                    status=roadmap.status,
+                    message="Roadmap is already active",
+                )
+
+            # Archive the previous active roadmap.
+            await (
+                self.roadmap_repository
+                .archive_active_roadmaps(
+                    profile_id=profile.id,
+                )
+            )
+
+            # Activate the selected roadmap.
+            roadmap.status = RoadmapStatus.ACTIVE
+
+            await self.db.flush()
+            await self.db.commit()
+            await self.db.refresh(roadmap)
+
+            return RoadmapActivateResponse(
+                id=roadmap.id,
+                title=roadmap.title,
+                status=roadmap.status,
+                message="Roadmap activated successfully",
+            )
+
+        except Exception:
+            await self.db.rollback()
+            raise
+
+    async def delete_roadmap(
+        self,
+        roadmap_id: UUID,
+        auth_user_id: UUID,
+    ) -> None:
+
+        profile = await (
+            self.profile_repository
+            .get_by_auth_user_id(auth_user_id)
+        )
+
+        if not profile:
+            raise HTTPException(
+                status_code=404,
+                detail="Profile not found",
+            )
+
+        try:
+            # Serialize roadmap-management operations.
+            await self.roadmap_repository.lock_profile(
+                profile_id=profile.id,
+            )
+
+            # Validate ownership.
+            roadmap = await (
+                self.roadmap_repository
+                .get_by_id_for_profile(
+                    roadmap_id=roadmap_id,
+                    profile_id=profile.id,
+                )
+            )
+
+            if not roadmap:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Roadmap not found",
+                )
+
+            # ORM/database cascades must cover dependent records.
+            await self.roadmap_repository.delete_roadmap(
+                roadmap
+            )
+
+            await self.db.commit()
+
+        except Exception:
+            await self.db.rollback()
+            raise    

@@ -24,7 +24,7 @@ export default function DailyHoursStep({
       <div className="space-y-8">
 
         <div className="text-center">
-          <h2 className="text-5xl font-bold text-purple-600">
+          <h2 className="text-5xl font-bold text-brand-violet">
             {data.daily_hours}h
           </h2>
 
@@ -40,7 +40,7 @@ export default function DailyHoursStep({
           step={1}
           onValueChange={(value) =>
             updateData({
-              daily_hours: value[0],
+              daily_hours: Array.isArray(value) ? value[0] : value,
             })
           }
         />

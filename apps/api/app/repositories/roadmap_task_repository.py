@@ -33,7 +33,8 @@ class RoadmapTaskRepository:
         result = await self.db.execute(
             select(RoadmapTask)
             .options(
-                selectinload(RoadmapTask.phase)
+                selectinload(RoadmapTask.phase),
+                selectinload(RoadmapTask.learning_units),
             )
             .where(RoadmapTask.id == task_id)
         )
@@ -49,7 +50,8 @@ class RoadmapTaskRepository:
         result = await self.db.execute(
             select(RoadmapTask)
             .options(
-                selectinload(RoadmapTask.phase)
+                selectinload(RoadmapTask.phase),
+                selectinload(RoadmapTask.learning_units),
             )
             .where(
                 RoadmapTask.id == task_id
@@ -104,7 +106,8 @@ class RoadmapTaskRepository:
             .join(RoadmapPhase)
             .join(Roadmap)
             .options(
-                selectinload(RoadmapTask.phase)
+                selectinload(RoadmapTask.phase),
+                selectinload(RoadmapTask.learning_units),
             )
             .where(
                 RoadmapTask.id == task_id,

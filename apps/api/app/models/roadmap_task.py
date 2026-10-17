@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base_model import BaseModel
-
+from .resource import Resource
 
 class RoadmapTask(BaseModel):
     __tablename__ = "roadmap_tasks"
@@ -51,3 +51,16 @@ class RoadmapTask(BaseModel):
         "RoadmapPhase",
         back_populates="tasks",
     )
+
+    learning_units = relationship(
+        "TaskLearningUnit",
+        back_populates="task",
+        cascade="all, delete-orphan",
+        order_by="TaskLearningUnit.order",
+    )
+
+    resources: Mapped[list["Resource"]] = relationship(
+    "Resource",
+    back_populates="task",
+    cascade="all, delete-orphan",
+)

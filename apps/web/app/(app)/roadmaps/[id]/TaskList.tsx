@@ -1,209 +1,3 @@
-// "use client";
-
-// import { useState } from "react";
-// import { ChevronDown } from "lucide-react";
-
-// import { TaskCard } from "./TaskCard";
-// import { api } from "@/lib/api/client";
-
-// import {
-//   Roadmap,
-//   RoadmapPhase,
-//   RoadmapTask,
-// } from "@/types/roadmap";
-
-// interface TaskListProps {
-//   roadmap: Roadmap;
-//   onRoadmapChange?: (roadmap: Roadmap) => void;
-// }
-
-// export default function TaskList({
-//   roadmap,
-//   onRoadmapChange,
-// }: TaskListProps) {
-//   const [updatingTaskId, setUpdatingTaskId] =
-//     useState<string | null>(null);
-
-//   function calculatePhaseProgress(
-//     phase: RoadmapPhase
-//   ) {
-//     if (phase.tasks.length === 0) {
-//       return 0;
-//     }
-
-//     const completed = phase.tasks.filter(
-//       (task) => task.completed
-//     ).length;
-
-//     return Math.round(
-//       (completed / phase.tasks.length) * 100
-//     );
-//   }
-
-//   async function updateTask(
-//     taskId: string,
-//     completed: boolean
-//   ) {
-//     if (updatingTaskId) {
-//       return;
-//     }
-
-//     const previousRoadmap = roadmap;
-
-//     // Optimistic update
-//     const updatedRoadmap: Roadmap = {
-//       ...roadmap,
-
-//       phases: roadmap.phases.map(
-//         (phase: RoadmapPhase) => ({
-//           ...phase,
-
-//           tasks: phase.tasks.map(
-//             (task: RoadmapTask) =>
-//               task.id === taskId
-//                 ? {
-//                     ...task,
-//                     completed,
-//                   }
-//                 : task
-//           ),
-//         })
-//       ),
-//     };
-
-//     // Immediately update parent
-//     onRoadmapChange?.(updatedRoadmap);
-
-//     try {
-//       setUpdatingTaskId(taskId);
-
-//       await api.patch(
-//         `/roadmaps/tasks/${taskId}`,
-//         {
-//           completed,
-//         }
-//       );
-//     } catch (error) {
-//       console.error(
-//         "Failed to update task:",
-//         error
-//       );
-
-//       // Rollback
-//       onRoadmapChange?.(previousRoadmap);
-//     } finally {
-//       setUpdatingTaskId(null);
-//     }
-//   }
-
-//   return (
-//     <section className="mt-10 space-y-5">
-//       {roadmap.phases.map(
-//         (phase: RoadmapPhase) => {
-//           const phaseProgress =
-//             calculatePhaseProgress(phase);
-
-//           const completedTasks =
-//             phase.tasks.filter(
-//               (task) => task.completed
-//             ).length;
-
-//           return (
-//             <details
-//               key={phase.id}
-//               className="group rounded-xl border bg-card"
-//             >
-//               <summary
-//                 className="
-//                   flex
-//                   cursor-pointer
-//                   list-none
-//                   items-center
-//                   justify-between
-//                   gap-6
-//                   p-6
-//                 "
-//               >
-//                 <div className="min-w-0 flex-1">
-//                   <div className="flex items-center justify-between gap-4">
-//                     <h2 className="text-xl font-semibold">
-//                       {phase.title}
-//                     </h2>
-
-//                     <span className="text-sm font-medium text-muted-foreground">
-//                       {completedTasks}/
-//                       {phase.tasks.length}
-//                     </span>
-//                   </div>
-
-//                   <p className="mt-2 text-sm text-muted-foreground">
-//                     {phase.description}
-//                   </p>
-
-//                   {/* Phase progress */}
-//                   <div className="mt-4">
-//                     <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-//                       <span>
-//                         Phase progress
-//                       </span>
-
-//                       <span>
-//                         {phaseProgress}%
-//                       </span>
-//                     </div>
-
-//                     <div className="h-2 overflow-hidden rounded-full bg-muted">
-//                       <div
-//                         className="
-//                           h-full
-//                           rounded-full
-//                           bg-primary
-//                           transition-all
-//                           duration-300
-//                         "
-//                         style={{
-//                           width: `${phaseProgress}%`,
-//                         }}
-//                       />
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 <ChevronDown
-//                   className="
-//                     h-5
-//                     w-5
-//                     shrink-0
-//                     transition-transform
-//                     group-open:rotate-180
-//                   "
-//                 />
-//               </summary>
-
-//               <div className="border-t p-6">
-//                 <div className="space-y-4">
-//                   {phase.tasks.map(
-//                     (task: RoadmapTask) => (
-//                       <TaskCard
-//                         key={task.id}
-//                         task={task}
-//                         loading={
-//                           updatingTaskId === task.id
-//                         }
-//                         onToggle={updateTask}
-//                       />
-//                     )
-//                   )}
-//                 </div>
-//               </div>
-//             </details>
-//           );
-//         }
-//       )}
-//     </section>
-//   );
-// }
-
 "use client";
 
 import { useState } from "react";
@@ -213,6 +7,8 @@ import { TaskCard } from "./TaskCard";
 import TaskDetailsDialog from "./TaskDetailsDialog";
 
 import { api } from "@/lib/api/client";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 import {
   Roadmap,
@@ -471,205 +267,85 @@ export default function TaskList({
       {/* Roadmap Phases */}
       {/* ============================= */}
 
-      <section className="mt-10 space-y-5">
-        {roadmap.phases.map(
-          (phase: RoadmapPhase) => {
-            const phaseProgress =
-              calculatePhaseProgress(
-                phase
-              );
+      <section className="mt-8 space-y-4">
+        {roadmap.phases.map((phase: RoadmapPhase, index: number) => {
+          const phaseProgress = calculatePhaseProgress(phase);
 
-            const completedTasks =
-              phase.tasks.filter(
-                (task) =>
-                  task.completed
-              ).length;
+          const completedTasks = phase.tasks.filter(
+            (task) => task.completed
+          ).length;
 
-            return (
-              <details
-                key={phase.id}
-                className="
-                  group
-                  rounded-xl
-                  border
-                  bg-card
-                "
-              >
-                {/* ============================= */}
-                {/* Phase Header */}
-                {/* ============================= */}
+          return (
+            <details
+              key={phase.id}
+              className="group overflow-hidden rounded-3xl border border-border bg-card"
+              open={index === 0}
+            >
+              {/* ============================= */}
+              {/* Phase Header */}
+              {/* ============================= */}
 
-                <summary
-                  className="
-                    flex
-                    cursor-pointer
-                    list-none
-                    items-center
-                    justify-between
-                    gap-6
-                    p-6
-                  "
+              <summary className="flex cursor-pointer list-none items-center gap-4 p-5 sm:p-6">
+                <span
+                  className={cn(
+                    "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+                    phaseProgress === 100
+                      ? "bg-emerald-500/15 text-emerald-500"
+                      : "bg-brand-violet/10 text-brand-violet"
+                  )}
                 >
-                  <div
-                    className="
-                      min-w-0
-                      flex-1
-                    "
-                  >
-                    {/* Title + task count */}
+                  {index + 1}
+                </span>
 
-                    <div
-                      className="
-                        flex
-                        items-center
-                        justify-between
-                        gap-4
-                      "
-                    >
-                      <h2
-                        className="
-                          text-xl
-                          font-semibold
-                        "
-                      >
-                        {phase.title}
-                      </h2>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-4">
+                    <h2 className="font-heading text-base font-semibold sm:text-lg">
+                      {phase.title}
+                    </h2>
 
-                      <span
-                        className="
-                          shrink-0
-                          text-sm
-                          font-medium
-                          text-muted-foreground
-                        "
-                      >
-                        {completedTasks}/
-                        {phase.tasks.length}
-                      </span>
-                    </div>
-
-                    {/* Phase description */}
-
-                    <p
-                      className="
-                        mt-2
-                        text-sm
-                        text-muted-foreground
-                      "
-                    >
-                      {phase.description}
-                    </p>
-
-                    {/* ============================= */}
-                    {/* Phase Progress */}
-                    {/* ============================= */}
-
-                    <div className="mt-4">
-                      <div
-                        className="
-                          mb-1
-                          flex
-                          justify-between
-                          text-xs
-                          text-muted-foreground
-                        "
-                      >
-                        <span>
-                          Phase progress
-                        </span>
-
-                        <span>
-                          {phaseProgress}%
-                        </span>
-                      </div>
-
-                      <div
-                        className="
-                          h-2
-                          overflow-hidden
-                          rounded-full
-                          bg-muted
-                        "
-                      >
-                        <div
-                          className="
-                            h-full
-                            rounded-full
-                            bg-primary
-                            transition-all
-                            duration-300
-                          "
-                          style={{
-                            width: `${phaseProgress}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
+                    <span className="shrink-0 text-sm font-medium text-muted-foreground">
+                      {completedTasks}/{phase.tasks.length}
+                    </span>
                   </div>
 
-                  {/* Expand/collapse icon */}
+                  <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
+                    {phase.description}
+                  </p>
 
-                  <ChevronDown
-                    className="
-                      h-5
-                      w-5
-                      shrink-0
-                      transition-transform
-                      duration-200
-                      group-open:rotate-180
-                    "
-                  />
-                </summary>
-
-                {/* ============================= */}
-                {/* Tasks */}
-                {/* ============================= */}
-
-                <div
-                  className="
-                    border-t
-                    p-6
-                  "
-                >
-                  {phase.tasks.length === 0 ? (
-                    <p
-                      className="
-                        text-sm
-                        text-muted-foreground
-                      "
-                    >
-                      No tasks available for
-                      this phase.
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {phase.tasks.map(
-                        (
-                          task: RoadmapTask
-                        ) => (
-                          <TaskCard
-                            key={task.id}
-                            task={task}
-                            loading={
-                              updatingTaskId ===
-                              task.id
-                            }
-                            onToggle={
-                              updateTask
-                            }
-                            onOpen={
-                              handleOpenTask
-                            }
-                          />
-                        )
-                      )}
-                    </div>
-                  )}
+                  <div className="mt-3">
+                    <Progress value={phaseProgress} className="h-1.5" />
+                  </div>
                 </div>
-              </details>
-            );
-          }
-        )}
+
+                <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+
+              {/* ============================= */}
+              {/* Tasks */}
+              {/* ============================= */}
+
+              <div className="border-t border-border p-5 sm:p-6">
+                {phase.tasks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No tasks available for this phase.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {phase.tasks.map((task: RoadmapTask) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        loading={updatingTaskId === task.id}
+                        onToggle={updateTask}
+                        onOpen={handleOpenTask}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </details>
+          );
+        })}
       </section>
 
       {/* ============================= */}
@@ -677,11 +353,10 @@ export default function TaskList({
       {/* ============================= */}
 
       <TaskDetailsDialog
+        roadmapId={roadmap.id}
         task={selectedTask}
         open={taskDialogOpen}
-        onOpenChange={
-          handleTaskDialogChange
-        }
+        onOpenChange={handleTaskDialogChange}
         onToggle={updateTask}
       />
     </>

@@ -2,73 +2,55 @@
 
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
+import WelcomeBirdIllustration from "@/components/illustrations/WelcomeBirdIllustration";
 import { StepProps } from "../types";
-import { Rocket, Target, Calendar, Brain } from "lucide-react";
+import { Rocket, Target, Calendar, Brain, LucideIcon } from "lucide-react";
 
-export default function WelcomeStep({
-  next,
-}: StepProps) {
+const features: { icon: LucideIcon; title: string; description: string }[] = [
+  {
+    icon: Rocket,
+    title: "Personalized Roadmap",
+    description: "Tailored for your goals.",
+  },
+  {
+    icon: Calendar,
+    title: "Daily Schedule",
+    description: "Learn consistently every day.",
+  },
+  {
+    icon: Brain,
+    title: "AI Powered",
+    description: "Dynamic learning path.",
+  },
+  {
+    icon: Target,
+    title: "Job Ready",
+    description: "Real projects and interview prep.",
+  },
+];
+
+export default function WelcomeStep({ next }: StepProps) {
   return (
     <OnboardingCard
       title="Welcome to Uraan AI 🚀"
       subtitle="Let's create your personalized career roadmap."
+      illustration={<WelcomeBirdIllustration />}
     >
-      <div className="grid gap-6">
-
-        <div className="flex items-center gap-4">
-          <Rocket className="text-purple-600" />
-          <div>
-            <h3 className="font-semibold">
-              Personalized Roadmap
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Tailored for your goals.
-            </p>
+      <div className="grid gap-5 sm:grid-cols-2">
+        {features.map(({ icon: Icon, title, description }) => (
+          <div key={title} className="flex items-center gap-4">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-violet/10 text-brand-violet">
+              <Icon size={20} />
+            </span>
+            <div>
+              <h3 className="font-semibold">{title}</h3>
+              <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
           </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Calendar className="text-purple-600" />
-          <div>
-            <h3 className="font-semibold">
-              Daily Schedule
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Learn consistently every day.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Brain className="text-purple-600" />
-          <div>
-            <h3 className="font-semibold">
-              AI Powered
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Dynamic learning path.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Target className="text-purple-600" />
-          <div>
-            <h3 className="font-semibold">
-              Job Ready
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Real projects and interview prep.
-            </p>
-          </div>
-        </div>
-
+        ))}
       </div>
 
-      <NavigationButtons
-        onNext={next}
-        nextLabel="Let's Begin"
-      />
+      <NavigationButtons onNext={next} nextLabel="Let's Begin" />
     </OnboardingCard>
   );
 }

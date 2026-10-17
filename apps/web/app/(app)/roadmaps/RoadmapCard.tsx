@@ -12,46 +12,36 @@ import {
 } from "@/components/ui/card";
 
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 interface Props {
   roadmap: RoadmapSummary;
 }
 
-export default function RoadmapCard({
-  roadmap,
-}: Props) {
+const statusStyles: Record<string, string> = {
+  active: "bg-emerald-500/15 text-emerald-500",
+  completed: "bg-brand-violet/15 text-brand-violet",
+  paused: "bg-muted text-muted-foreground",
+};
+
+export default function RoadmapCard({ roadmap }: Props) {
   return (
-    <Card>
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader>
-
-        <div className="flex items-center justify-between">
-
-          <CardTitle>
-            {roadmap.title}
-          </CardTitle>
-
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="line-clamp-1">{roadmap.title}</CardTitle>
           <span
-            className="
-              rounded-full
-              bg-primary/10
-              px-3
-              py-1
-              text-xs
-              font-medium
-              text-primary
-            "
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize ${
+              statusStyles[roadmap.status] ?? "bg-muted text-muted-foreground"
+            }`}
           >
             {roadmap.status}
           </span>
-
         </div>
-
       </CardHeader>
 
       <CardContent className="space-y-5">
-
-        <p className="text-sm text-muted-foreground">
+        <p className="line-clamp-2 text-sm text-muted-foreground">
           {roadmap.description}
         </p>
 
@@ -61,36 +51,22 @@ export default function RoadmapCard({
           <span>
             {roadmap.completed_tasks} / {roadmap.total_tasks} Tasks
           </span>
-
-          <span>
-            {roadmap.progress}%
-          </span>
+          <span>{roadmap.progress}%</span>
         </div>
 
         <div className="flex items-center justify-between">
-
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock size={16} />
-            Updated{" "}
-            {new Date(
-              roadmap.updated_at
-            ).toLocaleDateString()}
+            <Clock size={14} />
+            Updated {new Date(roadmap.updated_at).toLocaleDateString()}
           </div>
 
-          <Button>
-
-            <Link
-              href={`/roadmaps/${roadmap.id}`}
-              className="flex items-center gap-2"
-            >
-              <span>Continue </span>
-              <ArrowRight className="ml-2 h-4 w-4"/>
-            </Link>
-
-          </Button>
-
+          <Link
+            href={`/roadmaps/${roadmap.id}`}
+            className={buttonVariants({ className: "gap-1.5" })}
+          >
+            Continue <ArrowRight size={15} />
+          </Link>
         </div>
-
       </CardContent>
     </Card>
   );

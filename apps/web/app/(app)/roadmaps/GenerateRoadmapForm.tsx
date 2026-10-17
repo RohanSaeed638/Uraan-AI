@@ -470,18 +470,14 @@ export default function GenerateRoadmapForm({
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value={LearningStyle.VIDEO}>
-              Video-based
-            </SelectItem>
             <SelectItem value={LearningStyle.READING}>
-              Reading-based
+              Reading only
             </SelectItem>
-            <SelectItem value={LearningStyle.PROJECT}>
-              Project-based
+            <SelectItem value={LearningStyle.READING_VIDEO}>
+              Reading + Video
             </SelectItem>
-
-            <SelectItem value={LearningStyle.MIXED}>
-              Mix of theory and practice
+            <SelectItem value={LearningStyle.READING_VIDEO_PROJECT}>
+              Reading + Video + Projects
             </SelectItem>
           </SelectContent>
         </Select>

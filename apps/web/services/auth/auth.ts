@@ -59,6 +59,27 @@ export class AuthService {
     });
   }
 
+  async loginWithOAuth(provider: "google" | "github") {
+    return await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  }
+
+  async resetPassword(email: string) {
+    return await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+  }
+
+  async updateFullName(fullName: string) {
+    return await supabase.auth.updateUser({
+      data: { full_name: fullName },
+    });
+  }
+
   async logout() {
     await supabase.auth.signOut();
   }

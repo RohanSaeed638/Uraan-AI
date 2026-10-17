@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Clock,
-  BookOpen,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Clock, BookOpen, Target } from "lucide-react";
 
 import TaskList from "./TaskList";
+import { Card } from "@/components/ui/card";
+import ProgressRing from "@/components/shared/ProgressRing";
 
 import { Roadmap } from "@/types/roadmap";
 
@@ -14,142 +14,108 @@ interface RoadmapDetailClientProps {
   roadmap: Roadmap;
 }
 
+const statusStyles: Record<string, string> = {
+  active: "bg-emerald-500/15 text-emerald-500",
+  completed: "bg-brand-violet/15 text-brand-violet",
+  paused: "bg-muted text-muted-foreground",
+};
+
 export default function RoadmapDetailClient({
   roadmap: initialRoadmap,
 }: RoadmapDetailClientProps) {
-  const [roadmap, setRoadmap] =
-    useState<Roadmap>(initialRoadmap);
+  const [roadmap, setRoadmap] = useState<Roadmap>(initialRoadmap);
 
   function calculateProgress(roadmap: Roadmap) {
-    const tasks = roadmap.phases.flatMap(
-      (phase) => phase.tasks
-    );
-
-    if (tasks.length === 0) {
-      return 0;
-    }
-
-    const completed = tasks.filter(
-      (task) => task.completed
-    ).length;
-
-    return Math.round(
-      (completed / tasks.length) * 100
-    );
+    const tasks = roadmap.phases.flatMap((phase) => phase.tasks);
+    if (tasks.length === 0) return 0;
+    const completed = tasks.filter((task) => task.completed).length;
+    return Math.round((completed / tasks.length) * 100);
   }
 
   const progress = calculateProgress(roadmap);
 
   const totalHours = roadmap.phases
     .flatMap((phase) => phase.tasks)
-    .reduce(
-      (total, task) =>
-        total + (task.estimated_hours ?? 0),
-      0
-    );
+    .reduce((total, task) => total + (task.estimated_hours ?? 0), 0);
 
-  function handleRoadmapChange(
-    updatedRoadmap: Roadmap
-  ) {
+  function handleRoadmapChange(updatedRoadmap: Roadmap) {
     setRoadmap(updatedRoadmap);
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
-      {/* Header */}
-      <section className="rounded-xl border bg-card p-8">
-        <div className="flex items-start justify-between gap-5">
-          <div className="min-w-0">
-            <h1 className="text-3xl font-bold">
-              {roadmap.title}
-            </h1>
+    <div>
+      <Link
+        href="/roadmaps"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft size={14} /> Back to Roadmaps
+      </Link>
 
-            <p className="mt-4 leading-7 text-muted-foreground">
+      {/* Header */}
+      <Card>
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-heading text-2xl font-bold sm:text-3xl">
+                {roadmap.title}
+              </h1>
+              <span
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize ${
+                  statusStyles[roadmap.status] ??
+                  "bg-muted text-muted-foreground"
+                }`}
+              >
+                {roadmap.status}
+              </span>
+            </div>
+            <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
               {roadmap.description}
             </p>
           </div>
 
-          <span
-            className="
-              shrink-0
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-sm
-              font-medium
-              text-green-700
-            "
-          >
-            {roadmap.status}
-          </span>
+          <ProgressRing value={progress} size={96} />
         </div>
 
         {/* Stats */}
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground">
-              Completion
-            </p>
-
-            <p className="mt-2 text-2xl font-bold">
-              {progress}%
-            </p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-brand-violet/10">
+              <Target size={18} className="text-brand-violet" />
+            </span>
+            <div>
+              <p className="text-lg font-bold leading-none">{progress}%</p>
+              <p className="mt-1 text-xs text-muted-foreground">Completion</p>
+            </div>
           </div>
 
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground">
-              Total Learning Hours
-            </p>
-
-            <p className="mt-2 flex items-center gap-2 text-2xl font-bold">
-              <Clock size={22} />
-              {totalHours}h
-            </p>
+          <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-brand-gold/15">
+              <Clock size={18} className="text-brand-gold" />
+            </span>
+            <div>
+              <p className="text-lg font-bold leading-none">{totalHours}h</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Total learning hours
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground">
-              Phases
-            </p>
-
-            <p className="mt-2 flex items-center gap-2 text-2xl font-bold">
-              <BookOpen size={22} />
-              {roadmap.phases.length}
-            </p>
-          </div>
-        </div>
-
-        {/* Overall Progress */}
-        <div className="mt-8">
-          <div className="mb-2 flex justify-between text-sm">
-            <span>Overall progress</span>
-
-            <span>{progress}%</span>
-          </div>
-
-          <div className="h-3 overflow-hidden rounded-full bg-muted">
-            <div
-              className="
-                h-full
-                rounded-full
-                bg-primary
-                transition-all
-                duration-300
-              "
-              style={{
-                width: `${progress}%`,
-              }}
-            />
+          <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-sky-500/10">
+              <BookOpen size={18} className="text-sky-500" />
+            </span>
+            <div>
+              <p className="text-lg font-bold leading-none">
+                {roadmap.phases.length}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">Phases</p>
+            </div>
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* Tasks */}
-      <TaskList
-        roadmap={roadmap}
-        onRoadmapChange={handleRoadmapChange}
-      />
+      <TaskList roadmap={roadmap} onRoadmapChange={handleRoadmapChange} />
     </div>
   );
 }

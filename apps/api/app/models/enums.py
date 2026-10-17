@@ -7,10 +7,9 @@ class SkillLevel(str, Enum):
 
 
 class LearningStyle(str, Enum):
-    VIDEO = "video"
     READING = "reading"
-    PROJECT = "project"
-    MIXED = "mixed"
+    READING_VIDEO = "reading_video"
+    READING_VIDEO_PROJECT = "reading_video_project"
 
 
 class RoadmapStatus(str, Enum):

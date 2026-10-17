@@ -2,8 +2,9 @@ from datetime import datetime
 from uuid import UUID
 
 from app.models.enums import LearningStyle, RoadmapStatus, SkillLevel, CareerStage
-from pydantic import BaseModel, Field
-
+from app.schemas.task import LearningUnitResponse
+from pydantic import BaseModel, Field, ConfigDict
+from app.models.task_learning_unit import LearningUnitType
 
 class TaskResponse(BaseModel):
     id: UUID
@@ -14,7 +15,8 @@ class TaskResponse(BaseModel):
     estimated_hours: int | None
     order: int
     completed: bool
-
+    learning_units: list[LearningUnitResponse] = []
+    
     class Config:
         from_attributes = True
 
@@ -94,3 +96,13 @@ class RoadmapGenerateRequest(BaseModel):
     )
 
     learning_style: LearningStyle    
+
+class UpdateLearningUnitRequest(BaseModel):
+    completed: bool
+
+
+class RoadmapActivateResponse(BaseModel):
+    id: UUID
+    title: str
+    status: RoadmapStatus
+    message: str

@@ -14,7 +14,7 @@ export default function SectionTitle({
       </h1>
 
       {subtitle && (
-        <p className="mt-3 text-gray-500">
+        <p className="mt-3 text-muted-foreground">
           {subtitle}
         </p>
       )}

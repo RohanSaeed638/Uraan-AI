@@ -1,5 +1,6 @@
 "use client";
 
+import { BookOpen, Video, Code2 } from "lucide-react";
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import OptionCard from "@/components/onboarding/OptionCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
@@ -7,24 +8,22 @@ import { StepProps, LearningStyle } from "../types";
 
 const learningStyles = [
   {
-    value: "videos" as LearningStyle,
-    title: "🎥 Videos",
-    description: "I learn best through video tutorials.",
+    value: "READING" as LearningStyle,
+    icon: BookOpen,
+    title: "Reading",
+    description: "Text-based learning with structured content.",
   },
   {
-    value: "reading" as LearningStyle,
-    title: "📚 Reading",
-    description: "I prefer books and written guides.",
+    value: "READING_VIDEO" as LearningStyle,
+    icon: Video,
+    title: "Reading + Videos",
+    description: "Reading plus video tutorials and guides.",
   },
   {
-    value: "projects" as LearningStyle,
-    title: "💻 Projects",
-    description: "I learn by building real applications.",
-  },
-  {
-    value: "mixed" as LearningStyle,
-    title: "🎯 Mixed",
-    description: "A combination of videos, reading and projects.",
+    value: "READING_VIDEO_PROJECT" as LearningStyle,
+    icon: Code2,
+    title: "Reading + Videos + Projects",
+    description: "Hands-on projects and real-world practice.",
   },
 ];
 
@@ -36,13 +35,14 @@ export default function LearningStyleStep({
 }: StepProps) {
   return (
     <OnboardingCard
-      title="How do you prefer learning?"
-      subtitle="We'll customize the roadmap to match your style."
+      title="Choose your learning style"
+      subtitle="Select how you prefer to learn. Each option builds on the last."
     >
       <div className="grid gap-4">
         {learningStyles.map((style) => (
           <OptionCard
             key={style.value}
+            icon={<style.icon size={18} />}
             title={style.title}
             description={style.description}
             selected={data.learning_style === style.value}

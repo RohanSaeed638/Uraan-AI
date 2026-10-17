@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import StepIndicator from "@/components/onboarding/StepIndicator";
+import StageIndicator from "@/components/onboarding/StageIndicator";
 
 import WelcomeStep from "./components/WelcomeStep";
 import ProfileStep from "./components/ProfileStep";
@@ -17,7 +17,7 @@ import GeneratingStep from "./components/GeneratingStep";
 import { useMutation } from "@tanstack/react-query";
 import { updateProfile } from "@/lib/api/profile";
 
-import { TOTAL_STEPS } from "./constants";
+import { STAGES, STEP_TO_STAGE } from "./constants";
 
 import { OnboardingForm } from "./types";
 import { generateRoadmap } from "@/services/roadmap";
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
         const roadmap =
         await generateRoadmapMutation.mutateAsync();
 
-        router.push(`/roadmap/${roadmap.data.id}`);
+        router.push(`/roadmaps/${roadmap.data.id}`);
 
 
     } catch (error) {
@@ -175,19 +175,15 @@ export default function OnboardingPage() {
 
   ];
 
+  const activeStage = STEP_TO_STAGE[step];
+
   return (
-
     <main className="mx-auto max-w-5xl p-8">
-
-      <StepIndicator
-        current={step}
-        total={TOTAL_STEPS}
-      />
+      {activeStage !== null && (
+        <StageIndicator stages={STAGES} activeStage={activeStage} />
+      )}
 
       {steps[step]}
-
     </main>
-
   );
-
 }

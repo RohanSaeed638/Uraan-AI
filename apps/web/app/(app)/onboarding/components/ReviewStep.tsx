@@ -3,6 +3,7 @@
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
 import SummaryCard from "@/components/onboarding/SummaryCard";
+import CheckIllustration from "@/components/illustrations/CheckIllustration";
 
 import { StepProps } from "../types";
 
@@ -13,8 +14,9 @@ export default function ReviewStep({
 }: StepProps) {
   return (
     <OnboardingCard
-      title="Review your roadmap"
-      subtitle="Everything look good?"
+      title="Your profile is ready 🎉"
+      subtitle="Let's create your personalized roadmap."
+      illustration={<CheckIllustration />}
     >
       <div className="grid grid-cols-2 gap-4">
 
