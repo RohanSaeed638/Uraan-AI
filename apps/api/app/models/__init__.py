@@ -20,4 +20,10 @@ from .profile import Profile
 from .task_learning_unit import TaskLearningUnit
 from .user_task_progress import UserTaskProgress
 from .user_settings import UserSettings
+from .xp_event import XPEvent
+from .push_subscription import PushSubscription
+from .notification import Notification
+from .document import Document
+from .portfolio import Portfolio, PortfolioProject
+from .interview import InterviewSession, InterviewTurn
 

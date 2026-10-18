@@ -11,6 +11,14 @@ from app.api.routes.projects import router as projects_router
 from app.api.routes.quizzes import router as quizzes_router
 from app.api.routes.settings import router as settings_router
 from app.api.routes.mentor import router as mentor_router
+from app.api.routes.gamification import router as gamification_router
+from app.api.routes.leaderboard import router as leaderboard_router
+from app.api.routes.notifications import router as notifications_router
+from app.api.routes.calendar import router as calendar_router
+from app.api.routes.documents import router as documents_router
+from app.api.routes.portfolio import router as portfolio_router
+from app.api.routes.interviews import router as interviews_router
+from app.api.routes.account import router as account_router
 from app.core.exceptions import global_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,6 +49,14 @@ app.include_router(projects_router)
 app.include_router(quizzes_router)
 app.include_router(settings_router)
 app.include_router(mentor_router)
+app.include_router(gamification_router)
+app.include_router(leaderboard_router)
+app.include_router(notifications_router)
+app.include_router(calendar_router)
+app.include_router(documents_router)
+app.include_router(portfolio_router)
+app.include_router(interviews_router)
+app.include_router(account_router)
 app.add_exception_handler(
     Exception,
     global_exception_handler

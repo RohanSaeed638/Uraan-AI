@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Flame, ListChecks, Sparkles } from "lucide-react";
+import { ArrowRight, Clock, Flame, ListChecks, Sparkles, Zap } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
-import { getDashboardSummary } from "@/lib/server/data";
+import { getDashboardSummary, getGamification } from "@/lib/server/data";
 import { RoadmapSummary } from "@/types/roadmap";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -30,9 +30,10 @@ async function getRoadmaps(): Promise<RoadmapSummary[]> {
 }
 
 export default async function DashboardPage() {
-  const [roadmaps, summary] = await Promise.all([
+  const [roadmaps, summary, gamification] = await Promise.all([
     getRoadmaps(),
     getDashboardSummary(),
+    getGamification(),
   ]);
 
   const active = roadmaps.filter((r) => r.status === "active");
@@ -68,11 +69,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {current && (
           <Card className="overflow-hidden">
-            <div className="flex flex-col items-start justify-between gap-6 p-2 sm:flex-row sm:items-center">
-              <div>
+            <div className="flex flex-col items-start justify-between gap-6 px-6 sm:flex-row sm:items-center">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold">
                   Current Roadmap
                 </p>
@@ -126,7 +127,7 @@ export default async function DashboardPage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gold/15">
-                <Flame size={16} className="text-brand-gold" />
+                <ListChecks size={16} className="text-brand-gold" />
               </span>
               <div>
                 <p className="text-lg font-bold leading-none">
@@ -137,6 +138,46 @@ export default async function DashboardPage() {
                 </p>
               </div>
             </div>
+            {gamification && (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gold/15">
+                    <Flame size={16} className="text-brand-gold" />
+                  </span>
+                  <div>
+                    <p className="text-lg font-bold leading-none">
+                      {gamification.streak_days}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Day streak
+                      {gamification.active_today ? " · done today" : ""}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-brand-violet/10">
+                    <Zap size={16} className="text-brand-violet" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-bold leading-none">
+                      Level {gamification.level}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {gamification.xp_into_level}/{gamification.xp_per_level}{" "}
+                      XP to next level
+                    </p>
+                    <Progress
+                      value={Math.round(
+                        (gamification.xp_into_level /
+                          gamification.xp_per_level) *
+                          100
+                      )}
+                      className="mt-1.5 h-1.5"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </Card>
       </div>
@@ -156,10 +197,10 @@ export default async function DashboardPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {roadmaps.slice(0, 3).map((roadmap) => (
-            <Card key={roadmap.id} className="gap-3">
-              <div className="flex items-center justify-between">
-                <p className="font-medium">{roadmap.title}</p>
-                <span className="rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-brand-violet">
+            <Card key={roadmap.id} className="gap-3 px-5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="line-clamp-2 min-w-0 font-medium">{roadmap.title}</p>
+                <span className="shrink-0 rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-brand-violet">
                   {roadmap.status}
                 </span>
               </div>

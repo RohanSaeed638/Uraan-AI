@@ -8,6 +8,11 @@ from app.repositories.roadmap_repository import RoadmapRepository
 from app.models.enums import RoadmapStatus
 from app.repositories.roadmap_task_repository import RoadmapTaskRepository
 from app.schemas.roadmap import RoadmapActivateResponse
+from app.services.gamification_service import (
+    GamificationService,
+    REASON_TASK,
+    XP_TASK_COMPLETED,
+)
 
 class RoadmapService:
 
@@ -53,7 +58,7 @@ class RoadmapService:
         )
 
         if profile is None:
-            raise Exception("Profile not found")
+            raise HTTPException(status_code=404, detail="Profile not found")
 
         roadmap = await self.roadmap_repository.get_latest(
             profile.id
@@ -110,6 +115,14 @@ class RoadmapService:
         task.completed = completed
 
         await self.db.flush()
+
+        if completed:
+            await GamificationService(self.db).award(
+                profile=profile,
+                amount=XP_TASK_COMPLETED,
+                reason=REASON_TASK,
+                ref_id=task.id,
+            )
 
         progress = await self.roadmap_task_repository.get_roadmap_progress(
             task.phase.roadmap_id,

@@ -3,11 +3,11 @@ export type SkillLevel =
   | "intermediate"
   | "advanced";
 
+// Must match the backend enum values.
 export type LearningStyle =
-  | "videos"
   | "reading"
-  | "projects"
-  | "mixed";
+  | "reading_video"
+  | "reading_video_project";
 
 export interface OnboardingForm {
   full_name: string;

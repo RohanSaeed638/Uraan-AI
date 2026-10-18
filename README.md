@@ -17,9 +17,24 @@ mentor).
 
 ## Features
 
-Auth and onboarding, roadmap generation, tasks and learning units, dashboard,
-learning, progress, projects, settings, quizzes (generated on first open) and
-the AI mentor.
+- **Core:** auth and onboarding, roadmap generation, tasks and learning units,
+  dashboard, learning, progress, projects, settings, quizzes (generated on
+  first open) and the AI mentor.
+- **XP and streaks:** XP for lessons, tasks, passed quizzes and finished
+  interviews (each awarded once); a daily streak on the learner's own
+  timezone; levels every 100 XP.
+- **Leaderboard:** weekly and all-time. Opt-in only (Settings), showing first
+  name and last initial.
+- **Notifications:** in-app bell plus optional web push, driven by a daily
+  reminder script (below).
+- **Calendar:** remaining study days laid out from today, with a subscribable
+  `.ics` feed for Google, Apple and Outlook calendars.
+- **Resume builder:** resume, cover letter and LinkedIn summary drafted from
+  completed work. Missing facts become `[placeholders]`; nothing is invented.
+- **Portfolio:** project showcase with an optional public page at `/p/<slug>`
+  and a GitHub checklist.
+- **Interview coach:** 5-question text mock interviews scored on technical,
+  communication and confidence (confidence is judged from wording only).
 
 ## Setup
 
@@ -40,6 +55,30 @@ alembic upgrade head
 uvicorn app.main:app --reload     # http://localhost:8000/docs
 pytest tests
 ```
+
+#### Push notifications and reminders
+
+Push is off until VAPID keys are set; the in-app bell works without them.
+
+```bash
+cd apps/api
+python scripts/generate_vapid_keys.py
+```
+
+Paste the three printed lines into `apps/api/.env` (set `VAPID_SUBJECT` to your
+own `mailto:` address) and restart the API. Keep the private key secret and
+reuse the same pair afterwards: changing it invalidates existing browser
+subscriptions.
+
+Reminders are sent by a script, not a long-running worker. Run it every 15
+minutes from any scheduler (Railway/Render cron, system cron, Task Scheduler):
+
+```bash
+python -m app.workers.send_reminders
+```
+
+It is safe to run more often or twice: each reminder is sent at most once per
+day per user, at the reminder time and timezone set in Settings.
 
 ### Web (`apps/web`)
 

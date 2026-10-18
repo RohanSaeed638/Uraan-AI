@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 
 from openai import OpenAIError
 
+from app.repositories.settings_repository import SettingsRepository
 from app.services.mentor_ai_service import MentorAIService
 
 
@@ -38,6 +39,21 @@ class MentorService:
         self.profile_repository = ProfileRepository(db)
         self.mentor_repository = MentorRepository(db)
         self.mentor_ai_service = MentorAIService()
+        self.settings_repository = SettingsRepository(db)
+
+    async def _require_mentor_enabled(self, profile_id: UUID) -> None:
+        """403 when the user switched the AI mentor off in Settings.
+        No saved settings means the default, which is on."""
+        settings = await self.settings_repository.get_by_profile_id(
+            profile_id
+        )
+
+        if settings is not None and not settings.ai_mentor_enabled:
+            raise HTTPException(
+                status_code=403,
+                detail="AI Mentor is turned off in Settings.",
+            )
+
     async def create_conversation(
         self,
         payload: MentorConversationCreateRequest,
@@ -54,6 +70,8 @@ class MentorService:
                 status_code=404,
                 detail="Profile not found",
             )
+
+        await self._require_mentor_enabled(profile.id)
 
         try:
             conversation = await (
@@ -209,6 +227,8 @@ class MentorService:
                 status_code=404,
                 detail="Conversation not found",
             )
+
+        await self._require_mentor_enabled(profile.id)
 
         content = payload.content.strip()
 

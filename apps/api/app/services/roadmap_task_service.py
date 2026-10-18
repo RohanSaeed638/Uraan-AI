@@ -41,6 +41,11 @@ from uuid import UUID
 from fastapi import HTTPException
 
 from app.repositories.profile_repository import ProfileRepository
+from app.services.gamification_service import (
+    GamificationService,
+    REASON_TASK,
+    XP_TASK_COMPLETED,
+)
 from app.repositories.roadmap_task_repository import (
     RoadmapTaskRepository,
 )
@@ -123,6 +128,14 @@ class RoadmapTaskService:
             )
 
         task.completed = completed
+
+        if completed:
+            await GamificationService(self.db).award(
+                profile=profile,
+                amount=XP_TASK_COMPLETED,
+                reason=REASON_TASK,
+                ref_id=task.id,
+            )
 
         await self.db.commit()
         await self.db.refresh(task)

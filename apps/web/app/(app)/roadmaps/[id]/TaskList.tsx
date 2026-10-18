@@ -285,7 +285,7 @@ export default function TaskList({
               {/* Phase Header */}
               {/* ============================= */}
 
-              <summary className="flex cursor-pointer list-none items-center gap-4 p-5 sm:p-6">
+              <summary className="flex cursor-pointer list-none items-center gap-3 p-4 sm:gap-4 sm:p-6">
                 <span
                   className={cn(
                     "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
@@ -324,7 +324,7 @@ export default function TaskList({
               {/* Tasks */}
               {/* ============================= */}
 
-              <div className="border-t border-border p-5 sm:p-6">
+              <div className="border-t border-border p-3 sm:p-6">
                 {phase.tasks.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     No tasks available for this phase.

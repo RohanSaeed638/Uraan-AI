@@ -19,6 +19,12 @@ class Settings(BaseSettings):
 
     REDIS_URL: str
 
+    # Web push (generate with `vapid --gen`). Push is disabled when unset;
+    # in-app notifications still work.
+    VAPID_PUBLIC_KEY: str = ""
+    VAPID_PRIVATE_KEY: str = ""
+    VAPID_SUBJECT: str = "mailto:admin@example.com"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"

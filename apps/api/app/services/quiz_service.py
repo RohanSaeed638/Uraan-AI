@@ -4,6 +4,11 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.services.quiz_generator import QuizGenerator
+from app.services.gamification_service import (
+    GamificationService,
+    REASON_QUIZ,
+    XP_QUIZ_PASSED,
+)
 from app.models.quiz import Quiz
 from app.models.quiz_attempt import QuizAttempt
 from app.models.quiz_question import QuizQuestion
@@ -239,6 +244,15 @@ class QuizService:
 
         try:
             await self.quiz_repository.create_attempt(attempt)
+
+            if passed:
+                await GamificationService(self.db).award(
+                    profile=profile,
+                    amount=XP_QUIZ_PASSED,
+                    reason=REASON_QUIZ,
+                    ref_id=task_id,
+                )
+
             await self.db.commit()
         except Exception:
             await self.db.rollback()

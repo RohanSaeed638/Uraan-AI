@@ -81,7 +81,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         {visible.map((p) => (
           <Link key={p.id} href={p.href}>
-            <Card className="h-full gap-3 transition hover:border-brand-violet/40 hover:shadow-md">
+            <Card className="h-full gap-3 px-6 transition hover:border-brand-violet/40 hover:shadow-md">
               <div className="flex items-start justify-between gap-3">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/10 text-brand-violet">
                   <FolderKanban size={18} />

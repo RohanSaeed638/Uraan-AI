@@ -33,7 +33,7 @@ const initialData: OnboardingForm = {
 
   skill_level: "beginner",
 
-  learning_style: "mixed",
+  learning_style: "reading",
 
   daily_hours: 2,
 

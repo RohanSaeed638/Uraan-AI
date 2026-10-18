@@ -2,7 +2,6 @@
 
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { LogOut, Settings, User as UserIcon, ChevronDown } from "lucide-react";
 
 import { authService } from "@/services/auth/auth";
@@ -12,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -32,16 +32,17 @@ export default function UserDropdown({ user }: { user: User }) {
 
   async function logout() {
     // Clear client state immediately rather than waiting on the async
-    // onAuthStateChange listener — otherwise there's a window where
-    // other pages (e.g. the landing page) can still see a stale user.
+    // onAuthStateChange listener, so no page can still see a stale user.
     clearUser();
-    await authService.logout();
-    toast.success("Logged out");
-    // A hard navigation (not router.replace/refresh) so the Router
-    // Cache and any in-memory component state are fully reset, and the
-    // request to /login is guaranteed to reflect the now-cleared
-    // session cookies via the proxy's session refresh.
-    window.location.href = "/login";
+
+    try {
+      await authService.logout();
+    } finally {
+      // A hard navigation (not router.replace/refresh) so the Router Cache
+      // and all in-memory state are reset, and the request to /login sees
+      // the cleared cookies. Runs even if sign-out reported a problem.
+      window.location.href = "/login";
+    }
   }
 
   return (
@@ -53,20 +54,23 @@ export default function UserDropdown({ user }: { user: User }) {
             {initials}
           </AvatarFallback>
         </Avatar>
-        <span className="hidden text-left leading-tight sm:block">
-          <span className="block text-sm font-medium">{fullName}</span>
+        <span className="hidden min-w-0 max-w-40 text-left leading-tight sm:block">
+          <span className="block truncate text-sm font-medium">{fullName}</span>
           <span className="block text-xs text-muted-foreground">Student</span>
         </span>
         <ChevronDown size={14} className="hidden text-muted-foreground sm:block" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <span className="block text-sm font-medium">{fullName}</span>
-          <span className="block text-xs font-normal text-muted-foreground">
-            {user.email}
-          </span>
-        </DropdownMenuLabel>
+        {/* A menu label must sit inside a group, or the menu throws on open. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <span className="block truncate text-sm font-medium">{fullName}</span>
+            <span className="block truncate text-xs font-normal text-muted-foreground">
+              {user.email}
+            </span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/profile")}>
           <UserIcon size={16} /> Profile

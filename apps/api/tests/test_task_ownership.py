@@ -42,20 +42,21 @@ def _service(profile, task, owner_id):
     return service
 
 
-def test_owner_can_complete_task():
+def test_owner_can_complete_task(awards):
     owner = SimpleNamespace(id=uuid4())
-    task = SimpleNamespace(completed=False)
+    task = SimpleNamespace(id=uuid4(), completed=False)
     service = _service(owner, task, owner.id)
 
     result = asyncio.run(service.update_completion(uuid4(), True, uuid4()))
 
     assert result.completed is True
+    assert [a[0] for a in awards] == ["task_completed"]
 
 
-def test_other_users_cannot_complete_task():
+def test_other_users_cannot_complete_task(awards):
     owner_id = uuid4()
     intruder = SimpleNamespace(id=uuid4())
-    task = SimpleNamespace(completed=False)
+    task = SimpleNamespace(id=uuid4(), completed=False)
     service = _service(intruder, task, owner_id)
 
     with pytest.raises(HTTPException) as exc:
@@ -63,6 +64,7 @@ def test_other_users_cannot_complete_task():
 
     assert exc.value.status_code == 404
     assert task.completed is False
+    assert awards == []
 
 
 def test_missing_profile_is_404():

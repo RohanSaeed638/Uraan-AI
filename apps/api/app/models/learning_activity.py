@@ -17,9 +17,9 @@ class LearningActivity(BaseModel):
 
     __table_args__ = (
         UniqueConstraint(
-            # "user_id",
+            "profile_id",
             "learning_unit_id",
-            name="uq_learning_activity_user_unit",
+            name="uq_learning_activity_profile_unit",
         ),
     )
 

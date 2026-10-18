@@ -33,6 +33,43 @@ import { createClient } from "@/lib/supabase/client";
 
 const supabase = createClient();
 
+/**
+ * Ends the login. The server does the real work (it revokes the session and
+ * clears the cookies it reads); the browser client is cleared afterwards so
+ * its own copy and any other open tab notice. Neither step can throw, so
+ * callers can always carry on to the login page.
+ */
+let ending = false;
+
+/** True while this tab is signing itself out and about to leave the page. */
+export const isEndingSession = () => ending;
+
+async function endSession(scope: "local" | "global") {
+  ending = true;
+
+  try {
+    await fetch(`/auth/signout?scope=${scope}`, {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+  } catch {
+    // Offline: the browser-side sign-out below still clears this device.
+  }
+
+  try {
+    await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // Nothing more to clear.
+  }
+
+  // The caller redirects next; if that somehow doesn't happen, don't leave
+  // the "signing out" state stuck on.
+  setTimeout(() => {
+    ending = false;
+  }, 5000);
+}
+
 export class AuthService {
   async register(
   fullName: string,
@@ -80,8 +117,31 @@ export class AuthService {
     });
   }
 
+  /** Signs out this device only. */
   async logout() {
-    await supabase.auth.signOut();
+    await endSession("local");
+  }
+
+  /** Signs out every device, not just this browser. */
+  async logoutEverywhere() {
+    await endSession("global");
+  }
+
+  /** Supabase emails a confirmation link to the new address. */
+  async updateEmail(email: string) {
+    return await supabase.auth.updateUser(
+      { email },
+      { emailRedirectTo: `${window.location.origin}/auth/callback` }
+    );
+  }
+
+  async updatePassword(password: string) {
+    return await supabase.auth.updateUser({ password });
+  }
+
+  /** Confirms the current password, so a stolen session can't change it. */
+  async verifyPassword(email: string, password: string) {
+    return await supabase.auth.signInWithPassword({ email, password });
   }
 
   async getUser() {

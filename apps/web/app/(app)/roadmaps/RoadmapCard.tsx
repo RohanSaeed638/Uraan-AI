@@ -13,6 +13,7 @@ import {
 
 import { Progress } from "@/components/ui/progress";
 import { buttonVariants } from "@/components/ui/button";
+import { formatDate } from "@/lib/format";
 
 interface Props {
   roadmap: RoadmapSummary;
@@ -28,8 +29,8 @@ export default function RoadmapCard({ roadmap }: Props) {
   return (
     <Card className="transition-shadow hover:shadow-md">
       <CardHeader>
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="line-clamp-1">{roadmap.title}</CardTitle>
+        <div className="flex items-start justify-between gap-3">
+          <CardTitle className="line-clamp-2 min-w-0">{roadmap.title}</CardTitle>
           <span
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize ${
               statusStyles[roadmap.status] ?? "bg-muted text-muted-foreground"
@@ -57,7 +58,7 @@ export default function RoadmapCard({ roadmap }: Props) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock size={14} />
-            Updated {new Date(roadmap.updated_at).toLocaleDateString()}
+            Updated {formatDate(roadmap.updated_at)}
           </div>
 
           <Link

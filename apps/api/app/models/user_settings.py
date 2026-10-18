@@ -63,3 +63,10 @@ class UserSettings(BaseModel):
         default=True,
         server_default="true",
     )
+
+    show_on_leaderboard: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+    )

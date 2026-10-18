@@ -1,64 +1,61 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
+
+import { api } from "@/lib/api";
+import { setStoredTheme, Theme, useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
-const THEME_KEY = "uraan-theme";
-const THEME_EVENT = "uraan-theme-change";
+const OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+];
 
-function subscribe(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener(THEME_EVENT, onChange);
-  return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener(THEME_EVENT, onChange);
-  };
-}
+/**
+ * Light / Dark / System. The choice applies at once, is remembered on this
+ * device, and is saved to the account so other devices follow it.
+ */
+export default function ThemeToggle({
+  onSaveError,
+}: {
+  onSaveError?: () => void;
+}) {
+  const theme = useTheme();
 
-function getIsDark() {
-  const stored = localStorage.getItem(THEME_KEY);
-  return stored ? stored === "dark" : true;
-}
+  async function choose(next: Theme) {
+    setStoredTheme(next);
 
-export default function ThemeToggle() {
-  const isDark = useSyncExternalStore(subscribe, getIsDark, () => true);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
-
-  function setTheme(dark: boolean) {
-    localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
-    window.dispatchEvent(new Event(THEME_EVENT));
+    try {
+      await api.patch("/settings", { theme: next });
+    } catch {
+      onSaveError?.();
+    }
   }
 
   return (
-    <div className="inline-flex rounded-full border border-border bg-muted/50 p-1">
-      <button
-        type="button"
-        onClick={() => setTheme(false)}
-        className={cn(
-          "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
-          !isDark
-            ? "bg-card text-foreground shadow-sm"
-            : "text-muted-foreground"
-        )}
-      >
-        <Sun size={14} /> Light
-      </button>
-      <button
-        type="button"
-        onClick={() => setTheme(true)}
-        className={cn(
-          "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
-          isDark
-            ? "bg-card text-foreground shadow-sm"
-            : "text-muted-foreground"
-        )}
-      >
-        <Moon size={14} /> Dark
-      </button>
+    <div
+      role="radiogroup"
+      aria-label="Theme"
+      className="inline-flex max-w-full flex-wrap rounded-full border border-border bg-muted/50 p-1"
+    >
+      {OPTIONS.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          type="button"
+          role="radio"
+          aria-checked={theme === value}
+          onClick={() => choose(value)}
+          className={cn(
+            "flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition",
+            theme === value
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Icon size={14} /> {label}
+        </button>
+      ))}
     </div>
   );
 }

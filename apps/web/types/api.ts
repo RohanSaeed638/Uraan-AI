@@ -30,6 +30,16 @@ export interface DashboardSummary {
   };
 }
 
+export interface Gamification {
+  xp: number;
+  level: number;
+  xp_into_level: number;
+  xp_per_level: number;
+  streak_days: number;
+  active_today: boolean;
+  weekly_xp: number;
+}
+
 export interface CompletionStats {
   total: number;
   completed: number;
@@ -89,6 +99,140 @@ export interface UserSettings {
   reminder_time: string;
   timezone: string;
   ai_mentor_enabled: boolean;
+  show_on_leaderboard: boolean;
+}
+
+export interface AppNotification {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  url: string | null;
+  read: boolean;
+  created_at: string;
+}
+
+export interface NotificationList {
+  notifications: AppNotification[];
+  unread_count: number;
+}
+
+export type Difficulty = "beginner" | "intermediate" | "advanced";
+
+export interface InterviewTurn {
+  order: number;
+  question: string;
+  answer: string | null;
+  feedback: string | null;
+  technical_score: number | null;
+  communication_score: number | null;
+  confidence_score: number | null;
+}
+
+export interface InterviewSession {
+  id: string;
+  role: string;
+  difficulty: Difficulty;
+  status: "in_progress" | "completed";
+  overall_score: number | null;
+  averages: {
+    technical: number;
+    communication: number;
+    confidence: number;
+  } | null;
+  summary: {
+    strengths: string[];
+    improvements: string[];
+    next_steps: string[];
+  } | null;
+  answered: number;
+  total: number;
+  created_at: string;
+  turns: InterviewTurn[];
+}
+
+export type InterviewListItem = Omit<
+  InterviewSession,
+  "averages" | "summary" | "turns"
+>;
+
+export interface PortfolioProject {
+  id: string;
+  source_unit_id: string | null;
+  title: string;
+  description: string | null;
+  repo_url: string | null;
+  live_url: string | null;
+  tech: string[];
+  visible: boolean;
+}
+
+export interface Portfolio {
+  headline: string | null;
+  bio: string | null;
+  slug: string | null;
+  is_public: boolean;
+  projects: PortfolioProject[];
+  checklist: { id: string; label: string; done: boolean }[];
+  suggestions: { unit_id: string; title: string; task_title: string }[];
+}
+
+export interface PublicPortfolio {
+  name: string;
+  headline: string | null;
+  bio: string | null;
+  projects: Pick<
+    PortfolioProject,
+    "title" | "description" | "repo_url" | "live_url" | "tech"
+  >[];
+}
+
+export type DocumentKind = "resume" | "cover_letter" | "linkedin_summary";
+
+export interface CareerDocument {
+  id: string;
+  kind: DocumentKind;
+  title: string;
+  target_role: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CalendarDay {
+  date: string;
+  day: number;
+  total_estimated_minutes: number;
+  units: {
+    id: string;
+    task_id: string;
+    task_title: string;
+    title: string;
+    type: string;
+    estimated_minutes: number | null;
+    completed: boolean;
+  }[];
+}
+
+export interface CalendarSchedule {
+  roadmap_id: string | null;
+  roadmap_title: string | null;
+  today: string;
+  days: CalendarDay[];
+}
+
+export type LeaderboardPeriod = "weekly" | "all_time";
+
+export interface Leaderboard {
+  period: LeaderboardPeriod;
+  entries: {
+    rank: number;
+    display_name: string;
+    xp: number;
+    level: number;
+    is_me: boolean;
+  }[];
+  me: { xp: number; rank: number | null; on_leaderboard: boolean };
 }
 
 export interface QuizQuestion {
@@ -147,3 +291,35 @@ export interface MentorSendResult {
   user_message: MentorMessage;
   assistant_message: MentorMessage;
 }
+
+export interface ProfileData {
+  id: string;
+  full_name: string;
+  language: string;
+  country: string | null;
+  timezone: string | null;
+  career_slug: string | null;
+  skill_level: "beginner" | "intermediate" | "advanced" | null;
+  learning_style: "reading" | "reading_video" | "reading_video_project" | null;
+  career_stage:
+    | "beginner"
+    | "job_ready"
+    | "student"
+    | "professional"
+    | "career_switcher"
+    | null;
+  daily_hours: number;
+  target_duration: number;
+  learning_goal: string | null;
+  onboarding_completed: boolean;
+  streak_days: number;
+  xp: number;
+  created_at: string | null;
+}
+
+export type ProfileChanges = Partial<
+  Omit<
+    ProfileData,
+    "id" | "onboarding_completed" | "streak_days" | "xp" | "created_at"
+  >
+>;

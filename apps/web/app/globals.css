@@ -138,6 +138,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Long words, titles and URLs wrap instead of overflowing. */
+    overflow-wrap: anywhere;
+  }
+  /* Buttons and tabs wrap at spaces only, never mid-word. */
+  button {
+    overflow-wrap: normal;
   }
   html {
     @apply font-sans;

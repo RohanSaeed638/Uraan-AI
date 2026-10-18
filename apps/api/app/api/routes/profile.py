@@ -5,6 +5,7 @@ from app.dependencies.services import get_profile_service
 
 from app.schemas.auth import CurrentUser
 from app.schemas.profile import (
+    PatchProfileRequest,
     ProfileResponse,
     UpdateProfileRequest,
 )
@@ -50,3 +51,18 @@ async def update_me(
     )
 
     return profile
+
+
+@router.patch(
+    "/me",
+    response_model=ProfileResponse,
+)
+async def patch_me(
+    request: PatchProfileRequest,
+    current_user: CurrentUser = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service),
+):
+    return await service.patch_profile(
+        current_user.id,
+        request.model_dump(exclude_unset=True),
+    )

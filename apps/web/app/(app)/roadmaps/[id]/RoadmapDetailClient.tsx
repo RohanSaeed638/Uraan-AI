@@ -52,7 +52,7 @@ export default function RoadmapDetailClient({
       </Link>
 
       {/* Header */}
-      <Card>
+      <Card className="px-6 sm:px-8">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">

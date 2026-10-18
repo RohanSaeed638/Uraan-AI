@@ -69,12 +69,23 @@ class _AI:
         return self.reply
 
 
-def _service(ai):
+class _Settings:
+    """Stands in for the saved user settings (None = never saved)."""
+
+    def __init__(self, enabled=None):
+        self.row = None if enabled is None else SimpleNamespace(ai_mentor_enabled=enabled)
+
+    async def get_by_profile_id(self, profile_id):
+        return self.row
+
+
+def _service(ai, mentor_enabled=None):
     service = MentorService.__new__(MentorService)
     service.db = _Db()
     service.profile_repository = _Profiles()
     service.mentor_repository = _Mentor()
     service.mentor_ai_service = ai
+    service.settings_repository = _Settings(mentor_enabled)
     return service
 
 
@@ -115,3 +126,38 @@ def test_ai_failure_returns_503_and_saves_nothing():
     assert exc.value.status_code == 503
     assert service.mentor_repository.created == []
     assert not service.db.committed
+
+
+def test_mentor_blocked_when_switched_off():
+    ai = _AI(reply="should never be used")
+    service = _service(ai, mentor_enabled=False)
+
+    with pytest.raises(HTTPException) as exc:
+        _send(service)
+
+    assert exc.value.status_code == 403
+    assert ai.received is None
+    assert service.mentor_repository.created == []
+    assert not service.db.committed
+
+
+def test_mentor_works_when_switched_on_or_never_configured():
+    for enabled in (True, None):
+        service = _service(_AI(reply="Hello"), mentor_enabled=enabled)
+
+        assert _send(service).assistant_message.content == "Hello"
+
+
+def test_new_conversation_blocked_when_switched_off():
+    from app.schemas.mentor import MentorConversationCreateRequest
+
+    service = _service(_AI(reply="x"), mentor_enabled=False)
+
+    with pytest.raises(HTTPException) as exc:
+        asyncio.run(
+            service.create_conversation(
+                MentorConversationCreateRequest(title="Hi"), uuid4()
+            )
+        )
+
+    assert exc.value.status_code == 403

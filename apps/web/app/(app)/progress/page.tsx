@@ -82,7 +82,7 @@ export default async function ProgressPage() {
       <h2 className="font-heading mt-10 text-lg font-semibold">By roadmap</h2>
       <div className="mt-3 space-y-4">
         {rows.map((r) => (
-          <Card key={r.roadmap_id} className="gap-4">
+          <Card key={r.roadmap_id} className="gap-4 px-6">
             <div className="flex items-center justify-between gap-4">
               <Link
                 href={`/roadmaps/${r.roadmap_id}`}
@@ -90,7 +90,7 @@ export default async function ProgressPage() {
               >
                 {r.title}
               </Link>
-              <span className="text-sm font-medium">
+              <span className="shrink-0 text-sm font-medium">
                 {Math.round(r.completion_percentage)}%
               </span>
             </div>

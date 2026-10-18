@@ -99,9 +99,14 @@ class RoadmapTaskRepository:
         self,
         task_id: UUID,
         profile_id: UUID,
+        fresh: bool = False,
     ) -> RoadmapTask | None:
+        """The task with its phase and lessons, if the profile owns it.
 
-        result = await self.db.execute(
+        `fresh` re-reads attributes already held by the session. Use it after
+        lessons were written or a transaction was rolled back, otherwise the
+        session can hand back a cached copy with stale (or unloaded) lessons."""
+        stmt = (
             select(RoadmapTask)
             .join(RoadmapPhase)
             .join(Roadmap)
@@ -114,5 +119,10 @@ class RoadmapTaskRepository:
                 Roadmap.profile_id == profile_id,
             )
         )
+
+        if fresh:
+            stmt = stmt.execution_options(populate_existing=True)
+
+        result = await self.db.execute(stmt)
 
         return result.scalars().first()

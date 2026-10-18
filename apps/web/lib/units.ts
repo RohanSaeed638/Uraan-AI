@@ -56,3 +56,28 @@ export function formatMinutes(total: number) {
   const m = total % 60;
   return m ? `${h}h ${m}m` : `${h}h`;
 }
+
+/** A YouTube results page, used when no specific video could be verified. */
+export function isSearchLink(url?: string | null) {
+  return !!url && url.includes("youtube.com/results");
+}
+
+const typeColors: Record<string, string> = {
+  reading: "text-sky-600 dark:text-sky-400",
+  video: "text-rose-600 dark:text-rose-400",
+  project: "text-amber-600 dark:text-amber-400",
+};
+
+export function unitColor(type: string) {
+  return typeColors[type?.toLowerCase()] ?? "text-primary";
+}
+
+const actionLabels: Record<string, string> = {
+  reading: "Read",
+  video: "Watch",
+  project: "Start project",
+};
+
+export function unitAction(type: string) {
+  return actionLabels[type?.toLowerCase()] ?? "Start";
+}

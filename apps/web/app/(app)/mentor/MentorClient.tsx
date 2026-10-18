@@ -12,6 +12,7 @@ import {
   listConversations,
   sendMessage,
 } from "@/lib/api/mentor";
+import { apiErrorMessage } from "@/lib/profile-options";
 import { MentorConversationDetail, MentorMessage } from "@/types/api";
 
 import { Button } from "@/components/ui/button";
@@ -66,7 +67,8 @@ export default function MentorClient() {
       });
       queryClient.invalidateQueries({ queryKey: LIST_KEY });
     },
-    onError: () => toast.error("The mentor couldn't reply. Try again."),
+    onError: (e) =>
+      toast.error(apiErrorMessage(e, "The mentor couldn't reply. Try again.")),
   });
 
   const remove = useMutation({
@@ -92,8 +94,8 @@ export default function MentorClient() {
   }
 
   return (
-    <div className="grid h-[calc(100vh-8rem)] gap-6 lg:grid-cols-[280px_1fr]">
-      <Card className="flex flex-col gap-3 overflow-hidden p-4">
+    <div className="grid h-[calc(100vh-8rem)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:grid-rows-1">
+      <Card className="flex max-h-44 flex-col gap-3 overflow-hidden p-4 lg:max-h-none">
         <Button
           variant="outline"
           className="gap-2"

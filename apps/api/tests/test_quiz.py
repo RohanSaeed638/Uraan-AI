@@ -98,7 +98,7 @@ def _submit(service, questions, picks):
     return asyncio.run(service.submit(uuid4(), payload, uuid4()))
 
 
-def test_submit_passes_at_seventy_percent():
+def test_submit_passes_at_seventy_percent(awards):
     questions = _questions(10)
     service = _service(questions)
 
@@ -109,9 +109,10 @@ def test_submit_passes_at_seventy_percent():
     assert result.passed
     assert service.db.committed
     assert len(service.quiz_repository.attempts) == 1
+    assert [a[0] for a in awards] == ["quiz_passed"]
 
 
-def test_submit_fails_below_threshold():
+def test_submit_fails_below_threshold(awards):
     questions = _questions(5)
     service = _service(questions)
 
@@ -119,6 +120,7 @@ def test_submit_fails_below_threshold():
 
     assert result.score_percentage == 60.0
     assert not result.passed
+    assert awards == []
 
 
 def test_submit_requires_an_answer_for_every_question():

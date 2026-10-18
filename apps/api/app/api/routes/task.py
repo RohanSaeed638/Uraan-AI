@@ -5,7 +5,13 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_user
-from app.dependencies.services import get_roadmap_task_service
+from app.dependencies.services import (
+    get_roadmap_task_service,
+    get_task_learning_unit_service,
+)
+from app.services.task_learning_unit_service import (
+    TaskLearningUnitService,
+)
 from app.schemas.task import (
     RoadmapTaskResponse,
     UpdateTaskCompletionRequest,
@@ -34,6 +40,25 @@ async def get_task(
     ),
 ):
     return await service.get_task(
+        task_id=task_id,
+        auth_user_id=current_user.id,
+    )
+
+
+@router.post(
+    "/{task_id}/learning-plan",
+    response_model=RoadmapTaskResponse,
+)
+async def create_learning_plan(
+    task_id: UUID,
+    current_user=Depends(get_current_user),
+    service: TaskLearningUnitService = Depends(
+        get_task_learning_unit_service
+    ),
+):
+    """Writes the task's lessons if it has none, then returns the task.
+    Calling it again returns the saved lessons without regenerating."""
+    return await service.ensure_plan(
         task_id=task_id,
         auth_user_id=current_user.id,
     )

@@ -7,6 +7,10 @@ import CheckIllustration from "@/components/illustrations/CheckIllustration";
 
 import { StepProps } from "../types";
 
+/** "reading_video" -> "Reading Video", "backend-engineer" -> "Backend Engineer". */
+const pretty = (value: string) =>
+  value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 export default function ReviewStep({
   data,
   previous,
@@ -27,22 +31,22 @@ export default function ReviewStep({
 
         <SummaryCard
           label="Language"
-          value={data.language}
+          value={data.language === "ur" ? "اردو" : "English"}
         />
 
         <SummaryCard
           label="Career"
-          value={data.career_slug}
+          value={pretty(data.career_slug)}
         />
 
         <SummaryCard
           label="Skill Level"
-          value={data.skill_level}
+          value={pretty(data.skill_level)}
         />
 
         <SummaryCard
           label="Learning Style"
-          value={data.learning_style}
+          value={pretty(data.learning_style)}
         />
 
         <SummaryCard

@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from app.api.routes import settings
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

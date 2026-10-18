@@ -56,7 +56,7 @@ class RoadmapTask(BaseModel):
         "TaskLearningUnit",
         back_populates="task",
         cascade="all, delete-orphan",
-        order_by="TaskLearningUnit.order",
+        order_by="TaskLearningUnit.day, TaskLearningUnit.order",
     )
 
     resources: Mapped[list["Resource"]] = relationship(

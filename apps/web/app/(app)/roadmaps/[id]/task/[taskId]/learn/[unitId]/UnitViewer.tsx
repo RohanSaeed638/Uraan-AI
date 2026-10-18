@@ -15,7 +15,7 @@ import {
 
 import { api } from "@/lib/api/client";
 import { setUnitCompleted } from "@/lib/api/units";
-import { formatMinutes, getUnitMeta } from "@/lib/units";
+import { formatMinutes, getUnitMeta, isSearchLink } from "@/lib/units";
 import { RoadmapTask } from "@/types/roadmap";
 
 import SimpleMarkdown from "@/components/shared/SimpleMarkdown";
@@ -184,14 +184,16 @@ export default function UnitViewer({
   /* ---------- Lesson screen ---------- */
   const video = unit.resource_url ? embedUrl(unit.resource_url) : null;
   const isFile = unit.resource_url && /\.(mp4|webm)(\?|$)/i.test(unit.resource_url);
+  const searchLink = isSearchLink(unit.resource_url);
 
   return (
     <div className="mx-auto max-w-3xl">
       <Link
         href={`/roadmaps/${roadmapId}/task/${task.id}`}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="mb-4 inline-flex max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft size={14} /> Back to {task.title}
+        <ArrowLeft size={14} className="shrink-0" />
+        <span className="truncate">Back to {task.title}</span>
       </Link>
 
       <div className="mb-6">
@@ -225,7 +227,38 @@ export default function UnitViewer({
         <p className="mt-2 text-muted-foreground">{unit.description}</p>
       )}
 
+      {unit.type === "project" && (
+        <div className="mt-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+          <p className="font-semibold text-amber-700 dark:text-amber-400">
+            Hands-on project
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            Build this yourself, tick off each requirement, then mark the
+            lesson complete. Keep the result: it can go in your portfolio.
+          </p>
+        </div>
+      )}
+
       <div className="mt-6 space-y-6">
+        {searchLink && unit.resource_url && (
+          <a
+            href={unit.resource_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 transition hover:bg-muted"
+          >
+            <span>
+              <span className="block font-semibold">Find a video on YouTube</span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                We couldn&apos;t confirm a specific video, so this opens a
+                search for this lesson. Pick a recent, well-rated result and
+                follow along with the notes below.
+              </span>
+            </span>
+            <ExternalLink size={18} className="shrink-0 text-brand-violet" />
+          </a>
+        )}
+
         {video && (
           <div className="aspect-video overflow-hidden rounded-3xl border border-border bg-black">
             <iframe
@@ -252,7 +285,7 @@ export default function UnitViewer({
           </Card>
         )}
 
-        {unit.resource_url && !video && !isFile && (
+        {unit.resource_url && !video && !isFile && !searchLink && (
           <a
             href={unit.resource_url}
             target="_blank"

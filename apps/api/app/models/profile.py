@@ -1,5 +1,7 @@
+from datetime import date
+
 from sqlalchemy import Enum
-from sqlalchemy import String, Integer, Boolean 
+from sqlalchemy import Date, String, Integer, Boolean 
 from sqlalchemy.orm import Mapped, mapped_column 
 from app.models.base_model import BaseModel 
 from app.models.enums import SkillLevel, LearningStyle, CareerStage
@@ -49,6 +51,26 @@ class Profile(BaseModel):
     streak_days: Mapped[int] = mapped_column(
         Integer,
         default=0,
+        server_default="0",
+    )
+
+    xp: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+    )
+
+    last_activity_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    # Secret in the user's calendar feed URL; regenerating it revokes the
+    # old link.
+    calendar_token: Mapped[str | None] = mapped_column(
+        String(64),
+        unique=True,
+        nullable=True,
     )
 
     onboarding_completed: Mapped[bool] = mapped_column(

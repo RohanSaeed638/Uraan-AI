@@ -8,19 +8,19 @@ import { StepProps, LearningStyle } from "../types";
 
 const learningStyles = [
   {
-    value: "READING" as LearningStyle,
+    value: "reading" as LearningStyle,
     icon: BookOpen,
     title: "Reading",
     description: "Text-based learning with structured content.",
   },
   {
-    value: "READING_VIDEO" as LearningStyle,
+    value: "reading_video" as LearningStyle,
     icon: Video,
     title: "Reading + Videos",
     description: "Reading plus video tutorials and guides.",
   },
   {
-    value: "READING_VIDEO_PROJECT" as LearningStyle,
+    value: "reading_video_project" as LearningStyle,
     icon: Code2,
     title: "Reading + Videos + Projects",
     description: "Hands-on projects and real-world practice.",

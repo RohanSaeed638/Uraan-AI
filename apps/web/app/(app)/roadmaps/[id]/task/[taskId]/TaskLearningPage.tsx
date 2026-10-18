@@ -17,6 +17,9 @@ import {
 
 import { RoadmapTask } from "@/types/roadmap";
 
+import { isSearchLink, unitAction, unitColor } from "@/lib/units";
+
+import LessonPlanLoader from "./LessonPlanLoader";
 import TaskQuiz from "./TaskQuiz";
 
 interface TaskLearningPageProps {
@@ -165,6 +168,51 @@ export default function TaskLearningPage({
     }
   };
 
+  /*
+   * A task with no lessons yet: write them, then reload.
+   */
+  if (learningUnits.length === 0) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6 pb-10">
+        <Link
+          href={`/roadmaps/${roadmapId}`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to roadmap
+        </Link>
+
+        <section className="rounded-xl border bg-card p-6 md:p-8">
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+            {task.title}
+          </h1>
+          {task.description && (
+            <p className="mt-3 leading-7 text-muted-foreground">
+              {task.description}
+            </p>
+          )}
+        </section>
+
+        <LessonPlanLoader taskId={task.id} />
+      </div>
+    );
+  }
+
+  /*
+   * How many lessons of each kind, shown above the plan.
+   */
+  const mix = (["reading", "video", "project"] as const)
+    .map((type) => ({
+      type,
+      count: learningUnits.filter((u) => u.type.toLowerCase() === type).length,
+      minutes: learningUnits
+        .filter((u) => u.type.toLowerCase() === type)
+        .reduce((sum, u) => sum + (u.estimated_minutes ?? 0), 0),
+    }))
+    .filter((item) => item.count > 0);
+
+  const furtherReading = (task.resource_links ?? []).filter(Boolean);
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-10">
 
@@ -277,6 +325,32 @@ export default function TaskLearningPage({
       {/* Continue Learning */}
       {/* -------------------------------------------------- */}
 
+      {/* What this task is made of */}
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        {mix.map(({ type, count, minutes }) => {
+          const MixIcon = getUnitIcon(type);
+
+          return (
+            <div
+              key={type}
+              className="flex items-center gap-3 rounded-xl border bg-card p-4"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <MixIcon className={`h-5 w-5 ${unitColor(type)}`} />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">
+                  {count} {getUnitTypeLabel(type)}
+                  {count === 1 ? "" : "s"}
+                </p>
+                <p className="text-xs text-muted-foreground">{minutes} min</p>
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
       {nextUnit && (
         <section className="rounded-xl border bg-primary/5 p-5">
 
@@ -320,9 +394,9 @@ export default function TaskLearningPage({
 
             </div>
 
-            <button
-              type="button"
-              className="
+            <Link
+              href={`/roadmaps/${roadmapId}/task/${task.id}/learn/${nextUnit.id}`}
+              className="shrink-0 whitespace-nowrap 
                 inline-flex
                 items-center
                 justify-center
@@ -340,7 +414,7 @@ export default function TaskLearningPage({
             >
               Continue
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
 
           </div>
 
@@ -351,7 +425,7 @@ export default function TaskLearningPage({
       {/* Main Learning Area */}
       {/* -------------------------------------------------- */}
 
-      <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
 
         {/* ------------------------------------------------ */}
         {/* Learning Plan Sidebar */}
@@ -615,11 +689,11 @@ export default function TaskLearningPage({
 
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
-                          <div>
+                          <div className="min-w-0">
 
                             <div className="flex items-center gap-2">
 
-                              <Icon className="h-4 w-4 text-primary" />
+                              <Icon className={`h-4 w-4 ${unitColor(unit.type)}`} />
 
                               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                 {getUnitTypeLabel(
@@ -685,9 +759,7 @@ export default function TaskLearningPage({
                               hover:opacity-90
                             "
                           >
-                            {unit.completed
-                              ? "Review"
-                              : "Start"}
+                            {unit.completed ? "Review" : unitAction(unit.type)}
 
                             <ChevronRight className="h-4 w-4" />
                           </Link>
@@ -711,8 +783,7 @@ export default function TaskLearningPage({
                                 hover:bg-muted
                               "
                             >
-                              Resource
-
+                              {isSearchLink(unit.resource_url) ? "Find on YouTube" : "Open resource"}
                               <ExternalLink className="h-4 w-4" />
                             </a>
                           )}
@@ -798,6 +869,27 @@ export default function TaskLearningPage({
         </main>
 
       </div>
+
+      {furtherReading.length > 0 && (
+        <section className="rounded-xl border bg-card p-6">
+          <h2 className="text-sm font-semibold">Further reading</h2>
+          <ul className="mt-3 space-y-2">
+            {furtherReading.map((url) => (
+              <li key={url}>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 break-all text-sm text-primary hover:underline"
+                >
+                  {url}
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {totalUnits > 0 && completedUnits === totalUnits && (
         <TaskQuiz taskId={task.id} />

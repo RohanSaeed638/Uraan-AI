@@ -1,7 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { Roadmap, RoadmapSummary } from "@/types/roadmap";
 import {
+  CalendarSchedule,
+  ProfileData,
+  CareerDocument,
   DashboardSummary,
+  Gamification,
+  InterviewListItem,
+  InterviewSession,
+  Leaderboard,
+  LeaderboardPeriod,
+  Portfolio,
   ProgressOverview,
   ProjectList,
   UserSettings,
@@ -57,6 +66,29 @@ async function getJson<T>(path: string): Promise<T | null> {
 export const getDashboardSummary = () =>
   getJson<DashboardSummary>("/dashboard/summary");
 
+export const getGamification = () =>
+  getJson<Gamification>("/gamification/me");
+
+export const getInterviews = () =>
+  getJson<{ sessions: InterviewListItem[] }>("/interviews");
+
+export const getInterview = (id: string) =>
+  getJson<InterviewSession>(`/interviews/${encodeURIComponent(id)}`);
+
+export const getPortfolio = () => getJson<Portfolio>("/portfolio");
+
+export const getDocuments = () =>
+  getJson<{ documents: CareerDocument[] }>("/documents");
+
+export const getCalendarSchedule = () =>
+  getJson<CalendarSchedule>("/calendar/schedule");
+
+export const getCalendarToken = () =>
+  getJson<{ token: string }>("/calendar/subscription");
+
+export const getLeaderboard = (period: LeaderboardPeriod) =>
+  getJson<Leaderboard>(`/leaderboard?period=${period}`);
+
 export const getProgressOverview = () =>
   getJson<ProgressOverview>("/progress/overview");
 
@@ -64,15 +96,7 @@ export const getProjects = () => getJson<ProjectList>("/projects");
 
 export const getUserSettings = () => getJson<UserSettings>("/settings");
 
-export interface Profile {
-  full_name?: string | null;
-  language?: string | null;
-  career_slug?: string | null;
-  skill_level?: string | null;
-  learning_style?: string | null;
-  daily_hours?: number | null;
-  target_duration?: number | null;
-}
+export type Profile = ProfileData;
 
 export async function getProfileServer(): Promise<Profile | null> {
   try {

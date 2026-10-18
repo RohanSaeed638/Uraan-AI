@@ -21,6 +21,7 @@ class UserSettingsResponse(BaseModel):
     reminder_time: time
     timezone: str
     ai_mentor_enabled: bool
+    show_on_leaderboard: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,6 +33,7 @@ class UpdateUserSettingsRequest(BaseModel):
     reminder_time: time | None = None
     timezone: str | None = None
     ai_mentor_enabled: bool | None = None
+    show_on_leaderboard: bool | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -55,6 +57,7 @@ class UpdateUserSettingsRequest(BaseModel):
         "reminder_time",
         "timezone",
         "ai_mentor_enabled",
+        "show_on_leaderboard",
     )
     @classmethod
     def reject_null(cls, value):
@@ -70,3 +73,4 @@ class UpdateUserSettingsRequest(BaseModel):
                 "Reminder time must not include a timezone offset"
             )
         return value    
+

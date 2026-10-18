@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
-import { Toaster } from "sonner";
+import AppToaster from "@/components/shared/AppToaster";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -50,7 +50,9 @@ export default function RootLayout({
             __html: `
               try {
                 var stored = localStorage.getItem('uraan-theme');
-                var dark = stored ? stored === 'dark' : true;
+                var dark = stored === 'light' ? false
+                  : stored === 'system' ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                  : true;
                 document.documentElement.classList.toggle('dark', dark);
               } catch (e) {}
             `,
@@ -60,7 +62,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           {children}
-          <Toaster richColors theme="dark" />
+          <AppToaster />
         </AuthProvider>
       </body>
     </html>
