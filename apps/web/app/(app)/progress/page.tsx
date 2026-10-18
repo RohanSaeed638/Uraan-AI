@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, CheckSquare, Clock, TrendingUp } from "lucide-react";
 
-import { getRoadmapDetails } from "@/lib/server/data";
+import { getProgressOverview } from "@/lib/server/data";
 import { formatMinutes } from "@/lib/units";
 
 import { Card } from "@/components/ui/card";
@@ -13,46 +13,17 @@ const pct = (done: number, total: number) =>
   total === 0 ? 0 : Math.round((done / total) * 100);
 
 export default async function ProgressPage() {
-  const roadmaps = await getRoadmapDetails();
+  const overview = await getProgressOverview();
 
-  const rows = roadmaps.map((roadmap) => {
-    const phases = [...(roadmap.phases ?? [])]
-      .sort((a, b) => a.order - b.order)
-      .map((phase) => {
-        const tasks = phase.tasks ?? [];
-        return {
-          id: phase.id,
-          title: phase.title,
-          done: tasks.filter((t) => t.completed).length,
-          total: tasks.length,
-        };
-      });
+  const rows = overview?.roadmap_progress ?? [];
 
-    const tasks = (roadmap.phases ?? []).flatMap((p) => p.tasks ?? []);
-    const units = tasks.flatMap((t) => t.learning_units ?? []);
-
-    return {
-      id: roadmap.id,
-      title: roadmap.title,
-      phases,
-      tasksDone: tasks.filter((t) => t.completed).length,
-      tasksTotal: tasks.length,
-      unitsDone: units.filter((u) => u.completed).length,
-      unitsTotal: units.length,
-      minutes: units
-        .filter((u) => u.completed)
-        .reduce((s, u) => s + (u.estimated_minutes ?? 0), 0),
-    };
-  });
-
-  const sum = (f: (r: (typeof rows)[number]) => number) =>
-    rows.reduce((s, r) => s + f(r), 0);
-
-  const tasksDone = sum((r) => r.tasksDone);
-  const tasksTotal = sum((r) => r.tasksTotal);
-  const unitsDone = sum((r) => r.unitsDone);
-  const unitsTotal = sum((r) => r.unitsTotal);
-  const minutes = sum((r) => r.minutes);
+  const tasksDone = overview?.tasks.completed ?? 0;
+  const tasksTotal = overview?.tasks.total ?? 0;
+  const unitsDone = overview?.learning_units.completed ?? 0;
+  const unitsTotal = overview?.learning_units.total ?? 0;
+  const minutes = Math.round(
+    (overview?.estimated_completed_learning_hours ?? 0) * 60
+  );
 
   if (rows.length === 0) {
     return (
@@ -111,30 +82,33 @@ export default async function ProgressPage() {
       <h2 className="font-heading mt-10 text-lg font-semibold">By roadmap</h2>
       <div className="mt-3 space-y-4">
         {rows.map((r) => (
-          <Card key={r.id} className="gap-4">
+          <Card key={r.roadmap_id} className="gap-4">
             <div className="flex items-center justify-between gap-4">
               <Link
-                href={`/roadmaps/${r.id}`}
+                href={`/roadmaps/${r.roadmap_id}`}
                 className="font-semibold hover:text-brand-violet"
               >
                 {r.title}
               </Link>
               <span className="text-sm font-medium">
-                {pct(r.tasksDone, r.tasksTotal)}%
+                {Math.round(r.completion_percentage)}%
               </span>
             </div>
-            <Progress value={pct(r.tasksDone, r.tasksTotal)} />
+            <Progress value={Math.round(r.completion_percentage)} />
 
             <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
               {r.phases.map((phase) => (
-                <div key={phase.id}>
+                <div key={phase.phase_id}>
                   <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                     <span className="truncate pr-3">{phase.title}</span>
                     <span>
-                      {phase.done}/{phase.total}
+                      {phase.completed_tasks}/{phase.total_tasks}
                     </span>
                   </div>
-                  <Progress value={pct(phase.done, phase.total)} className="h-1.5" />
+                  <Progress
+                    value={Math.round(phase.completion_percentage)}
+                    className="h-1.5"
+                  />
                 </div>
               ))}
             </div>

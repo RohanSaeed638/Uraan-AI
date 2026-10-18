@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
+import { getUserSettings } from "@/lib/server/data";
+
 import SettingsClient from "./SettingsClient";
 
 export default async function SettingsPage() {
@@ -13,5 +15,7 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  return <SettingsClient user={user} />;
+  const settings = await getUserSettings();
+
+  return <SettingsClient user={user} settings={settings} />;
 }

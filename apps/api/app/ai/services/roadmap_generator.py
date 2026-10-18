@@ -56,7 +56,7 @@ class RoadmapGenerator:
 
         response = await client.chat.completions.create(
 
-            model="gpt-5.4-nano",
+            model=settings.OPENAI_MODEL,
 
             messages=[
                 {
@@ -98,7 +98,7 @@ class RoadmapGenerator:
         )
 
         response = await client.chat.completions.create(
-            model="gpt-5.4-nano",
+            model=settings.OPENAI_MODEL,
             messages=[
                 {
                     "role": "system",

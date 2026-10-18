@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { Roadmap, RoadmapSummary } from "@/types/roadmap";
+import {
+  DashboardSummary,
+  ProgressOverview,
+  ProjectList,
+  UserSettings,
+} from "@/types/api";
 
 async function authedFetch(path: string) {
   const supabase = await createClient();
@@ -38,6 +44,25 @@ export async function getRoadmapDetails(): Promise<Roadmap[]> {
     return [];
   }
 }
+
+async function getJson<T>(path: string): Promise<T | null> {
+  try {
+    const res = await authedFetch(path);
+    return res.ok ? ((await res.json()) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+export const getDashboardSummary = () =>
+  getJson<DashboardSummary>("/dashboard/summary");
+
+export const getProgressOverview = () =>
+  getJson<ProgressOverview>("/progress/overview");
+
+export const getProjects = () => getJson<ProjectList>("/projects");
+
+export const getUserSettings = () => getJson<UserSettings>("/settings");
 
 export interface Profile {
   full_name?: string | null;

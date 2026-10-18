@@ -48,8 +48,7 @@ async def list_learning(
     if selected_roadmap_id is None:
 
         current_roadmap = await roadmap_service.get_current(
-            db=db,
-            user_id=current_user.id,
+            auth_user_id=current_user.id,
         )
 
         if current_roadmap is None:

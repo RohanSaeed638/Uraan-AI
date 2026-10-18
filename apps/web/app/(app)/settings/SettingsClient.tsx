@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { Loader2, User as UserIcon, Palette } from "lucide-react";
+import { User as UserIcon, Palette, Bell } from "lucide-react";
 
 import { authService } from "@/services/auth/auth";
 import { useAuthStore } from "@/store/auth";
+import { api } from "@/lib/api";
+import { UserSettings } from "@/types/api";
 
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,9 +21,55 @@ import { cn } from "@/lib/utils";
 const tabs = [
   { key: "account", label: "Account", icon: UserIcon },
   { key: "appearance", label: "Appearance", icon: Palette },
+  { key: "preferences", label: "Preferences", icon: Bell },
 ] as const;
 
-export default function SettingsClient({ user }: { user: User }) {
+type PreferenceKey =
+  | "email_notifications"
+  | "learning_reminders"
+  | "ai_mentor_enabled";
+
+const preferenceOptions: { key: PreferenceKey; label: string; hint: string }[] =
+  [
+    {
+      key: "email_notifications",
+      label: "Email notifications",
+      hint: "Product updates and activity summaries.",
+    },
+    {
+      key: "learning_reminders",
+      label: "Learning reminders",
+      hint: "A daily nudge to keep your streak going.",
+    },
+    {
+      key: "ai_mentor_enabled",
+      label: "AI mentor",
+      hint: "Enable the AI mentor across the app.",
+    },
+  ];
+
+export default function SettingsClient({
+  user,
+  settings: initialSettings,
+}: {
+  user: User;
+  settings: UserSettings | null;
+}) {
+  const [settings, setSettings] = useState(initialSettings);
+
+  async function updateSettings(patch: Partial<UserSettings>) {
+    if (!settings) return;
+    const previous = settings;
+    setSettings({ ...settings, ...patch });
+    try {
+      const { data } = await api.patch<UserSettings>("/settings", patch);
+      setSettings(data);
+    } catch {
+      setSettings(previous);
+      toast.error("Could not save your preferences.");
+    }
+  }
+
   const setUser = useAuthStore((state) => state.setUser);
   const [active, setActive] = useState<(typeof tabs)[number]["key"]>(
     "account"
@@ -125,6 +173,57 @@ export default function SettingsClient({ user }: { user: User }) {
                   Save Changes
                 </LoadingButton>
               </form>
+            </Card>
+          )}
+
+          {active === "preferences" && (
+            <Card className="max-w-xl p-7">
+              <h2 className="text-sm font-semibold">Preferences</h2>
+              {settings ? (
+                <div className="mt-5 space-y-5">
+                  {preferenceOptions.map(({ key, label, hint }) => (
+                    <label
+                      key={key}
+                      className="flex cursor-pointer items-start justify-between gap-4"
+                    >
+                      <span>
+                        <span className="block text-sm font-medium">
+                          {label}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {hint}
+                        </span>
+                      </span>
+                      <input
+                        type="checkbox"
+                        className="mt-1 size-4 accent-brand-violet"
+                        checked={settings[key]}
+                        onChange={(e) =>
+                          updateSettings({ [key]: e.target.checked })
+                        }
+                      />
+                    </label>
+                  ))}
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="reminderTime">Reminder time</Label>
+                    <Input
+                      id="reminderTime"
+                      type="time"
+                      value={settings.reminder_time.slice(0, 5)}
+                      disabled={!settings.learning_reminders}
+                      onChange={(e) =>
+                        e.target.value &&
+                        updateSettings({ reminder_time: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Preferences are unavailable right now.
+                </p>
+              )}
             </Card>
           )}
 

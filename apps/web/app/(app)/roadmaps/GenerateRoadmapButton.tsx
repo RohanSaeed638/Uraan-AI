@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import GenerateRoadmapDialog from "./GenerateRoadmapDialog";

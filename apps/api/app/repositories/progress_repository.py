@@ -39,7 +39,10 @@ async def get_user_roadmap_statistics(
             RoadmapTask,
             RoadmapTask.phase_id == RoadmapPhase.id,
         )
-        .where(Roadmap.user_id == user_id)
+        .where(
+            Roadmap.user_id == user_id,
+            Roadmap.status != "archived",
+        )
         .group_by(
             Roadmap.id,
             Roadmap.title,
@@ -103,9 +106,54 @@ async def get_user_learning_statistics(
             Roadmap,
             RoadmapPhase.roadmap_id == Roadmap.id,
         )
-        .where(Roadmap.user_id == user_id)
+        .where(
+            Roadmap.user_id == user_id,
+            Roadmap.status != "archived",
+        )
     )
 
     result = await db.execute(stmt)
 
     return result.one()
+
+
+async def get_user_phase_statistics(
+    db: AsyncSession,
+    user_id: UUID,
+):
+    stmt = (
+        select(
+            Roadmap.id.label("roadmap_id"),
+            RoadmapPhase.id.label("phase_id"),
+            RoadmapPhase.title.label("title"),
+            RoadmapPhase.order.label("order"),
+            func.count(RoadmapTask.id).label("total_tasks"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (RoadmapTask.completed.is_(True), 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            ).label("completed_tasks"),
+        )
+        .select_from(Roadmap)
+        .join(RoadmapPhase, RoadmapPhase.roadmap_id == Roadmap.id)
+        .outerjoin(RoadmapTask, RoadmapTask.phase_id == RoadmapPhase.id)
+        .where(
+            Roadmap.user_id == user_id,
+            Roadmap.status != "archived",
+        )
+        .group_by(
+            Roadmap.id,
+            RoadmapPhase.id,
+            RoadmapPhase.title,
+            RoadmapPhase.order,
+        )
+        .order_by(RoadmapPhase.order.asc())
+    )
+
+    result = await db.execute(stmt)
+
+    return result.all()

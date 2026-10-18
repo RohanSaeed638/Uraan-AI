@@ -10,6 +10,7 @@ from app.api.routes.progress import router as progress_router
 from app.api.routes.projects import router as projects_router
 from app.api.routes.quizzes import router as quizzes_router
 from app.api.routes.settings import router as settings_router
+from app.api.routes.mentor import router as mentor_router
 from app.core.exceptions import global_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -39,6 +40,7 @@ app.include_router(progress_router)
 app.include_router(projects_router)
 app.include_router(quizzes_router)
 app.include_router(settings_router)
+app.include_router(mentor_router)
 app.add_exception_handler(
     Exception,
     global_exception_handler

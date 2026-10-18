@@ -83,6 +83,24 @@ class QuizRepository:
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
+    async def create_quiz_with_questions(
+        self,
+        quiz: Quiz,
+        questions: list[QuizQuestion],
+    ) -> Quiz:
+        """Stages the quiz and questions; the caller commits."""
+
+        self.db.add(quiz)
+        await self.db.flush()
+
+        for question in questions:
+            question.quiz_id = quiz.id
+
+        self.db.add_all(questions)
+        await self.db.flush()
+
+        return quiz
+
     async def create_attempt(
         self,
         attempt: QuizAttempt,

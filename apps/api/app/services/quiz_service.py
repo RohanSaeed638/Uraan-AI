@@ -3,9 +3,15 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.services.quiz_generator import QuizGenerator
+from app.models.quiz import Quiz
 from app.models.quiz_attempt import QuizAttempt
+from app.models.quiz_question import QuizQuestion
 from app.repositories.profile_repository import ProfileRepository
 from app.repositories.quiz_repository import QuizRepository
+from app.repositories.roadmap_task_repository import (
+    RoadmapTaskRepository,
+)
 from app.schemas.quiz import (
     QuizSubmitRequest,
     QuizSubmitResponse,
@@ -23,6 +29,8 @@ class QuizService:
         self.db = db
         self.profile_repository = ProfileRepository(db)
         self.quiz_repository = QuizRepository(db)
+        self.task_repository = RoadmapTaskRepository(db)
+        self.generator = QuizGenerator()
 
     async def _get_profile_and_validate_task(
         self,
@@ -53,13 +61,63 @@ class QuizService:
 
         return profile
 
+    async def _generate_quiz(
+        self,
+        task_id: UUID,
+        profile,
+    ) -> list[QuizQuestion]:
+        # Loads the task with its learning units, which the prompt uses.
+        task = await self.task_repository.get_task_for_user(
+            task_id=task_id,
+            profile_id=profile.id,
+        )
+
+        try:
+            output = await self.generator.generate(
+                profile=profile,
+                task=task,
+            )
+        except Exception as exc:
+            raise HTTPException(
+                status_code=502,
+                detail="Could not generate a quiz right now. Try again.",
+            ) from exc
+
+        quiz = Quiz(
+            task_id=task_id,
+            title=f"{task.title} quiz",
+            passing_score=int(PASSING_PERCENTAGE),
+        )
+
+        try:
+            await self.quiz_repository.create_quiz_with_questions(
+                quiz=quiz,
+                questions=[
+                    QuizQuestion(
+                        task_id=task_id,
+                        question=item.question,
+                        options=item.options,
+                        correct_option=item.correct_option,
+                        explanation=item.explanation,
+                        order=index,
+                    )
+                    for index, item in enumerate(output.questions)
+                ],
+            )
+            await self.db.commit()
+        except Exception:
+            await self.db.rollback()
+            raise
+
+        return await self.quiz_repository.get_questions(task_id)
+
     async def get_questions(
         self,
         task_id: UUID,
         auth_user_id: UUID,
     ) -> list[QuizQuestionResponse]:
 
-        await self._get_profile_and_validate_task(
+        profile = await self._get_profile_and_validate_task(
             task_id,
             auth_user_id,
         )
@@ -67,6 +125,12 @@ class QuizService:
         questions = await self.quiz_repository.get_questions(
             task_id
         )
+
+        if not questions:
+            questions = await self._generate_quiz(
+                task_id=task_id,
+                profile=profile,
+            )
 
         return [
             QuizQuestionResponse(

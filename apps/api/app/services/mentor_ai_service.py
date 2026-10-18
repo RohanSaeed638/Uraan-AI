@@ -33,7 +33,7 @@ class MentorAIService:
 
     def __init__(self):
         self.client = AsyncOpenAI(
-            api_key=settings.openai_api_key,
+            api_key=settings.OPENAI_API_KEY,
             timeout=30.0,
             max_retries=1,
         )
@@ -44,7 +44,7 @@ class MentorAIService:
     ) -> str:
 
         response = await self.client.chat.completions.create(
-            model=settings.openai_model,
+            model=settings.OPENAI_MODEL,
             messages=[
                 {
                     "role": "system",

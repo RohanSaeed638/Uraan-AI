@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Clock, Flame, ListChecks, Sparkles } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import { getDashboardSummary } from "@/lib/server/data";
 import { RoadmapSummary } from "@/types/roadmap";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -29,19 +30,18 @@ async function getRoadmaps(): Promise<RoadmapSummary[]> {
 }
 
 export default async function DashboardPage() {
-  const roadmaps = await getRoadmaps();
+  const [roadmaps, summary] = await Promise.all([
+    getRoadmaps(),
+    getDashboardSummary(),
+  ]);
 
   const active = roadmaps.filter((r) => r.status === "active");
-  const current =
-    active.sort(
-      (a, b) =>
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    )[0] ?? roadmaps[0];
+  const current = summary?.current_roadmap ?? null;
+  const next = summary?.next_learning ?? null;
 
-  const totalTasksCompleted = roadmaps.reduce(
-    (sum, r) => sum + r.completed_tasks,
-    0
-  );
+  const totalTasksCompleted =
+    summary?.stats.completed_tasks ??
+    roadmaps.reduce((sum, r) => sum + r.completed_tasks, 0);
 
   if (roadmaps.length === 0) {
     return (
@@ -83,14 +83,27 @@ export default async function DashboardPage() {
                   {current.completed_tasks} / {current.total_tasks} tasks
                   complete
                 </p>
+                {next && (
+                  <p className="mt-3 text-sm">
+                    <span className="text-muted-foreground">Up next: </span>
+                    {next.learning_unit_title}
+                  </p>
+                )}
                 <Link
-                  href={`/roadmaps/${current.id}`}
+                  href={
+                    next
+                      ? `/roadmaps/${next.roadmap_id}/task/${next.task_id}/learn/${next.learning_unit_id}`
+                      : `/roadmaps/${current.id}`
+                  }
                   className={buttonVariants({ className: "mt-5 gap-2" })}
                 >
                   Continue Learning <ArrowRight size={15} />
                 </Link>
               </div>
-              <ProgressRing value={current.progress} size={104} />
+              <ProgressRing
+                value={Math.round(current.completion_percentage)}
+                size={104}
+              />
             </div>
           </Card>
         )}

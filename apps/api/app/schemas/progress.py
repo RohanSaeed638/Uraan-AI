@@ -51,6 +51,7 @@ class RoadmapProgressItem(BaseModel):
     total_tasks: int
     completed_tasks: int
     completion_percentage: float
+    phases: list[PhaseProgressResponse] = Field(default_factory=list)
 
 
 class ProgressOverviewResponse(BaseModel):

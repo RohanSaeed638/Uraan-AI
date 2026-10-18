@@ -33,7 +33,7 @@ async def get_next_learning_unit(
         )
         .where(
             Roadmap.user_id == user_id,
-            Roadmap.status == "in_progress",
+            Roadmap.status == "active",
             RoadmapTask.completed.is_(False),
             TaskLearningUnit.completed.is_(False),
         )

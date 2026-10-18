@@ -16,6 +16,7 @@ from app.schemas.progress import (
 from app.repositories.progress_repository import (
     get_user_roadmap_statistics,
     get_user_learning_statistics,
+    get_user_phase_statistics,
 )
 
 def calculate_percentage(completed: int, total: int) -> float:
@@ -29,10 +30,9 @@ async def get_roadmap_progress(
     db: AsyncSession,
     roadmap_id: UUID,
     user_id: UUID,
-    roadmap_repository: RoadmapRepository = Depends(RoadmapRepository),
 ) -> RoadmapProgressResponse:
 
-    roadmap = await roadmap_repository.get_roadmap_for_progress(
+    roadmap = await RoadmapRepository(db).get_roadmap_for_progress(
         db=db,
         roadmap_id=roadmap_id,
         user_id=user_id,
@@ -132,6 +132,26 @@ async def get_progress_overview(
         user_id=user_id,
     )
 
+    phase_rows = await get_user_phase_statistics(
+        db=db,
+        user_id=user_id,
+    )
+
+    phases_by_roadmap = {}
+    for phase in phase_rows:
+        phases_by_roadmap.setdefault(phase.roadmap_id, []).append(
+            PhaseProgressResponse(
+                phase_id=phase.phase_id,
+                title=phase.title,
+                total_tasks=phase.total_tasks,
+                completed_tasks=phase.completed_tasks,
+                completion_percentage=calculate_completion(
+                    phase.completed_tasks,
+                    phase.total_tasks,
+                ),
+            )
+        )
+
     total_roadmaps = len(roadmap_rows)
 
     completed_roadmaps = 0
@@ -152,7 +172,7 @@ async def get_progress_overview(
         if status == "completed":
             completed_roadmaps += 1
 
-        elif status == "in_progress":
+        elif status == "active":
             in_progress_roadmaps += 1
 
         total_tasks += row.total_tasks
@@ -168,6 +188,7 @@ async def get_progress_overview(
                     row.completed_tasks,
                     row.total_tasks,
                 ),
+                phases=phases_by_roadmap.get(row.roadmap_id, []),
             )
         )
 

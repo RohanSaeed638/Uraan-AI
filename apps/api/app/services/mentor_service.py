@@ -244,7 +244,7 @@ class MentorService:
         # unanswered user message in the database.
         try:
             assistant_content = await (
-                self.ai_service.generate_response(
+                self.mentor_ai_service.generate_response(
                     messages=llm_messages,
                 )
             )

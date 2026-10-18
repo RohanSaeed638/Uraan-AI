@@ -1,23 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const THEME_KEY = "uraan-theme";
+const THEME_EVENT = "uraan-theme-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(THEME_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(THEME_EVENT, onChange);
+  };
+}
+
+function getIsDark() {
+  const stored = localStorage.getItem(THEME_KEY);
+  return stored ? stored === "dark" : true;
+}
+
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true);
+  const isDark = useSyncExternalStore(subscribe, getIsDark, () => true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("uraan-theme");
-    const dark = stored ? stored === "dark" : true;
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-  }, []);
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
 
   function setTheme(dark: boolean) {
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("uraan-theme", dark ? "dark" : "light");
+    localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+    window.dispatchEvent(new Event(THEME_EVENT));
   }
 
   return (

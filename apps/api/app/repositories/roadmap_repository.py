@@ -206,6 +206,7 @@ class RoadmapRepository:
 
         return result.scalar_one_or_none()
 
+    @staticmethod
     async def get_owned_roadmap(
         db: AsyncSession,
         user_id: UUID,

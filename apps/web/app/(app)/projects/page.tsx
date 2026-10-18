@@ -1,22 +1,19 @@
-import { getRoadmapDetails } from "@/lib/server/data";
-import { flattenUnits } from "@/lib/units";
+import { getProjects } from "@/lib/server/data";
 
 import ProjectsClient from "./ProjectsClient";
 
 export default async function ProjectsPage() {
-  const roadmaps = await getRoadmapDetails();
+  const data = await getProjects();
 
-  const projects = flattenUnits(roadmaps)
-    .filter((c) => c.unit.type?.toLowerCase() === "project")
-    .map((c) => ({
-      id: c.unit.id,
-      title: c.unit.title,
-      description: c.unit.description,
-      minutes: c.unit.estimated_minutes,
-      completed: c.unit.completed,
-      context: `${c.taskTitle} · ${c.roadmapTitle}`,
-      href: `/roadmaps/${c.roadmapId}/task/${c.taskId}/learn/${c.unit.id}`,
-    }));
+  const projects = (data?.projects ?? []).map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    minutes: p.estimated_minutes,
+    completed: p.completed,
+    context: `${p.task_title} · ${p.roadmap_title}`,
+    href: `/roadmaps/${p.roadmap_id}/task/${p.task_id}/learn/${p.id}`,
+  }));
 
   return <ProjectsClient projects={projects} />;
 }

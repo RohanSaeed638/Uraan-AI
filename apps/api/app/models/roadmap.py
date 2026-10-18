@@ -2,7 +2,10 @@ from enum import Enum
 
 from app.models.enums import CareerStage, LearningStyle, RoadmapStatus, SkillLevel
 from sqlalchemy import String, ForeignKey, Integer, Enum as SQLAlchemyEnum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import select
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
+
+from app.models.profile import Profile
 
 from app.models.base_model import BaseModel
 
@@ -12,6 +15,16 @@ class Roadmap(BaseModel):
 
     profile_id: Mapped[str] = mapped_column(
         ForeignKey("profiles.id")
+    )
+
+    # Supabase auth user that owns the roadmap, via its profile. Lets queries
+    # filter on `Roadmap.user_id == current_user.id`; never loaded onto
+    # instances.
+    user_id = column_property(
+        select(Profile.auth_user_id)
+        .where(Profile.id == profile_id)
+        .scalar_subquery(),
+        deferred=True,
     )
 
     title: Mapped[str] = mapped_column(

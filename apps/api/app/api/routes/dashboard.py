@@ -32,7 +32,6 @@ async def dashboard_summary(
     )
 
     current_roadmap = await roadmap_service.get_current(
-        db=db,
         auth_user_id=user_id,
     )
 
@@ -40,10 +39,10 @@ async def dashboard_summary(
         db=db,
         user_id=user_id,
         user_name=(
-            profile.name if profile else None
+            profile.full_name if profile else None
         ),
         career_goal=(
-            profile.career_goal if profile else None
+            profile.career_slug if profile else None
         ),
         current_roadmap=current_roadmap,
     )

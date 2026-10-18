@@ -17,6 +17,8 @@ import {
 
 import { RoadmapTask } from "@/types/roadmap";
 
+import TaskQuiz from "./TaskQuiz";
+
 interface TaskLearningPageProps {
   roadmapId: string;
   task: RoadmapTask;
@@ -26,7 +28,10 @@ export default function TaskLearningPage({
   roadmapId,
   task,
 }: TaskLearningPageProps) {
-  const learningUnits = task.learning_units ?? [];
+  const learningUnits = useMemo(
+    () => task.learning_units ?? [],
+    [task.learning_units]
+  );
 
   /*
    * Get all available days.
@@ -483,7 +488,7 @@ export default function TaskLearningPage({
                 </p>
 
                 <h2 className="mt-1 text-2xl font-semibold">
-                  Today's learning session
+                  Today&apos;s learning session
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -559,7 +564,7 @@ export default function TaskLearningPage({
 
                 <p className="mt-1 text-sm text-muted-foreground">
                   Learning material for this day
-                  hasn't been generated yet.
+                  hasn&apos;t been generated yet.
                 </p>
 
               </div>
@@ -749,7 +754,7 @@ export default function TaskLearningPage({
                     </h3>
 
                     <p className="text-sm text-muted-foreground">
-                      Great work. You're ready to
+                      Great work. You&apos;re ready to
                       continue to the next part.
                     </p>
 
@@ -793,6 +798,10 @@ export default function TaskLearningPage({
         </main>
 
       </div>
+
+      {totalUnits > 0 && completedUnits === totalUnits && (
+        <TaskQuiz taskId={task.id} />
+      )}
 
     </div>
   );

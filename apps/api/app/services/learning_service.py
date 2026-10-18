@@ -59,7 +59,6 @@ async def get_learning_agenda(
     user_id: UUID,
     roadmap_id: UUID,
     view: LearningView = "today",
-    roadmap_repository: RoadmapRepository = Depends(RoadmapRepository),
 ) -> LearningAgendaResponse:
 
     rows = await get_roadmap_learning_units(
@@ -68,7 +67,7 @@ async def get_learning_agenda(
         roadmap_id=roadmap_id,
     )
 
-    roadmap = await roadmap_repository.get_owned_roadmap(
+    roadmap = await RoadmapRepository.get_owned_roadmap(
         db=db,
         user_id=user_id,
         roadmap_id=roadmap_id,

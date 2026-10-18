@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Bot,
   BookOpen,
   CheckSquare,
   FolderKanban,
@@ -24,6 +25,7 @@ const items = [
   { title: "Tasks", href: "/tasks", icon: CheckSquare },
   { title: "Projects", href: "/projects", icon: FolderKanban },
   { title: "Progress", href: "/progress", icon: TrendingUp },
+  { title: "AI Mentor", href: "/mentor", icon: Bot },
   { title: "Profile", href: "/profile", icon: User },
   { title: "Settings", href: "/settings", icon: Settings },
 ];
