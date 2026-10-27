@@ -1,42 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/lib/api/notifications";
+import { fireConfetti } from "@/components/shared/ConfettiHost";
 import { AppNotification } from "@/types/api";
+import { useTimeAgo } from "@/lib/use-time-ago";
 import { cn } from "@/lib/utils";
 
 const KEY = ["notifications"] as const;
 
-function timeAgo(iso: string) {
-  const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
-}
+// Notifications that deserve a celebration when they arrive.
+const CELEBRATE = new Set(["achievement", "boss_defeated"]);
 
 export default function NotificationBell() {
+  const t = useTranslations("notifications");
+  const timeAgo = useTimeAgo();
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
     queryKey: KEY,
-    queryFn: listNotifications,
+    queryFn: () => listNotifications(),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: KEY });
+
+  // What was already there when the page loaded is not news; only what shows
+  // up afterwards is celebrated.
+  const seen = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    if (!data) return;
+
+    if (seen.current === null) {
+      seen.current = new Set(data.notifications.map((n) => n.id));
+      return;
+    }
+
+    const fresh = data.notifications.filter(
+      (n) => !seen.current!.has(n.id) && CELEBRATE.has(n.type)
+    );
+
+    data.notifications.forEach((n) => seen.current!.add(n.id));
+
+    if (fresh.length > 0) {
+      fireConfetti();
+      fresh.slice(0, 3).forEach((n) => toast.success(n.title, { description: n.body }));
+    }
+  }, [data]);
+
+  // Check for new notifications soon after anything that can earn one.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    function soon() {
+      clearTimeout(timer);
+      timer = setTimeout(() => queryClient.invalidateQueries({ queryKey: KEY }), 700);
+    }
+
+    window.addEventListener("uraan:progress", soon);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("uraan:progress", soon);
+    };
+  }, [queryClient]);
 
   const readOne = useMutation({
     mutationFn: markNotificationRead,
@@ -58,14 +100,14 @@ export default function NotificationBell() {
   return (
     <div className="relative">
       <button
-        aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
+        aria-label={unread ? t("unread", { count: unread }) : t("title")}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className="relative flex size-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
       >
         <Bell size={17} />
         {unread > 0 && (
-          <span className="absolute right-1 top-1 flex min-w-4 items-center justify-center rounded-full bg-brand-gold px-1 text-[10px] font-semibold leading-4 text-black">
+          <span className="absolute end-1 top-1 flex min-w-4 items-center justify-center rounded-full bg-brand-gold px-1 text-[10px] font-semibold leading-4 text-black">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -78,15 +120,15 @@ export default function NotificationBell() {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <div className="absolute right-0 top-11 z-40 w-80 overflow-hidden rounded-2xl border bg-popover text-popover-foreground shadow-lg">
+          <div className="absolute end-0 top-11 z-40 w-80 overflow-hidden rounded-2xl border bg-popover text-popover-foreground shadow-lg">
             <div className="flex items-center justify-between border-b px-4 py-3">
-              <p className="text-sm font-semibold">Notifications</p>
+              <p className="text-sm font-semibold">{t("title")}</p>
               {unread > 0 && (
                 <button
                   onClick={() => readAll.mutate()}
-                  className="text-xs font-medium text-brand-violet hover:underline"
+                  className="text-xs font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
                 >
-                  Mark all read
+                  {t("markAll")}
                 </button>
               )}
             </div>
@@ -94,7 +136,7 @@ export default function NotificationBell() {
             <div className="max-h-96 overflow-y-auto">
               {!data || data.notifications.length === 0 ? (
                 <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  You&apos;re all caught up.
+                  {t("caughtUp")}
                 </p>
               ) : (
                 data.notifications.map((n) => (
@@ -102,7 +144,7 @@ export default function NotificationBell() {
                     key={n.id}
                     onClick={() => open_(n)}
                     className={cn(
-                      "block w-full border-b px-4 py-3 text-left transition last:border-b-0 hover:bg-muted",
+                      "block w-full border-b px-4 py-3 text-start transition last:border-b-0 hover:bg-muted",
                       !n.read && "bg-brand-violet/5"
                     )}
                   >
@@ -119,6 +161,14 @@ export default function NotificationBell() {
                 ))
               )}
             </div>
+
+            <Link
+              href="/notifications"
+              onClick={() => setOpen(false)}
+              className="block border-t px-4 py-2.5 text-center text-xs font-medium text-brand-gold-deep hover:bg-muted dark:text-brand-gold"
+            >
+              {t("viewAll")}
+            </Link>
           </div>
         </>
       )}

@@ -1,4 +1,5 @@
 import { CAREERS, LANGUAGES } from "@/app/(app)/onboarding/constants";
+import { translateApiMessage } from "@/lib/api-errors";
 
 export { CAREERS, LANGUAGES };
 
@@ -21,6 +22,37 @@ export const CAREER_STAGES = [
   { value: "professional", label: "Working professional" },
   { value: "career_switcher", label: "Career switcher" },
 ] as const;
+
+// Value lists for the onboarding "About you" / "Your plan" answers. Labels
+// live in messages/*.json under `options.<name>.<value>`.
+export const EDUCATION = [
+  "school",
+  "college",
+  "bachelors",
+  "masters",
+  "self_taught",
+  "other",
+] as const;
+
+export const DEVICES = ["laptop", "desktop", "mobile"] as const;
+
+export const GOAL_TYPES = [
+  "local_job",
+  "remote_job",
+  "freelancing",
+  "startup",
+  "study_abroad",
+] as const;
+
+export const STUDY_HOURS = [
+  "morning",
+  "afternoon",
+  "evening",
+  "night",
+  "flexible",
+] as const;
+
+export const PACES = ["relaxed", "steady", "intensive"] as const;
 
 const COMMON_TIMEZONES = [
   "UTC",
@@ -69,10 +101,15 @@ export function labelFor(
 
 /** The first readable message from an API error response. */
 export function apiErrorMessage(error: unknown, fallback: string): string {
-  const detail = (error as { response?: { data?: { detail?: unknown } } })
-    ?.response?.data?.detail;
+  const data = (
+    error as { response?: { data?: { detail?: unknown; message?: unknown } } }
+  )?.response?.data;
+  const detail = data?.detail;
 
-  if (typeof detail === "string") return detail;
+  if (typeof detail === "string") return translateApiMessage(detail);
+
+  // Unexpected server errors use a safe, readable `message` instead.
+  if (typeof data?.message === "string") return translateApiMessage(data.message);
 
   if (Array.isArray(detail) && detail[0]?.msg) {
     const field = Array.isArray(detail[0].loc)

@@ -1,4 +1,6 @@
 from uuid import UUID
+from app.ai.llm import use_profile
+from app.ai.versions import prompt_version
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -71,6 +73,8 @@ class QuizService:
         task_id: UUID,
         profile,
     ) -> list[QuizQuestion]:
+        use_profile(profile.id, profile.language)
+
         # Loads the task with its learning units, which the prompt uses.
         task = await self.task_repository.get_task_for_user(
             task_id=task_id,
@@ -92,6 +96,7 @@ class QuizService:
             task_id=task_id,
             title=f"{task.title} quiz",
             passing_score=int(PASSING_PERCENTAGE),
+            prompt_version=prompt_version("quiz"),
         )
 
         try:

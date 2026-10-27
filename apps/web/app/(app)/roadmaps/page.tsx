@@ -1,11 +1,21 @@
+import { getTranslations } from "next-intl/server";
+
 import { createClient } from "@/lib/supabase/server";
+import PageHeader from "@/components/shared/PageHeader";
 
 import RoadmapList from "./RoadmapList";
 import EmptyState from "./EmptyState";
 import GenerateRoadmapButton from "./GenerateRoadmapButton";
 import { RoadmapSummary } from "@/types/roadmap";
 
-export default async function RoadmapPage() {
+export default async function RoadmapPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ career?: string }>;
+}) {
+  const { career } = await searchParams;
+  const t = await getTranslations("roadmaps");
+
   const supabase = await createClient();
 
   const {
@@ -24,15 +34,12 @@ export default async function RoadmapPage() {
 
   return (
     <main className="mx-auto max-w-6xl">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-3xl font-bold">My Roadmaps</h1>
-          <p className="mt-1 text-muted-foreground">
-            Track all your career journeys.
-          </p>
-        </div>
-        <GenerateRoadmapButton />
-      </div>
+      <PageHeader
+        className="mb-6"
+        title={t("title")}
+        subtitle={t("subtitle")}
+        actions={<GenerateRoadmapButton defaultCareer={career} />}
+      />
 
       {roadmaps.length === 0 ? (
         <EmptyState />

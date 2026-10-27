@@ -1,4 +1,5 @@
 from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base_model import BaseModel
@@ -23,6 +24,12 @@ class RoadmapPhase(BaseModel):
 
     duration_weeks: Mapped[int]
 
+    # What the learner can do by the end of the phase (2-4 short lines).
+    milestones: Mapped[list[str] | None] = mapped_column(
+        ARRAY(String),
+        nullable=True,
+    )
+
     roadmap = relationship(
         "Roadmap",
         back_populates="phases"
@@ -31,5 +38,6 @@ class RoadmapPhase(BaseModel):
     tasks = relationship(
         "RoadmapTask",
         back_populates="phase",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        order_by="RoadmapTask.order",
     )

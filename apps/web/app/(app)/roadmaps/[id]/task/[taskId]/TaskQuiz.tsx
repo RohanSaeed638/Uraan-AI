@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Loader2, RotateCcw, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export default function TaskQuiz({ taskId }: { taskId: string }) {
+  const t = useTranslations("quiz");
   const [started, setStarted] = useState(false);
   const [selected, setSelected] = useState<Record<string, number>>({});
 
@@ -33,7 +35,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
           selected_option,
         }))
       ),
-    onError: () => toast.error("Couldn't submit your answers. Try again."),
+    onError: () => toast.error(t("submitFailed")),
   });
 
   const questions = quiz.data ?? [];
@@ -50,12 +52,12 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
     return (
       <Card className="flex-row items-center justify-between gap-4 p-6">
         <div>
-          <h2 className="font-semibold">Check your understanding</h2>
+          <h2 className="font-semibold">{t("checkTitle")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Take a short quiz on this task. You need 70% to pass.
+            {t("checkText")}
           </p>
         </div>
-        <Button onClick={() => setStarted(true)}>Start quiz</Button>
+        <Button onClick={() => setStarted(true)}>{t("start")}</Button>
       </Card>
     );
   }
@@ -64,7 +66,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
     return (
       <Card className="flex-row items-center gap-3 p-6 text-sm text-muted-foreground">
         <Loader2 size={16} className="animate-spin" />
-        Preparing your quiz…
+        {t("preparing")}
       </Card>
     );
   }
@@ -73,10 +75,10 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
     return (
       <Card className="flex-row items-center justify-between gap-4 p-6">
         <p className="text-sm text-muted-foreground">
-          We couldn&apos;t load the quiz.
+          {t("loadFailed")}
         </p>
         <Button variant="outline" onClick={() => quiz.refetch()}>
-          Try again
+          {t("retry")}
         </Button>
       </Card>
     );
@@ -85,7 +87,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
   return (
     <Card className="gap-6 p-6">
       <div className="flex items-start justify-between gap-4">
-        <h2 className="font-semibold">Quiz</h2>
+        <h2 className="font-semibold">{t("title")}</h2>
         {result && (
           <p
             className={cn(
@@ -95,7 +97,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
           >
             {result.correct_answers}/{result.total_questions} ·{" "}
             {Math.round(result.score_percentage)}% ·{" "}
-            {result.passed ? "Passed" : "Not passed"}
+            {result.passed ? t("passed") : t("notPassed")}
           </p>
         )}
       </div>
@@ -124,7 +126,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
                       setSelected((prev) => ({ ...prev, [q.id]: i }))
                     }
                     className={cn(
-                      "flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition",
+                      "flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-start text-sm transition",
                       !result && isSelected
                         ? "border-brand-violet bg-brand-violet/10"
                         : "hover:bg-muted",
@@ -155,7 +157,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
 
       {result ? (
         <Button variant="outline" className="gap-2 self-start" onClick={retake}>
-          <RotateCcw size={14} /> Retake quiz
+          <RotateCcw size={14} /> {t("retake")}
         </Button>
       ) : (
         <Button
@@ -163,7 +165,7 @@ export default function TaskQuiz({ taskId }: { taskId: string }) {
           disabled={!answeredAll || submit.isPending}
           onClick={() => submit.mutate()}
         >
-          {submit.isPending ? "Submitting…" : "Submit answers"}
+          {submit.isPending ? t("submitting") : t("submit")}
         </Button>
       )}
     </Card>

@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -34,10 +35,21 @@ class NotificationService:
 
         return profile
 
-    async def list(self, auth_user_id: UUID) -> NotificationListResponse:
+    async def list(
+        self,
+        auth_user_id: UUID,
+        limit: int = 30,
+        before: datetime | None = None,
+        unread_only: bool = False,
+    ) -> NotificationListResponse:
         profile = await self._profile(auth_user_id)
 
-        rows = await self.notifications.list_for_profile(profile.id)
+        # One extra row tells whether there is a next page.
+        rows = await self.notifications.list_for_profile(
+            profile.id, limit + 1, before, unread_only
+        )
+        has_more = len(rows) > limit
+        rows = rows[:limit]
 
         return NotificationListResponse(
             notifications=[
@@ -53,6 +65,7 @@ class NotificationService:
                 for row in rows
             ],
             unread_count=await self.notifications.unread_count(profile.id),
+            has_more=has_more,
         )
 
     async def mark_read(

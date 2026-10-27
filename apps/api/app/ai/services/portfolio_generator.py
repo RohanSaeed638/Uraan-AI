@@ -1,10 +1,7 @@
-from openai import AsyncOpenAI
 
-from app.core.config import settings
+from app.ai.llm import complete_text
+from app.ai.versions import prompt_version
 
-client = AsyncOpenAI(
-    api_key=settings.OPENAI_API_KEY
-)
 
 PROMPT = """
 Write a short portfolio description for one project, in the first person.
@@ -48,9 +45,8 @@ class PortfolioGenerator:
         task_title: str | None,
         brief: str | None,
     ) -> str:
-        response = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            messages=[
+        content = await complete_text(
+            [
                 {
                     "role": "system",
                     "content": "You write honest, concise portfolio copy.",
@@ -60,13 +56,10 @@ class PortfolioGenerator:
                     "content": build_prompt(title, tech, task_title, brief),
                 },
             ],
+            purpose="portfolio",
             temperature=0.4,
-            max_completion_tokens=300,
+            max_tokens=300,
+            prompt_version=prompt_version("portfolio"),
         )
-
-        content = response.choices[0].message.content
-
-        if not content or not content.strip():
-            raise ValueError("AI returned an empty description.")
 
         return content.strip().strip('"')[:600]

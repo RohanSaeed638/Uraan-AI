@@ -99,9 +99,37 @@ class Roadmap(BaseModel):
     target_duration: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
-    )    
+    )
+
+    # Why the last background generation / regeneration / adaptation failed
+    # (a safe, readable message); cleared when one succeeds.
+    generation_error: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
+    # The status to go back to if a regeneration or adaptation fails or goes
+    # stale; empty for a first generation (which then becomes "failed").
+    status_before_job: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    # Without an explicit order the database may return rows in any order,
+    # which changes after rows are updated.
     phases = relationship(
         "RoadmapPhase",
         back_populates="roadmap",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        order_by="RoadmapPhase.order",
     )    
+
+    versions = relationship(
+        "RoadmapVersion",
+        back_populates="roadmap",
+        cascade="all, delete-orphan",
+        order_by="RoadmapVersion.version_number.desc()",
+    )
+
+    # Which prompt version produced this (see app/ai/versions.py).
+    prompt_version: Mapped[str | None] = mapped_column(String(40), nullable=True)

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +16,7 @@ import {
 } from "@/lib/validations/auth";
 
 import { authService } from "@/services/auth/auth";
+import { authErrorKey } from "@/lib/auth-errors";
 
 import AuthCard from "./AuthCard";
 import AuthHeader from "./AuthHeader";
@@ -28,6 +30,8 @@ import { Label } from "@/components/ui/label";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
+  const tErrors = useTranslations("auth.errors");
 
   const [loading, setLoading] = useState(false);
 
@@ -52,13 +56,13 @@ export default function RegisterForm() {
         );
 
       if (error) {
-        toast.error(error.message);
+        const key = authErrorKey(error.message);
+
+        toast.error(key ? tErrors(key) : error.message);
         return;
       }
 
-      toast.success(
-        "Account created successfully. Please verify your email."
-      );
+      toast.success(t("created"));
 
       reset();
 
@@ -66,7 +70,7 @@ export default function RegisterForm() {
     } catch (error) {
       console.error(error);
 
-      toast.error("Something went wrong.");
+      toast.error(tErrors("generic"));
     } finally {
       setLoading(false);
     }
@@ -75,73 +79,73 @@ export default function RegisterForm() {
   return (
     <AuthCard>
       <AuthHeader
-        title="Create your account"
-        subtitle="Start your journey towards your dream career."
+        title={t("createTitle")}
+        subtitle={t("createSubtitle")}
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="fullName">Full name</Label>
+          <Label htmlFor="fullName">{t("fullName")}</Label>
 
           <Input
             id="fullName"
-            placeholder="John Doe"
+            placeholder={t("fullNamePlaceholder")}
             {...register("fullName")}
           />
 
           {errors.fullName && (
             <p className="text-sm text-destructive">
-              {errors.fullName.message}
+              {tErrors(errors.fullName.message as "nameRequired")}
             </p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email address</Label>
+          <Label htmlFor="email">{t("email")}</Label>
 
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             {...register("email")}
           />
 
           {errors.email && (
             <p className="text-sm text-destructive">
-              {errors.email.message}
+              {tErrors(errors.email.message as "emailInvalid")}
             </p>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
 
             <PasswordInput
               id="password"
-              placeholder="Create a password"
+              placeholder={t("createPassword")}
               {...register("password")}
             />
 
             {errors.password && (
               <p className="text-sm text-destructive">
-                {errors.password.message}
+                {tErrors(errors.password.message as "passwordShort")}
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="confirmPassword">Confirm</Label>
+            <Label htmlFor="confirmPassword">{t("confirm")}</Label>
 
             <PasswordInput
               id="confirmPassword"
-              placeholder="Confirm password"
+              placeholder={t("confirmPlaceholder")}
               {...register("confirmPassword")}
             />
 
             {errors.confirmPassword && (
               <p className="text-sm text-destructive">
-                {errors.confirmPassword.message}
+                {tErrors(errors.confirmPassword.message as "mismatch")}
               </p>
             )}
           </div>
@@ -153,14 +157,14 @@ export default function RegisterForm() {
           className="w-full"
           size="lg"
         >
-          Create Account
+          {t("createAccount")}
         </LoadingButton>
       </form>
 
       <div className="my-6 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
         <span className="text-xs text-muted-foreground">
-          or continue with
+          {t("orContinue")}
         </span>
         <div className="h-px flex-1 bg-border" />
       </div>
@@ -168,13 +172,16 @@ export default function RegisterForm() {
       <OAuthButtons />
 
       <p className="mt-7 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          href="/login"
-          className="font-medium text-brand-violet hover:underline"
-        >
-          Sign in
-        </Link>
+        {t.rich("haveAccount", {
+          link: (chunks) => (
+            <Link
+              href="/login"
+              className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+            >
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     </AuthCard>
   );

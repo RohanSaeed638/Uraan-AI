@@ -4,25 +4,11 @@ import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import OptionCard from "@/components/onboarding/OptionCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
 
+import { useTranslations } from "next-intl";
+
 import { StepProps, SkillLevel } from "../types";
 
-const skillLevels = [
-  {
-    value: "beginner" as SkillLevel,
-    title: "🌱 Beginner",
-    description: "I'm completely new to this career.",
-  },
-  {
-    value: "intermediate" as SkillLevel,
-    title: "🔥 Intermediate",
-    description: "I know the basics and have built a few projects.",
-  },
-  {
-    value: "advanced" as SkillLevel,
-    title: "🚀 Advanced",
-    description: "I have experience and want to level up.",
-  },
-];
+const skillLevels = ["beginner", "intermediate", "advanced"] as SkillLevel[];
 
 export default function SkillLevelStep({
   data,
@@ -30,21 +16,23 @@ export default function SkillLevelStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.skill");
+
   return (
     <OnboardingCard
-      title="What's your current skill level?"
-      subtitle="This helps us generate the right roadmap."
+      title={t("title")}
+      subtitle={t("subtitle")}
     >
       <div className="grid gap-4">
         {skillLevels.map((level) => (
           <OptionCard
-            key={level.value}
-            title={level.title}
-            description={level.description}
-            selected={data.skill_level === level.value}
+            key={level}
+            title={t(level)}
+            description={t(`${level}Text`)}
+            selected={data.skill_level === level}
             onClick={() =>
               updateData({
-                skill_level: level.value,
+                skill_level: level,
               })
             }
           />

@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 
 import { createClient } from "@/lib/supabase/client";
-import { isEndingSession } from "@/services/auth/auth";
+import { authService, isEndingSession } from "@/services/auth/auth";
+import { sessionEndedWithBrowser } from "@/services/auth/session-preference";
 
 import { useAuthStore } from "@/store/auth";
 
@@ -22,6 +23,16 @@ export default function AuthProvider({
   const { setUser } = useAuthStore();
 
   useEffect(() => {
+    // A login made without "Remember me" ends when the browser was closed.
+    if (sessionEndedWithBrowser()) {
+      authService.logout().finally(() => {
+        if (!isPublicPath(window.location.pathname)) {
+          window.location.assign("/login");
+        }
+      });
+      return;
+    }
+
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
     });

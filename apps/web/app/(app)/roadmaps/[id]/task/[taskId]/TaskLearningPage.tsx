@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
+  Code2,
   ArrowLeft,
   BookOpen,
   Check,
@@ -17,8 +19,9 @@ import {
 
 import { RoadmapTask } from "@/types/roadmap";
 
-import { isSearchLink, unitAction, unitColor } from "@/lib/units";
+import { isSearchLink, unitAction, unitColor, unitLabel } from "@/lib/units";
 
+import RecommendedResources from "@/components/resources/RecommendedResources";
 import LessonPlanLoader from "./LessonPlanLoader";
 import TaskQuiz from "./TaskQuiz";
 
@@ -31,6 +34,9 @@ export default function TaskLearningPage({
   roadmapId,
   task,
 }: TaskLearningPageProps) {
+  const t = useTranslations("learn");
+  const tUnit = useTranslations("unit");
+
   const learningUnits = useMemo(
     () => task.learning_units ?? [],
     [task.learning_units]
@@ -44,7 +50,7 @@ export default function TaskLearningPage({
       new Set(learningUnits.map((unit) => unit.day))
     ).sort((a, b) => a - b);
   }, [learningUnits]);
-  console.log("days",days);
+
   /*
    * Start on the first day that isn't completely finished.
    * If everything is completed, start on the last day.
@@ -127,24 +133,8 @@ export default function TaskLearningPage({
   /*
    * Get a friendly label for the learning-unit type.
    */
-  const getUnitTypeLabel = (type: string) => {
-    switch (type.toLowerCase()) {
-      case "reading":
-        return "Reading";
-
-      case "video":
-        return "Video";
-
-      case "project":
-        return "Project";
-
-      case "practice":
-        return "Practice";
-
-      default:
-        return type;
-    }
-  };
+  const getUnitTypeLabel = (type: string) =>
+    type.toLowerCase() === "practice" ? tUnit("type.practice") : unitLabel(type, tUnit);
 
   /*
    * Get icon for learning-unit type.
@@ -159,6 +149,9 @@ export default function TaskLearningPage({
 
       case "project":
         return FolderKanban;
+
+      case "exercise":
+        return Code2;
 
       case "practice":
         return Target;
@@ -178,8 +171,8 @@ export default function TaskLearningPage({
           href={`/roadmaps/${roadmapId}`}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to roadmap
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+          {t("back")}
         </Link>
 
         <section className="rounded-xl border bg-card p-6 md:p-8">
@@ -201,7 +194,7 @@ export default function TaskLearningPage({
   /*
    * How many lessons of each kind, shown above the plan.
    */
-  const mix = (["reading", "video", "project"] as const)
+  const mix = (["reading", "video", "project", "exercise"] as const)
     .map((type) => ({
       type,
       count: learningUnits.filter((u) => u.type.toLowerCase() === type).length,
@@ -232,8 +225,8 @@ export default function TaskLearningPage({
           hover:text-foreground
         "
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to roadmap
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+        {t("back")}
       </Link>
 
       {/* -------------------------------------------------- */}
@@ -247,11 +240,11 @@ export default function TaskLearningPage({
           <div className="min-w-0">
 
             <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Task</span>
+              <span>{t("task")}</span>
 
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
 
-              <span>Learning</span>
+              <span>{t("learning")}</span>
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
@@ -274,7 +267,7 @@ export default function TaskLearningPage({
               <Clock className="h-4 w-4 text-muted-foreground" />
 
               <span>
-                {task.estimated_hours ?? 0} hours
+                {t("hours", { count: task.estimated_hours ?? 0 })}
               </span>
             </div>
 
@@ -297,7 +290,7 @@ export default function TaskLearningPage({
           <div className="mb-2 flex items-center justify-between text-sm">
 
             <span className="font-medium">
-              Learning progress
+              {t("progress")}
             </span>
 
             <span className="text-muted-foreground">
@@ -341,10 +334,9 @@ export default function TaskLearningPage({
               </span>
               <div>
                 <p className="text-sm font-semibold">
-                  {count} {getUnitTypeLabel(type)}
-                  {count === 1 ? "" : "s"}
+                  {tUnit(`typePlural.${type}`, { count })}
                 </p>
-                <p className="text-xs text-muted-foreground">{minutes} min</p>
+                <p className="text-xs text-muted-foreground">{tUnit("min", { count: minutes })}</p>
               </div>
             </div>
           );
@@ -365,7 +357,7 @@ export default function TaskLearningPage({
               <div>
 
                 <p className="text-sm font-medium text-primary">
-                  Continue learning
+                  {t("continueLearning")}
                 </p>
 
                 <h2 className="mt-1 font-semibold">
@@ -375,7 +367,7 @@ export default function TaskLearningPage({
                 <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
 
                   <span>
-                    Day {nextUnit.day}
+                    {tUnit("day", { day: nextUnit.day })}
                   </span>
 
                   {nextUnit.estimated_minutes != null && (
@@ -383,7 +375,7 @@ export default function TaskLearningPage({
                       <span>•</span>
 
                       <span>
-                        {nextUnit.estimated_minutes} min
+                        {tUnit("min", { count: nextUnit.estimated_minutes })}
                       </span>
                     </>
                   )}
@@ -412,8 +404,8 @@ export default function TaskLearningPage({
                 hover:opacity-90
               "
             >
-              Continue
-              <ChevronRight className="h-4 w-4" />
+              {t("continue")}
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
 
           </div>
@@ -436,12 +428,11 @@ export default function TaskLearningPage({
           <div className="mb-4 px-2">
 
             <h2 className="text-sm font-semibold">
-              Your learning plan
+              {t("planTitle")}
             </h2>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              {days.length}{" "}
-              {days.length === 1 ? "day" : "days"}
+              {t("days", { count: days.length })}
             </p>
 
           </div>
@@ -482,7 +473,7 @@ export default function TaskLearningPage({
                     w-full
                     rounded-lg
                     p-3
-                    text-left
+                    text-start
                     transition-colors
                     ${
                       active
@@ -520,7 +511,7 @@ export default function TaskLearningPage({
                       )}
 
                       <span className="font-medium">
-                        Day {day}
+                        {tUnit("day", { day })}
                       </span>
 
                     </div>
@@ -531,8 +522,8 @@ export default function TaskLearningPage({
 
                   </div>
 
-                  <div className="mt-1 pl-6 text-xs text-muted-foreground">
-                    {minutes} min
+                  <div className="mt-1 ps-6 text-xs text-muted-foreground">
+                    {tUnit("min", { count: minutes })}
                   </div>
 
                 </button>
@@ -558,16 +549,15 @@ export default function TaskLearningPage({
               <div>
 
                 <p className="text-sm font-medium text-primary">
-                  Day {selectedDay}
+                  {tUnit("day", { day: selectedDay })}
                 </p>
 
                 <h2 className="mt-1 text-2xl font-semibold">
-                  Today&apos;s learning session
+                  {t("sessionTitle")}
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Complete the activities below to
-                  continue progressing through this task.
+                  {t("sessionText")}
                 </p>
 
               </div>
@@ -576,7 +566,7 @@ export default function TaskLearningPage({
 
                 <Clock className="h-4 w-4" />
 
-                {dayMinutes} min
+                {tUnit("min", { count: dayMinutes })}
 
               </div>
 
@@ -589,7 +579,7 @@ export default function TaskLearningPage({
               <div className="mb-2 flex justify-between text-xs">
 
                 <span className="text-muted-foreground">
-                  Day progress
+                  {t("dayProgress")}
                 </span>
 
                 <span>
@@ -633,12 +623,11 @@ export default function TaskLearningPage({
                 <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
 
                 <h3 className="mt-3 font-semibold">
-                  No learning activities yet
+                  {t("noActivities")}
                 </h3>
 
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Learning material for this day
-                  hasn&apos;t been generated yet.
+                  {t("noActivitiesText")}
                 </p>
 
               </div>
@@ -725,7 +714,7 @@ export default function TaskLearningPage({
 
                               <Clock className="h-4 w-4" />
 
-                              {unit.estimated_minutes} min
+                              {tUnit("min", { count: unit.estimated_minutes })}
 
                             </div>
                           )}
@@ -759,9 +748,9 @@ export default function TaskLearningPage({
                               hover:opacity-90
                             "
                           >
-                            {unit.completed ? "Review" : unitAction(unit.type)}
+                            {unit.completed ? t("review") : unitAction(unit.type, tUnit)}
 
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                           </Link>
 
                           {unit.resource_url && (
@@ -783,7 +772,7 @@ export default function TaskLearningPage({
                                 hover:bg-muted
                               "
                             >
-                              {isSearchLink(unit.resource_url) ? "Find on YouTube" : "Open resource"}
+                              {isSearchLink(unit.resource_url) ? t("findYoutube") : t("openResource")}
                               <ExternalLink className="h-4 w-4" />
                             </a>
                           )}
@@ -821,12 +810,11 @@ export default function TaskLearningPage({
                   <div>
 
                     <h3 className="font-semibold">
-                      Day {selectedDay} completed
+                      {t("dayDone", { day: selectedDay })}
                     </h3>
 
                     <p className="text-sm text-muted-foreground">
-                      Great work. You&apos;re ready to
-                      continue to the next part.
+                      {t("dayDoneText")}
                     </p>
 
                   </div>
@@ -856,10 +844,9 @@ export default function TaskLearningPage({
                       hover:bg-muted
                     "
                   >
-                    Continue to Day{" "}
-                    {selectedDay + 1}
+                    {t("toDay", { day: selectedDay + 1 })}
 
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                   </button>
                 )}
 
@@ -870,9 +857,11 @@ export default function TaskLearningPage({
 
       </div>
 
+      <RecommendedResources taskId={task.id} />
+
       {furtherReading.length > 0 && (
         <section className="rounded-xl border bg-card p-6">
-          <h2 className="text-sm font-semibold">Further reading</h2>
+          <h2 className="text-sm font-semibold">{t("furtherReading")}</h2>
           <ul className="mt-3 space-y-2">
             {furtherReading.map((url) => (
               <li key={url}>

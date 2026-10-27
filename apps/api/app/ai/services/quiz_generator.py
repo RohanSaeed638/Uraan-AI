@@ -1,15 +1,10 @@
-from openai import AsyncOpenAI
-
+from app.ai.llm import complete_text
 from app.ai.parser import parse_ai_json
 from app.ai.prompts.quiz_prompt import QUIZ_PROMPT
 from app.ai.schemas.quiz_schema import QuizOutput
-from app.core.config import settings
+from app.ai.versions import prompt_version
 
 QUESTION_COUNT = 5
-
-client = AsyncOpenAI(
-    api_key=settings.OPENAI_API_KEY
-)
 
 
 class QuizGenerator:
@@ -39,9 +34,8 @@ class QuizGenerator:
             question_count=QUESTION_COUNT,
         )
 
-        response = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            messages=[
+        raw_content = await complete_text(
+            [
                 {
                     "role": "system",
                     "content": (
@@ -49,17 +43,13 @@ class QuizGenerator:
                         "instructor who writes fair, clear quizzes."
                     ),
                 },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
+                {"role": "user", "content": prompt},
             ],
+            purpose="quiz",
             temperature=0.4,
+            max_tokens=3000,
+            json_mode=True,
+            prompt_version=prompt_version("quiz"),
         )
-
-        raw_content = response.choices[0].message.content
-
-        if not raw_content:
-            raise ValueError("AI returned an empty quiz.")
 
         return QuizOutput(**parse_ai_json(raw_content))

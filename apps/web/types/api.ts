@@ -32,6 +32,10 @@ export interface DashboardSummary {
 
 export interface Gamification {
   xp: number;
+  career_title: string;
+  next_career_title: string | null;
+  xp_to_next_title: number | null;
+  title_progress: number;
   level: number;
   xp_into_level: number;
   xp_per_level: number;
@@ -81,6 +85,9 @@ export interface ProjectItem {
   estimated_minutes: number | null;
   completed: boolean;
   day: number;
+  difficulty?: "beginner" | "intermediate" | "advanced" | null;
+  skills?: string[];
+  portfolio_value?: string | null;
 }
 
 export interface ProjectList {
@@ -95,10 +102,14 @@ export interface UserSettings {
   profile_id: string;
   theme: "light" | "dark" | "system";
   email_notifications: boolean;
+  /** The server can send email (a sender is configured). */
+  email_available: boolean;
   learning_reminders: boolean;
   reminder_time: string;
   timezone: string;
   ai_mentor_enabled: boolean;
+  ai_tone: AiTone;
+  wording: Wording;
   show_on_leaderboard: boolean;
 }
 
@@ -115,6 +126,7 @@ export interface AppNotification {
 export interface NotificationList {
   notifications: AppNotification[];
   unread_count: number;
+  has_more: boolean;
 }
 
 export type Difficulty = "beginner" | "intermediate" | "advanced";
@@ -199,19 +211,28 @@ export interface CareerDocument {
   updated_at: string;
 }
 
+export interface PlannedLesson {
+  id: string;
+  task_id: string;
+  task_title: string;
+  title: string;
+  type: string;
+  minutes: number;
+  /** "19:00:00" */
+  start: string;
+  end: string;
+  /** Moved here by the learner; stays until unpinned. */
+  pinned: boolean;
+  /** Pinned to a day that passed, and not finished. */
+  missed: boolean;
+}
+
 export interface CalendarDay {
   date: string;
-  day: number;
-  total_estimated_minutes: number;
-  units: {
-    id: string;
-    task_id: string;
-    task_title: string;
-    title: string;
-    type: string;
-    estimated_minutes: number | null;
-    completed: boolean;
-  }[];
+  start: string;
+  end: string;
+  minutes: number;
+  units: PlannedLesson[];
 }
 
 export interface CalendarSchedule {
@@ -219,6 +240,16 @@ export interface CalendarSchedule {
   roadmap_title: string | null;
   today: string;
   days: CalendarDay[];
+  unscheduled: number;
+  availability: {
+    /** Minutes of study per weekday, Monday first. */
+    weekday_minutes: number[];
+    blocked_dates: string[];
+    start: string;
+  };
+  preferences: { note: string | null; active: boolean };
+  /** After an AI schedule change: what it changed. */
+  summary?: string | null;
 }
 
 export type LeaderboardPeriod = "weekly" | "all_time";
@@ -311,6 +342,13 @@ export interface ProfileData {
   daily_hours: number;
   target_duration: number;
   learning_goal: string | null;
+  age: number | null;
+  education: string | null;
+  device: string | null;
+  goal_type: string | null;
+  preferred_study_hours: string | null;
+  learning_pace: string | null;
+  weekend_study: boolean | null;
   onboarding_completed: boolean;
   streak_days: number;
   xp: number;
@@ -323,3 +361,108 @@ export type ProfileChanges = Partial<
     "id" | "onboarding_completed" | "streak_days" | "xp" | "created_at"
   >
 >;
+
+// ---- Career catalogue ----------------------------------------------------
+
+export type CareerDifficulty = "beginner" | "intermediate" | "advanced";
+export type MarketDemand = "low" | "medium" | "high" | "very_high";
+
+export interface CareerSummary {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: string | null;
+  icon: string | null;
+  color: string | null;
+  difficulty: CareerDifficulty | null;
+  estimated_months: number | null;
+  salary_min_pkr: number | null;
+  salary_max_pkr: number | null;
+  market_demand: MarketDemand | null;
+}
+
+export interface CareerSkill {
+  name: string;
+  order_number: number;
+}
+
+export interface CareerResource {
+  title: string;
+  type: string;
+  provider: string | null;
+  url: string;
+  is_free: boolean;
+  difficulty: string | null;
+}
+
+export interface CareerDetail extends CareerSummary {
+  skills: CareerSkill[];
+  resources: CareerResource[];
+}
+
+export interface CareerList {
+  items: CareerSummary[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CareerFilters {
+  search?: string;
+  difficulty?: CareerDifficulty | "";
+  demand?: MarketDemand | "";
+  min_salary?: number;
+}
+
+export interface CareerRecommendation {
+  career: CareerSummary;
+  reason: string;
+}
+
+export interface RecommendAnswers {
+  interests: string;
+  experience?: string;
+  education?: string;
+  daily_hours?: number;
+  goal?: string;
+}
+
+// ---- AI mentor: tone, suggestions, reviews, daily message ----------------------------------
+
+export type AiTone = "friendly" | "genz" | "professional";
+export type Wording = "classic" | "gamified";
+
+export interface MentorChip {
+  id: string;
+  label: string;
+  /** "ask" sends `prompt` as a message; "review" opens the review panel. */
+  kind: "ask" | "review";
+  prompt: string | null;
+}
+
+export type ReviewKind = "github" | "code" | "portfolio";
+
+export interface ReviewInput {
+  kind: ReviewKind;
+  url?: string;
+  code?: string;
+  language?: string;
+  note?: string;
+}
+
+export interface ReviewResult {
+  kind: ReviewKind;
+  reviewed: string;
+  summary: string;
+  verdict: "needs_work" | "solid" | "strong";
+  strengths: string[];
+  improvements: { title: string; detail: string; priority: "high" | "medium" | "low" }[];
+  next_steps: string[];
+}
+
+export interface DailyMotivation {
+  message: string;
+  day: string;
+  source: "ai" | "fallback";
+}

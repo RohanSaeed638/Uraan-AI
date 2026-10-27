@@ -1,14 +1,17 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { Sparkles, Bot, TrendingUp } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 
 const features = [
-  { icon: Sparkles, label: "Personalized learning roadmaps" },
-  { icon: Bot, label: "AI-powered content & guidance" },
-  { icon: TrendingUp, label: "Track your progress" },
-];
+  { icon: Sparkles, label: "feature1" },
+  { icon: Bot, label: "feature2" },
+  { icon: TrendingUp, label: "feature3" },
+] as const;
 
-export default function AuthBrandPanel() {
+export default async function AuthBrandPanel() {
+  const t = await getTranslations("auth");
+
   return (
     <div className="relative hidden overflow-hidden lg:flex lg:w-[46%] lg:flex-col lg:justify-between lg:p-10 xl:p-14">
       <Image
@@ -37,12 +40,10 @@ export default function AuthBrandPanel() {
 
       <div className="relative max-w-sm rounded-2xl bg-background/70 p-5 backdrop-blur-sm">
         <h2 className="font-heading text-3xl font-bold">
-          Your AI-Powered
-          <br /> Career Growth Partner
+          {t("brandTitle")}
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Personalized roadmaps. Practical learning.
-          <br /> Real career progress.
+          {t("brandText")}
         </p>
 
         <ul className="mt-8 flex flex-col gap-3">
@@ -51,7 +52,7 @@ export default function AuthBrandPanel() {
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gold/15">
                 <Icon size={15} className="text-brand-gold" />
               </span>
-              <span className="text-sm font-medium">{label}</span>
+              <span className="text-sm font-medium">{t(label)}</span>
             </li>
           ))}
         </ul>

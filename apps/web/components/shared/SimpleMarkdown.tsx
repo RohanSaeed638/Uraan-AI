@@ -32,7 +32,7 @@ function inline(text: string): ReactNode[] {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-brand-violet hover:underline"
+          className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
         >
           {label}
         </a>
@@ -104,7 +104,7 @@ export default function SimpleMarkdown({ source }: { source: string }) {
         i++;
       }
       blocks.push(
-        <ul key={key++} className="list-disc space-y-1.5 pl-6">
+        <ul key={key++} className="list-disc space-y-1.5 ps-6">
           {items.map((item, n) => (
             <li key={n}>{inline(item)}</li>
           ))}
@@ -120,7 +120,7 @@ export default function SimpleMarkdown({ source }: { source: string }) {
         i++;
       }
       blocks.push(
-        <ol key={key++} className="list-decimal space-y-1.5 pl-6">
+        <ol key={key++} className="list-decimal space-y-1.5 ps-6">
           {items.map((item, n) => (
             <li key={n}>{inline(item)}</li>
           ))}
@@ -138,7 +138,7 @@ export default function SimpleMarkdown({ source }: { source: string }) {
       blocks.push(
         <blockquote
           key={key++}
-          className="border-l-4 border-brand-violet/50 pl-4 text-muted-foreground"
+          className="border-s-4 border-brand-violet/50 ps-4 text-muted-foreground"
         >
           {inline(quote.join(" "))}
         </blockquote>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bot } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { getUserSettings } from "@/lib/server/data";
 
@@ -8,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import MentorClient from "./MentorClient";
 
 export default async function MentorPage() {
+  const t = await getTranslations("mentorChat");
   const settings = await getUserSettings();
 
   // Only an explicit "off" blocks the mentor; unknown settings keep it on.
@@ -18,17 +20,16 @@ export default async function MentorPage() {
           <Bot className="size-7 text-muted-foreground" />
         </span>
         <h1 className="font-heading mt-6 text-2xl font-bold">
-          AI Mentor is turned off
+          {t("offTitle")}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          You switched the mentor off in Settings. Turn it back on to chat
-          again. Your past conversations are kept.
+          {t("offText")}
         </p>
         <Link
           href="/settings?tab=preferences"
           className={buttonVariants({ className: "mt-6" })}
         >
-          Open Settings
+          {t("openSettings")}
         </Link>
       </div>
     );

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -15,9 +16,11 @@ import {
 
 import { api } from "@/lib/api/client";
 import { setUnitCompleted } from "@/lib/api/units";
-import { formatMinutes, getUnitMeta, isSearchLink } from "@/lib/units";
-import { RoadmapTask } from "@/types/roadmap";
+import { formatMinutes, getUnitMeta, isSearchLink, unitLabel } from "@/lib/units";
+import { ExerciseDetails, ProjectDetails, RoadmapTask } from "@/types/roadmap";
 
+import ExerciseView from "@/components/lessons/ExerciseView";
+import Pill from "@/components/shared/Pill";
 import SimpleMarkdown from "@/components/shared/SimpleMarkdown";
 import WelcomeBirdIllustration from "@/components/illustrations/WelcomeBirdIllustration";
 import { Card } from "@/components/ui/card";
@@ -46,6 +49,9 @@ export default function UnitViewer({
   task: RoadmapTask;
   initialUnitId: string;
 }) {
+  const t = useTranslations("viewer");
+  const tUnit = useTranslations("unit");
+  const tLevel = useTranslations("options.skill_level");
   const units = useMemo(
     () =>
       [...(task.learning_units ?? [])].sort(
@@ -94,9 +100,7 @@ export default function UnitViewer({
       try {
         await setUnitCompleted(unit.id, true);
       } catch {
-        toast.error(
-          "Couldn't sync this lesson to the server — progress is saved for this session only."
-        );
+        toast.error(t("syncFailed"));
       }
     }
 
@@ -107,7 +111,7 @@ export default function UnitViewer({
     } else if (nextDone.size === units.length) {
       setShowComplete(true);
     } else {
-      toast.info("Some earlier lessons in this task are still unfinished.");
+      toast.info(t("someUnfinished"));
     }
   }
 
@@ -117,9 +121,9 @@ export default function UnitViewer({
     try {
       await api.patch(`/roadmaps/tasks/${task.id}`, { completed: true });
       setTaskDone(true);
-      toast.success("Task marked as complete");
+      toast.success(t("taskDoneToast"));
     } catch {
-      toast.error("Couldn't update the task. Please try again.");
+      toast.error(t("taskFailed"));
     } finally {
       setSaving(false);
     }
@@ -131,18 +135,22 @@ export default function UnitViewer({
       <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center">
         <WelcomeBirdIllustration size={110} />
         <h1 className="font-heading mt-2 text-3xl font-bold">
-          {taskDone ? "Task Completed! 🎉" : "All lessons done! 🎉"}
+          {taskDone ? t("taskCompleted") : t("allDone")}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          You&apos;ve finished every lesson in{" "}
-          <span className="font-medium text-foreground">{task.title}</span>.
+          {t.rich("finishedIn", {
+            task: task.title,
+            b: (chunks) => (
+              <span className="font-medium text-foreground">{chunks}</span>
+            ),
+          })}
         </p>
 
         <div className="mt-8 grid w-full grid-cols-3 gap-3">
           {[
-            { label: "Lessons", value: `${done.size}/${units.length}` },
-            { label: "Time", value: formatMinutes(totalMinutes) },
-            { label: "Status", value: taskDone ? "Completed" : "In review" },
+            { label: t("lessons"), value: `${done.size}/${units.length}` },
+            { label: t("time"), value: formatMinutes(totalMinutes, tUnit) },
+            { label: t("status"), value: taskDone ? t("completed") : t("inReview") },
           ].map(({ label, value }) => (
             <Card key={label} className="items-center gap-1 p-4">
               <p className="text-lg font-bold">{value}</p>
@@ -157,7 +165,7 @@ export default function UnitViewer({
               {saving ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Mark task as complete"
+                t("markTask")
               )}
             </Button>
           )}
@@ -168,13 +176,13 @@ export default function UnitViewer({
               variant: taskDone ? "default" : "outline",
             })}
           >
-            View all tasks
+            {t("allTasks")}
           </Link>
           <Link
             href={`/roadmaps/${roadmapId}`}
             className={buttonVariants({ variant: "ghost" })}
           >
-            Back to roadmap
+            {t("backRoadmap")}
           </Link>
         </div>
       </div>
@@ -192,32 +200,32 @@ export default function UnitViewer({
         href={`/roadmaps/${roadmapId}/task/${task.id}`}
         className="mb-4 inline-flex max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft size={14} className="shrink-0" />
-        <span className="truncate">Back to {task.title}</span>
+        <ArrowLeft size={14} className="shrink-0 rtl:rotate-180" />
+        <span className="truncate">{t("backTo", { task: task.title })}</span>
       </Link>
 
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
           <span>
-            Lesson {index + 1} of {units.length}
+            {t("lessonOf", { current: index + 1, total: units.length })}
           </span>
-          <span>{percent}% complete</span>
+          <span>{t("percent", { percent })}</span>
         </div>
         <Progress value={percent} className="h-1.5" />
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-brand-violet">
-          <Icon size={14} /> {meta.label}
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-brand-gold-deep dark:text-brand-gold">
+          <Icon size={14} /> {unitLabel(unit.type, tUnit)}
         </span>
         {unit.estimated_minutes != null && (
           <span className="inline-flex items-center gap-1 text-muted-foreground">
-            <Clock size={13} /> {unit.estimated_minutes} min
+            <Clock size={13} /> {tUnit("min", { count: unit.estimated_minutes })}
           </span>
         )}
         {done.has(unit.id) && (
           <span className="inline-flex items-center gap-1 text-emerald-500">
-            <CheckCircle2 size={14} /> Completed
+            <CheckCircle2 size={14} /> {t("completed")}
           </span>
         )}
       </div>
@@ -230,12 +238,41 @@ export default function UnitViewer({
       {unit.type === "project" && (
         <div className="mt-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
           <p className="font-semibold text-amber-700 dark:text-amber-400">
-            Hands-on project
+            {t("project")}
           </p>
           <p className="mt-1 text-muted-foreground">
-            Build this yourself, tick off each requirement, then mark the
-            lesson complete. Keep the result: it can go in your portfolio.
+            {t("projectText")}
           </p>
+          {(() => {
+            const meta = unit.details as unknown as ProjectDetails | null;
+
+            if (!meta) return null;
+
+            return (
+              <div className="mt-3 space-y-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {meta.difficulty && (
+                    <Pill tone="soft">
+                      {["beginner", "intermediate", "advanced"].includes(meta.difficulty)
+                        ? tLevel(meta.difficulty)
+                        : meta.difficulty}
+                    </Pill>
+                  )}
+                  {meta.skills?.map((skill) => (
+                    <Pill key={skill}>{skill}</Pill>
+                  ))}
+                </div>
+                {meta.portfolio_value && (
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      {t("worthShowing")}
+                    </span>
+                    {meta.portfolio_value}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -248,11 +285,9 @@ export default function UnitViewer({
             className="flex items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 transition hover:bg-muted"
           >
             <span>
-              <span className="block font-semibold">Find a video on YouTube</span>
+              <span className="block font-semibold">{t("findVideo")}</span>
               <span className="mt-1 block text-sm text-muted-foreground">
-                We couldn&apos;t confirm a specific video, so this opens a
-                search for this lesson. Pick a recent, well-rated result and
-                follow along with the notes below.
+                {t("findVideoText")}
               </span>
             </span>
             <ExternalLink size={18} className="shrink-0 text-brand-violet" />
@@ -279,10 +314,17 @@ export default function UnitViewer({
           />
         )}
 
-        {unit.content && (
-          <Card className="p-6 sm:p-8">
-            <SimpleMarkdown source={unit.content} />
-          </Card>
+        {unit.type === "exercise" && unit.details ? (
+          <ExerciseView
+            problem={unit.content}
+            details={unit.details as unknown as ExerciseDetails}
+          />
+        ) : (
+          unit.content && (
+            <Card className="p-6 sm:p-8">
+              <SimpleMarkdown source={unit.content} />
+            </Card>
+          )
         )}
 
         {unit.resource_url && !video && !isFile && !searchLink && (
@@ -292,8 +334,8 @@ export default function UnitViewer({
             rel="noopener noreferrer"
             className="flex items-center justify-between rounded-2xl border border-border p-4 transition hover:bg-muted"
           >
-            <span className="font-medium text-brand-violet">
-              Open {unit.type === "project" ? "project resources" : "the resource"}
+            <span className="font-medium text-brand-gold-deep dark:text-brand-gold">
+              {unit.type === "project" ? t("openProject") : t("openResource")}
             </span>
             <ExternalLink size={16} className="text-muted-foreground" />
           </a>
@@ -301,7 +343,7 @@ export default function UnitViewer({
 
         {!unit.content && !unit.resource_url && !unit.description && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            No content has been attached to this lesson yet.
+            {t("noContent")}
           </p>
         )}
       </div>
@@ -313,7 +355,7 @@ export default function UnitViewer({
           onClick={() => goTo(index - 1)}
           className="gap-1.5"
         >
-          <ArrowLeft size={15} /> Previous
+          <ArrowLeft size={15} className="rtl:rotate-180" /> {t("previous")}
         </Button>
 
         <div className="flex gap-3">
@@ -323,7 +365,7 @@ export default function UnitViewer({
               onClick={() => goTo(index + 1)}
               className={cn(done.has(unit.id) && "hidden")}
             >
-              Skip
+              {t("skip")}
             </Button>
           )}
           <Button onClick={completeAndContinue} disabled={saving} className="gap-1.5">
@@ -331,12 +373,12 @@ export default function UnitViewer({
               <Loader2 size={15} className="animate-spin" />
             ) : done.has(unit.id) && !isLast ? (
               <>
-                Next <ArrowRight size={15} />
+                {t("next")} <ArrowRight size={15} className="rtl:rotate-180" />
               </>
             ) : (
               <>
                 <Check size={15} />
-                {isLast ? "Finish" : "Mark complete & continue"}
+                {isLast ? t("finish") : t("markContinue")}
               </>
             )}
           </Button>

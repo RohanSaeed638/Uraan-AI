@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.achievement_catalog import career_title
 from app.models.profile import Profile
 from app.models.xp_event import XPEvent
 
@@ -66,9 +67,12 @@ class GamificationService:
         amount: int,
         reason: str,
         ref_id: UUID,
+        evaluate: bool = True,
     ) -> bool:
         """Awards XP once per (profile, reason, ref). Returns whether this
-        call was the one that awarded it."""
+        call was the one that awarded it. Unless `evaluate` is False the
+        learner's achievements are checked afterwards (their own bonus XP
+        passes False: the evaluation that paid it is already looping)."""
         stmt = (
             insert(XPEvent)
             .values(
@@ -97,6 +101,12 @@ class GamificationService:
         profile.last_activity_date = today
 
         await self.db.flush()
+
+        if evaluate:
+            # Local import: the achievement service uses this class too.
+            from app.services.achievement_service import AchievementService
+
+            await AchievementService(self.db).safe_evaluate(profile)
 
         return True
 
@@ -129,8 +139,14 @@ class GamificationService:
         ):
             streak = 0
 
+        title = career_title(xp)
+
         return {
             "xp": xp,
+            "career_title": title["title"],
+            "next_career_title": title["next_title"],
+            "xp_to_next_title": title["xp_to_next"],
+            "title_progress": round(title["progress"], 3),
             "level": level_for(xp),
             "xp_into_level": xp % XP_PER_LEVEL,
             "xp_per_level": XP_PER_LEVEL,

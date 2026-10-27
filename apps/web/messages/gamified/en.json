@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "dashboard": "Mission Control",
+    "tasks": "Missions",
+    "projects": "Quests",
+    "learning": "Training"
+  },
+  "dashboard": {
+    "continue": "Continue Mission",
+    "tasksCompleted": "Missions completed",
+    "streak": "Day streak",
+    "currentRoadmap": "Current Quest Line"
+  },
+  "tasks": {
+    "title": "Missions",
+    "subtitle": "Every mission across your roadmaps, in one place.",
+    "failed": "Couldn't update the mission. Please try again.",
+    "emptyTitle": "No missions yet",
+    "emptyText": "Missions appear here once you've generated a roadmap."
+  },
+  "projects": {
+    "title": "Quests",
+    "subtitle": "Take on real-world quests and showcase your skills.",
+    "emptyTitle": "No quests yet",
+    "completed": "Cleared",
+    "notStarted": "Not started"
+  },
+  "progress": {
+    "tasksCompleted": "Missions completed",
+    "lessonsCompleted": "Training completed",
+    "overall": "Overall missions"
+  },
+  "learning": {
+    "title": "Training",
+    "suggested": "Today's training",
+    "start": "Begin"
+  },
+  "viewer": {
+    "markContinue": "Claim XP & continue",
+    "markTask": "Claim mission XP",
+    "taskCompleted": "Mission Cleared! 🎉",
+    "allDone": "All training done! 🎉",
+    "taskDoneToast": "Mission cleared",
+    "allTasks": "View all missions"
+  },
+  "roadmaps": {
+    "tasks": {
+      "none": "No missions available for this phase."
+    },
+    "card": {
+      "tasks": "{done} / {total} Missions"
+    }
+  }
+}

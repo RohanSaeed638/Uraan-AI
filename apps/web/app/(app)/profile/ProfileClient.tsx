@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import PageHeader from "@/components/shared/PageHeader";
 import { useRouter } from "next/navigation";
 import {
   Briefcase,
@@ -16,18 +17,26 @@ import {
   UserCog,
   Zap,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+
+import { setLocaleCookie } from "@/app/actions/locale";
 import { toast } from "sonner";
 
 import { patchProfile } from "@/lib/api/profile";
 import {
   apiErrorMessage,
   CAREER_STAGES,
-  CAREERS,
+  DEVICES,
+  EDUCATION,
+  GOAL_TYPES,
   labelFor,
   LANGUAGES,
   LEARNING_STYLES,
+  PACES,
   SKILL_LEVELS,
+  STUDY_HOURS,
 } from "@/lib/profile-options";
+import { useCareerOptions } from "@/lib/careers";
 import { formatDate } from "@/lib/format";
 import { useTimezones } from "@/lib/use-timezones";
 import { authService } from "@/services/auth/auth";
@@ -61,6 +70,13 @@ interface FormState {
   daily_hours: string;
   target_duration: string;
   learning_goal: string;
+  age: string;
+  education: string;
+  device: string;
+  goal_type: string;
+  preferred_study_hours: string;
+  learning_pace: string;
+  weekend_study: string; // "", "yes" or "no"
 }
 
 function toForm(p: ProfileData): FormState {
@@ -76,6 +92,14 @@ function toForm(p: ProfileData): FormState {
     daily_hours: String(p.daily_hours ?? 2),
     target_duration: String(p.target_duration ?? 6),
     learning_goal: p.learning_goal ?? "",
+    age: p.age == null ? "" : String(p.age),
+    education: p.education ?? "",
+    device: p.device ?? "",
+    goal_type: p.goal_type ?? "",
+    preferred_study_hours: p.preferred_study_hours ?? "",
+    learning_pace: p.learning_pace ?? "",
+    weekend_study:
+      p.weekend_study == null ? "" : p.weekend_study ? "yes" : "no",
   };
 }
 
@@ -92,6 +116,18 @@ function diff(before: FormState, after: FormState): ProfileChanges {
       out[key] = Number(value);
     } else if (key === "full_name") {
       out[key] = value.trim();
+    } else if (key === "age") {
+      out[key] = value.trim() === "" ? null : Number(value);
+    } else if (key === "weekend_study") {
+      out[key] = value === "" ? null : value === "yes";
+    } else if (
+      key === "education" ||
+      key === "device" ||
+      key === "goal_type" ||
+      key === "preferred_study_hours" ||
+      key === "learning_pace"
+    ) {
+      out[key] = value === "" ? null : value;
     } else if (
       key === "country" ||
       key === "timezone" ||
@@ -107,17 +143,24 @@ function diff(before: FormState, after: FormState): ProfileChanges {
   return out as ProfileChanges;
 }
 
-function validate(form: FormState): string | null {
-  if (!form.full_name.trim()) return "Please enter your name.";
+function validate(form: FormState): "name" | "hours" | "months" | "age" | null {
+  if (!form.full_name.trim()) return "name";
 
   const hours = Number(form.daily_hours);
   if (!Number.isInteger(hours) || hours < 1 || hours > 12) {
-    return "Daily study time must be a whole number from 1 to 12 hours.";
+    return "hours";
   }
 
   const months = Number(form.target_duration);
   if (!Number.isInteger(months) || months < 1 || months > 36) {
-    return "Target duration must be a whole number from 1 to 36 months.";
+    return "months";
+  }
+
+  if (form.age.trim() !== "") {
+    const age = Number(form.age);
+    if (!Number.isInteger(age) || age < 10 || age > 100) {
+      return "age";
+    }
   }
 
   return null;
@@ -138,7 +181,7 @@ function Detail({
     <Card
       className={`flex-row items-start gap-4 p-5 ${wide ? "sm:col-span-2" : ""}`}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/10 text-brand-violet">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
         <Icon size={18} />
       </span>
       <div className="min-w-0">
@@ -169,13 +212,26 @@ function Field({
   );
 }
 
+function useChoiceLabel() {
+  const o = useTranslations("options");
+  const t = useTranslations("profile");
+
+  return (group: string, value: string | null) =>
+    value ? o(`${group}.${value}`) : t("notSet");
+}
+
 export default function ProfileClient({
   profile,
   gamification,
   account,
   initialEditing = false,
 }: Props & { initialEditing?: boolean }) {
+  const t = useTranslations("profile");
+  const choiceLabel = useChoiceLabel();
+  const { options: CAREERS } = useCareerOptions();
+  const o = useTranslations("options");
   const router = useRouter();
+  const locale = useLocale();
   const setUser = useAuthStore((state) => state.setUser);
 
   const [current, setCurrent] = useState(profile);
@@ -213,7 +269,7 @@ export default function ProfileClient({
 
     const problem = validate(form);
     if (problem) {
-      setError(problem);
+      setError(t(`errors.${problem}`));
       return;
     }
 
@@ -239,10 +295,14 @@ export default function ProfileClient({
       }
 
       setEditing(false);
-      toast.success("Profile updated.");
+      toast.success(t("updated"));
+
+      // A new language applies to the app right away.
+      if (changes.language) await setLocaleCookie(changes.language);
+
       router.refresh();
     } catch (err) {
-      setError(apiErrorMessage(err, "Couldn't save your profile. Try again."));
+      setError(apiErrorMessage(err, t("saveFailed")));
     } finally {
       setSaving(false);
     }
@@ -250,14 +310,14 @@ export default function ProfileClient({
 
   const stats = gamification
     ? [
-        { icon: Zap, label: "Level", value: `Level ${gamification.level}` },
-        { icon: Flame, label: "Day streak", value: String(gamification.streak_days) },
-        { icon: Target, label: "Total XP", value: String(gamification.xp) },
+        { icon: Zap, label: t("level"), value: t("levelValue", { level: gamification.level }) },
+        { icon: Flame, label: t("streak"), value: String(gamification.streak_days) },
+        { icon: Target, label: t("xp"), value: String(gamification.xp) },
         {
           icon: CalendarDays,
-          label: "Member since",
+          label: t("since"),
           value: current?.created_at
-            ? formatDate(current.created_at, { month: "short", year: "numeric" })
+            ? formatDate(current.created_at, { month: "short", year: "numeric" }, locale)
             : "—",
         },
       ]
@@ -265,10 +325,7 @@ export default function ProfileClient({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-heading text-3xl font-bold">Profile</h1>
-      <p className="mt-1 text-muted-foreground">
-        Your personal details and learning preferences.
-      </p>
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="mt-6 flex-col gap-4 p-6 sm:flex-row sm:items-center sm:gap-5">
         <Avatar size="lg" className="size-16 shrink-0">
@@ -285,7 +342,7 @@ export default function ProfileClient({
         </div>
         {current && !editing && (
           <Button variant="outline" size="sm" className="gap-2" onClick={startEditing}>
-            <Pencil size={14} /> Edit profile
+            <Pencil size={14} /> {t("edit")}
           </Button>
         )}
       </Card>
@@ -303,21 +360,20 @@ export default function ProfileClient({
       )}
 
       <h2 className="font-heading mt-8 text-lg font-semibold">
-        {editing ? "Edit your profile" : "Learning preferences"}
+        {editing ? t("editTitle") : t("prefsTitle")}
       </h2>
 
       {!current || !form ? (
         <Card className="mt-3 items-center p-8 text-center">
           <p className="text-sm text-muted-foreground">
-            Your profile couldn&apos;t be loaded right now. Refresh the page to
-            try again.
+            {t("loadFailed")}
           </p>
         </Card>
       ) : editing ? (
         <form onSubmit={save} className="mt-3">
           <Card className="gap-5 p-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field id="full_name" label="Full name">
+              <Field id="full_name" label={t("fields.full_name")}>
                 <Input
                   id="full_name"
                   value={form.full_name}
@@ -326,7 +382,7 @@ export default function ProfileClient({
                 />
               </Field>
 
-              <Field id="language" label="Language">
+              <Field id="language" label={t("fields.language")}>
                 <NativeSelect
                   id="language"
                   value={form.language}
@@ -340,23 +396,23 @@ export default function ProfileClient({
                 </NativeSelect>
               </Field>
 
-              <Field id="country" label="Country">
+              <Field id="country" label={t("fields.country")}>
                 <Input
                   id="country"
                   value={form.country}
                   maxLength={60}
-                  placeholder="e.g. Pakistan"
+                  placeholder={t("fields.countryExample")}
                   onChange={(e) => set("country", e.target.value)}
                 />
               </Field>
 
-              <Field id="timezone" label="Timezone">
+              <Field id="timezone" label={t("fields.timezone")}>
                 <NativeSelect
                   id="timezone"
                   value={form.timezone}
                   onChange={(e) => set("timezone", e.target.value)}
                 >
-                  <option value="">Not set</option>
+                  <option value="">{t("notSet")}</option>
                   {timezones.map((z) => (
                     <option key={z} value={z}>
                       {z}
@@ -365,14 +421,14 @@ export default function ProfileClient({
                 </NativeSelect>
               </Field>
 
-              <Field id="career_slug" label="Career path">
+              <Field id="career_slug" label={t("fields.career_slug")}>
                 <NativeSelect
                   id="career_slug"
                   value={form.career_slug}
                   onChange={(e) => set("career_slug", e.target.value)}
                 >
                   {!CAREERS.some((c) => c.value === form.career_slug) && (
-                    <option value={form.career_slug}>Choose a career…</option>
+                    <option value={form.career_slug}>{t("fields.chooseCareer")}</option>
                   )}
                   {CAREERS.map((c) => (
                     <option key={c.value} value={c.value}>
@@ -382,22 +438,22 @@ export default function ProfileClient({
                 </NativeSelect>
               </Field>
 
-              <Field id="career_stage" label="Where you are now">
+              <Field id="career_stage" label={t("fields.career_stage")}>
                 <NativeSelect
                   id="career_stage"
                   value={form.career_stage}
                   onChange={(e) => set("career_stage", e.target.value)}
                 >
-                  <option value="">Not set</option>
+                  <option value="">{t("notSet")}</option>
                   {CAREER_STAGES.map((s) => (
                     <option key={s.value} value={s.value}>
-                      {s.label}
+                      {o(`career_stage.${s.value}`)}
                     </option>
                   ))}
                 </NativeSelect>
               </Field>
 
-              <Field id="skill_level" label="Skill level">
+              <Field id="skill_level" label={t("fields.skill_level")}>
                 <NativeSelect
                   id="skill_level"
                   value={form.skill_level}
@@ -405,13 +461,13 @@ export default function ProfileClient({
                 >
                   {SKILL_LEVELS.map((s) => (
                     <option key={s.value} value={s.value}>
-                      {s.label}
+                      {o(`skill_level.${s.value}`)}
                     </option>
                   ))}
                 </NativeSelect>
               </Field>
 
-              <Field id="learning_style" label="Learning style">
+              <Field id="learning_style" label={t("fields.learning_style")}>
                 <NativeSelect
                   id="learning_style"
                   value={form.learning_style}
@@ -419,13 +475,13 @@ export default function ProfileClient({
                 >
                   {LEARNING_STYLES.map((s) => (
                     <option key={s.value} value={s.value}>
-                      {s.label}
+                      {o(`learning_style.${s.value}`)}
                     </option>
                   ))}
                 </NativeSelect>
               </Field>
 
-              <Field id="daily_hours" label="Daily study time (hours)">
+              <Field id="daily_hours" label={t("fields.daily_hours")}>
                 <Input
                   id="daily_hours"
                   type="number"
@@ -437,7 +493,7 @@ export default function ProfileClient({
                 />
               </Field>
 
-              <Field id="target_duration" label="Target duration (months)">
+              <Field id="target_duration" label={t("fields.target_duration")}>
                 <Input
                   id="target_duration"
                   type="number"
@@ -448,22 +504,120 @@ export default function ProfileClient({
                   onChange={(e) => set("target_duration", e.target.value)}
                 />
               </Field>
+
+              <Field id="age" label={t("fields.age")}>
+                <Input
+                  id="age"
+                  type="number"
+                  inputMode="numeric"
+                  min={10}
+                  max={100}
+                  value={form.age}
+                  onChange={(e) => set("age", e.target.value)}
+                />
+              </Field>
+
+              <Field id="education" label={t("fields.education")}>
+                <NativeSelect
+                  id="education"
+                  value={form.education}
+                  onChange={(e) => set("education", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  {EDUCATION.map((v) => (
+                    <option key={v} value={v}>
+                      {o(`education.${v}`)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field id="device" label={t("fields.device")}>
+                <NativeSelect
+                  id="device"
+                  value={form.device}
+                  onChange={(e) => set("device", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  {DEVICES.map((v) => (
+                    <option key={v} value={v}>
+                      {o(`device.${v}`)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field id="goal_type" label={t("fields.goal_type")}>
+                <NativeSelect
+                  id="goal_type"
+                  value={form.goal_type}
+                  onChange={(e) => set("goal_type", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  {GOAL_TYPES.map((v) => (
+                    <option key={v} value={v}>
+                      {o(`goal_type.${v}`)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field id="preferred_study_hours" label={t("fields.preferred_study_hours")}>
+                <NativeSelect
+                  id="preferred_study_hours"
+                  value={form.preferred_study_hours}
+                  onChange={(e) => set("preferred_study_hours", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  {STUDY_HOURS.map((v) => (
+                    <option key={v} value={v}>
+                      {o(`study_hours.${v}`)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field id="learning_pace" label={t("fields.learning_pace")}>
+                <NativeSelect
+                  id="learning_pace"
+                  value={form.learning_pace}
+                  onChange={(e) => set("learning_pace", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  {PACES.map((v) => (
+                    <option key={v} value={v}>
+                      {o(`pace.${v}`)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field id="weekend_study" label={t("fields.weekend_study")}>
+                <NativeSelect
+                  id="weekend_study"
+                  value={form.weekend_study}
+                  onChange={(e) => set("weekend_study", e.target.value)}
+                >
+                  <option value="">{t("notSet")}</option>
+                  <option value="yes">{t("weekendYes")}</option>
+                  <option value="no">{t("weekendNo")}</option>
+                </NativeSelect>
+              </Field>
             </div>
 
-            <Field id="learning_goal" label="Your goal">
+            <Field id="learning_goal" label={t("fields.learning_goal")}>
               <Textarea
                 id="learning_goal"
                 value={form.learning_goal}
                 maxLength={255}
-                placeholder="e.g. Get a junior backend job in 6 months"
+                placeholder={t("fields.goalExample")}
                 className="min-h-20"
                 onChange={(e) => set("learning_goal", e.target.value)}
               />
             </Field>
 
             <p className="text-xs text-muted-foreground">
-              Changes apply to new roadmaps and lessons. Roadmaps you already
-              created keep the style they were made with.
+              {t("appliesNew")}
             </p>
 
             {error && (
@@ -474,7 +628,7 @@ export default function ProfileClient({
 
             <div className="flex flex-wrap gap-3">
               <LoadingButton type="submit" loading={saving}>
-                Save changes
+                {t("save")}
               </LoadingButton>
               <Button
                 type="button"
@@ -485,22 +639,29 @@ export default function ProfileClient({
                   setError(null);
                 }}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </Card>
         </form>
       ) : (
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Detail icon={Briefcase} label="Career path" value={labelFor(CAREERS, current.career_slug)} />
-          <Detail icon={UserCog} label="Where you are now" value={labelFor(CAREER_STAGES, current.career_stage)} />
-          <Detail icon={Gauge} label="Skill level" value={labelFor(SKILL_LEVELS, current.skill_level)} />
-          <Detail icon={GraduationCap} label="Learning style" value={labelFor(LEARNING_STYLES, current.learning_style)} />
-          <Detail icon={Clock} label="Daily study time" value={`${current.daily_hours}h per day`} />
-          <Detail icon={Target} label="Target duration" value={`${current.target_duration} months`} />
-          <Detail icon={Globe} label="Language" value={labelFor(LANGUAGES, current.language)} />
-          <Detail icon={MapPin} label="Location" value={[current.country, current.timezone].filter(Boolean).join(" · ") || "Not set"} />
-          <Detail icon={Target} label="Your goal" value={current.learning_goal || "Not set"} wide />
+          <Detail icon={Briefcase} label={t("fields.career_slug")} value={labelFor(CAREERS, current.career_slug)} />
+          <Detail icon={UserCog} label={t("fields.career_stage")} value={choiceLabel("career_stage", current.career_stage)} />
+          <Detail icon={Gauge} label={t("fields.skill_level")} value={choiceLabel("skill_level", current.skill_level)} />
+          <Detail icon={GraduationCap} label={t("fields.learning_style")} value={choiceLabel("learning_style", current.learning_style)} />
+          <Detail icon={Clock} label={t("fields.dailyStudy")} value={t("perDay", { count: current.daily_hours })} />
+          <Detail icon={Target} label={t("fields.target")} value={t("months", { count: current.target_duration })} />
+          <Detail icon={CalendarDays} label={t("fields.age")} value={current.age ? String(current.age) : t("notSet")} />
+          <Detail icon={GraduationCap} label={t("fields.education")} value={choiceLabel("education", current.education)} />
+          <Detail icon={Gauge} label={t("fields.device")} value={choiceLabel("device", current.device)} />
+          <Detail icon={Target} label={t("fields.goal_type")} value={choiceLabel("goal_type", current.goal_type)} />
+          <Detail icon={Clock} label={t("fields.preferred_study_hours")} value={choiceLabel("study_hours", current.preferred_study_hours)} />
+          <Detail icon={Zap} label={t("fields.learning_pace")} value={choiceLabel("pace", current.learning_pace)} />
+          <Detail icon={CalendarDays} label={t("fields.weekend_study")} value={current.weekend_study == null ? t("notSet") : current.weekend_study ? t("weekendYes") : t("weekendNo")} />
+          <Detail icon={Globe} label={t("fields.language")} value={labelFor(LANGUAGES, current.language)} />
+          <Detail icon={MapPin} label={t("fields.location")} value={[current.country, current.timezone].filter(Boolean).join(" · ") || t("notSet")} />
+          <Detail icon={Target} label={t("fields.learning_goal")} value={current.learning_goal || t("notSet")} wide />
         </div>
       )}
     </div>

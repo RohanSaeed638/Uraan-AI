@@ -2,6 +2,7 @@
 
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LogOut, Settings, User as UserIcon, ChevronDown } from "lucide-react";
 
 import { authService } from "@/services/auth/auth";
@@ -20,9 +21,11 @@ import {
 
 export default function UserDropdown({ user }: { user: User }) {
   const router = useRouter();
+  const t = useTranslations("topbar");
+  const tNav = useTranslations("nav");
   const clearUser = useAuthStore((state) => state.logout);
 
-  const fullName: string = user.user_metadata?.full_name ?? "Student";
+  const fullName: string = user.user_metadata?.full_name ?? t("student");
   const initials = fullName
     .split(" ")
     .map((n) => n[0])
@@ -47,16 +50,16 @@ export default function UserDropdown({ user }: { user: User }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-accent">
+      <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2.5 transition hover:bg-accent">
         <Avatar>
           <AvatarImage src={user.user_metadata?.avatar_url} />
           <AvatarFallback className="bg-brand-violet text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
-        <span className="hidden min-w-0 max-w-40 text-left leading-tight sm:block">
+        <span className="hidden min-w-0 max-w-40 text-start leading-tight sm:block">
           <span className="block truncate text-sm font-medium">{fullName}</span>
-          <span className="block text-xs text-muted-foreground">Student</span>
+          <span className="block text-xs text-muted-foreground">{t("student")}</span>
         </span>
         <ChevronDown size={14} className="hidden text-muted-foreground sm:block" />
       </DropdownMenuTrigger>
@@ -73,17 +76,17 @@ export default function UserDropdown({ user }: { user: User }) {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/profile")}>
-          <UserIcon size={16} /> Profile
+          <UserIcon size={16} /> {tNav("profile")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/settings")}>
-          <Settings size={16} /> Settings
+          <Settings size={16} /> {tNav("settings")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={logout}
           className="text-destructive focus:text-destructive"
         >
-          <LogOut size={16} /> Log out
+          <LogOut size={16} /> {t("logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

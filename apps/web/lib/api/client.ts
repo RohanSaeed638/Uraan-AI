@@ -22,3 +22,18 @@ api.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+// After anything that changes data (finishing a lesson, a quiz, a task...),
+// let the app know, so things that react to progress (the notification bell,
+// which shows new achievements) can look straight away.
+api.interceptors.response.use((response) => {
+  if (
+    typeof window !== "undefined" &&
+    response.config.method &&
+    response.config.method.toLowerCase() !== "get"
+  ) {
+    window.dispatchEvent(new Event("uraan:progress"));
+  }
+
+  return response;
+});

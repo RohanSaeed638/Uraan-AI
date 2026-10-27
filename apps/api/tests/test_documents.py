@@ -20,6 +20,7 @@ def profile(**overrides):
     base = dict(
         id=uuid4(),
         full_name="Rohan Saeed",
+        language="en",
         skill_level=SimpleNamespace(value="beginner"),
         learning_goal="Get a junior backend job",
     )

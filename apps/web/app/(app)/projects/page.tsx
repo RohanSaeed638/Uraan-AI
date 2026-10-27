@@ -11,6 +11,9 @@ export default async function ProjectsPage() {
     description: p.description,
     minutes: p.estimated_minutes,
     completed: p.completed,
+    difficulty: p.difficulty ?? null,
+    skills: p.skills ?? [],
+    portfolioValue: p.portfolio_value ?? null,
     context: `${p.task_title} · ${p.roadmap_title}`,
     href: `/roadmaps/${p.roadmap_id}/task/${p.task_id}/learn/${p.id}`,
   }));

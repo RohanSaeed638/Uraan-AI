@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { Clock, ArrowRight } from "lucide-react";
 
 import { RoadmapSummary } from "@/types/roadmap";
@@ -22,21 +23,27 @@ interface Props {
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-500",
   completed: "bg-brand-violet/15 text-brand-violet",
-  paused: "bg-muted text-muted-foreground",
+  paused: "bg-amber-500/15 text-amber-500",
+  generating: "bg-sky-500/15 text-sky-500",
+  failed: "bg-destructive/15 text-destructive",
 };
 
 export default function RoadmapCard({ roadmap }: Props) {
+  const t = useTranslations("roadmaps.card");
+  const tStatus = useTranslations("status");
+  const locale = useLocale();
+
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <Card className="card-lift">
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="line-clamp-2 min-w-0">{roadmap.title}</CardTitle>
           <span
-            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize ${
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
               statusStyles[roadmap.status] ?? "bg-muted text-muted-foreground"
             }`}
           >
-            {roadmap.status}
+            {tStatus(roadmap.status)}
           </span>
         </div>
       </CardHeader>
@@ -50,7 +57,7 @@ export default function RoadmapCard({ roadmap }: Props) {
 
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
-            {roadmap.completed_tasks} / {roadmap.total_tasks} Tasks
+            {t("tasks", { done: roadmap.completed_tasks, total: roadmap.total_tasks })}
           </span>
           <span>{roadmap.progress}%</span>
         </div>
@@ -58,14 +65,14 @@ export default function RoadmapCard({ roadmap }: Props) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock size={14} />
-            Updated {formatDate(roadmap.updated_at)}
+            {t("updated", { date: formatDate(roadmap.updated_at, undefined, locale) })}
           </div>
 
           <Link
             href={`/roadmaps/${roadmap.id}`}
             className={buttonVariants({ className: "gap-1.5" })}
           >
-            Continue <ArrowRight size={15} />
+            {t("continue")} <ArrowRight size={15} className="rtl:rotate-180" />
           </Link>
         </div>
       </CardContent>

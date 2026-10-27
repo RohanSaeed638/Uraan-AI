@@ -16,8 +16,10 @@ class RoadmapStatus(str, Enum):
     PENDING = "pending"
     GENERATING = "generating"
     ACTIVE = "active"
+    PAUSED = "paused"
     COMPLETED = "completed"
     ARCHIVED = "archived"
+    FAILED = "failed"
 
 
 class LessonStatus(str, Enum):
@@ -38,12 +40,6 @@ class ResourceType(str, Enum):
     COURSE = "course"
     BOOK = "book"
 
-class RoadmapStatus(str, Enum):
-    GENERATING = "generating"
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
-    FAILED = "failed"
 
 class CareerStage(str, Enum):
     BEGINNER = "beginner"

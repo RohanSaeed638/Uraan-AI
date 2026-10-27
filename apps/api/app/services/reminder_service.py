@@ -6,13 +6,16 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.texts import text
 from app.models.profile import Profile
 from app.models.user_settings import UserSettings
 from app.repositories.notification_repository import (
     NotificationRepository,
     PushSubscriptionRepository,
 )
+from app.services.email_service import EmailService
 from app.services.gamification_service import GamificationService
+from app.services.motivation_service import MotivationService
 from app.services.push_service import send_push
 
 logger = logging.getLogger(__name__)
@@ -63,6 +66,7 @@ def daily_message(
     streak_days: int,
     studied_today: bool,
     local: datetime,
+    language: str | None = None,
 ) -> Message | None:
     if studied_today:
         return None
@@ -72,35 +76,35 @@ def daily_message(
     if streak_days > 0:
         return Message(
             TYPE_DAILY,
-            f"Keep your {streak_days}-day streak alive",
-            "One lesson today keeps it going. Finish today's quest.",
+            text("daily_streak_title", language, days=streak_days),
+            text("daily_streak_body", language),
             "/learning",
             key,
         )
 
     return Message(
         TYPE_DAILY,
-        "Time to study",
-        "Start a lesson today and begin a new streak.",
+        text("daily_start_title", language),
+        text("daily_start_body", language),
         "/learning",
         key,
     )
 
 
-def weekly_message(weekly_xp: int, local: datetime) -> Message | None:
+def weekly_message(weekly_xp: int, local: datetime, language: str | None = None) -> Message | None:
     if local.weekday() != 0:
         return None
 
     year, week, _ = local.isocalendar()
 
     if weekly_xp > 0:
-        body = f"You earned {weekly_xp} XP last week. Let's beat it."
+        body = text("weekly_xp", language, xp=weekly_xp)
     else:
-        body = "A fresh week starts now. Pick up where you left off."
+        body = text("weekly_fresh", language)
 
     return Message(
         TYPE_WEEKLY,
-        "Your weekly summary",
+        text("weekly_title", language),
         body,
         "/progress",
         f"{year}-W{week:02d}",
@@ -115,6 +119,51 @@ class ReminderService:
         self.notifications = NotificationRepository(db)
         self.subscriptions = PushSubscriptionRepository(db)
         self.gamification = GamificationService(db)
+        self.emails = EmailService(db)
+
+    async def _motivation(self, profile, settings) -> str | None:
+        """Today's motivational message to use as the reminder text. Never
+        stops a reminder from going out."""
+        try:
+            return (await MotivationService(self.db).for_profile(profile, settings))["message"]
+        except Exception:
+            # No rollback here: it would also undo the reminders already
+            # created earlier in this run.
+            logger.exception("Could not get today's motivation for a reminder")
+
+            return None
+
+    async def _roll_over(self, now: datetime) -> int:
+        """Once a day for every learner (reminders on or off): lessons they
+        missed and did not pin are planned again, and they are told. Runs
+        after the day has properly started on their clock."""
+        from app.services.calendar_service import CalendarService
+
+        rows = (
+            await self.db.execute(
+                select(Profile, UserSettings).outerjoin(
+                    UserSettings, UserSettings.profile_id == Profile.id
+                )
+            )
+        ).all()
+
+        service = CalendarService(self.db)
+        total = 0
+
+        for profile, settings in rows:
+            tz = settings.timezone if settings else profile.timezone
+
+            # Not before 04:00 local: late-night study still counts as today.
+            if local_now(tz, now).hour < 4:
+                continue
+
+            try:
+                total += await service.roll_over(profile, settings)
+            except Exception:
+                # No rollback: it would undo the reminders created earlier in this run.
+                logger.exception("Schedule roll-over failed for %s", profile.id)
+
+        return total
 
     async def run(self, now: datetime | None = None) -> dict:
         now = now or datetime.now(timezone.utc)
@@ -141,13 +190,17 @@ class ReminderService:
                     profile.streak_days or 0,
                     profile.last_activity_date == local.date(),
                     local,
+                    profile.language,
                 ),
                 weekly_message(
-                    await self.gamification.weekly_xp(profile), local
+                    await self.gamification.weekly_xp(profile), local, profile.language
                 ),
             ]
 
             for message in filter(None, messages):
+                if message.type == TYPE_DAILY:
+                    message.body = await self._motivation(profile, settings) or message.body
+
                 created = await self.notifications.create_once(
                     profile_id=profile.id,
                     type=message.type,
@@ -162,6 +215,8 @@ class ReminderService:
 
                 sent += 1
 
+                await self.emails.notify(profile, message.type, message.title, message.body, message.url)
+
                 subscriptions = await self.subscriptions.list_for_profile(
                     profile.id
                 )
@@ -173,6 +228,8 @@ class ReminderService:
                     message.url,
                 )
 
+        moved = await self._roll_over(now)
+
         await self.db.commit()
 
-        return {"notifications": sent, "pushes": pushed}
+        return {"notifications": sent, "pushes": pushed, "moved": moved}

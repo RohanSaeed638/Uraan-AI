@@ -1,4 +1,5 @@
 from uuid import UUID
+from app.services.achievement_service import AchievementService
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +27,11 @@ from datetime import datetime, timezone
 from openai import OpenAIError
 
 from app.repositories.settings_repository import SettingsRepository
+from app.ai.llm import AIUnavailableError
+from app.ai.prompts.mentor_prompt import build_system_prompt
+from app.ai.versions import prompt_version
 from app.services.mentor_ai_service import MentorAIService
+from app.services.mentor_context import MentorContext, build_context
 
 
 logger = logging.getLogger(__name__)
@@ -41,9 +46,10 @@ class MentorService:
         self.mentor_ai_service = MentorAIService()
         self.settings_repository = SettingsRepository(db)
 
-    async def _require_mentor_enabled(self, profile_id: UUID) -> None:
+    async def _require_mentor_enabled(self, profile_id: UUID):
         """403 when the user switched the AI mentor off in Settings.
-        No saved settings means the default, which is on."""
+        No saved settings means the default, which is on. Returns the saved
+        settings (or None)."""
         settings = await self.settings_repository.get_by_profile_id(
             profile_id
         )
@@ -53,6 +59,27 @@ class MentorService:
                 status_code=403,
                 detail="AI Mentor is turned off in Settings.",
             )
+
+        return settings
+
+    async def _context(self, profile) -> MentorContext:
+        """What the mentor knows about this learner. The chat still works
+        (just without personal context) if it cannot be put together."""
+        try:
+            return await build_context(self.db, profile)
+        except Exception:
+            logger.exception("Could not build the mentor context")
+            await self.db.rollback()
+
+            return MentorContext()
+
+    async def suggestions(self, auth_user_id: UUID) -> list:
+        profile = await self.profile_repository.get_by_auth_user_id(auth_user_id)
+
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+
+        return (await self._context(profile)).chips
 
     async def create_conversation(
         self,
@@ -228,7 +255,7 @@ class MentorService:
                 detail="Conversation not found",
             )
 
-        await self._require_mentor_enabled(profile.id)
+        settings = await self._require_mentor_enabled(profile.id)
 
         content = payload.content.strip()
 
@@ -262,14 +289,21 @@ class MentorService:
         # Generate before writing messages.
         # A failed LLM request won't leave an
         # unanswered user message in the database.
+        context = await self._context(profile)
+        system_prompt = build_system_prompt(
+            getattr(settings, "ai_tone", None), getattr(profile, "language", None), context.text
+        )
+
         try:
             assistant_content = await (
                 self.mentor_ai_service.generate_response(
                     messages=llm_messages,
+                    system_prompt=system_prompt,
+                    profile_id=profile.id,
                 )
             )
 
-        except (OpenAIError, RuntimeError):
+        except (OpenAIError, RuntimeError, AIUnavailableError):
             logger.exception(
                 "AI Mentor generation failed for conversation %s",
                 conversation_id,
@@ -297,12 +331,15 @@ class MentorService:
                     conversation_id=conversation.id,
                     role="assistant",
                     content=assistant_content,
+                    prompt_version=prompt_version("mentor"),
                 )
             )
 
             await self.mentor_repository.touch_conversation(
                 conversation
             )
+
+            await AchievementService(self.db).safe_evaluate(profile)
 
             await self.db.commit()
 

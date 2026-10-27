@@ -19,6 +19,8 @@ class NotificationResponse(BaseModel):
 class NotificationListResponse(BaseModel):
     notifications: list[NotificationResponse]
     unread_count: int
+    # More older ones exist: ask again with `before` set to the last created_at.
+    has_more: bool = False
 
 
 class PushKeys(BaseModel):

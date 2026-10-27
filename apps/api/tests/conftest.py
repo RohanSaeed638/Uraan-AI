@@ -8,7 +8,7 @@ def awards(monkeypatch):
     """Unit tests use fake sessions, so XP awards are recorded, not run."""
     given = []
 
-    async def fake_award(self, profile, amount, reason, ref_id):
+    async def fake_award(self, profile, amount, reason, ref_id, evaluate=True):
         given.append((reason, amount, ref_id))
         return True
 

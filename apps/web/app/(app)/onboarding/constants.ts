@@ -1,39 +1,11 @@
-export const TOTAL_STEPS = 10;
+import { careers as fallbackCareers } from "@/lib/constants/careers";
 
-export const CAREERS = [
-  {
-    label: "Backend Engineer",
-    value: "backend-engineer",
-  },
-  {
-    label: "Frontend Engineer",
-    value: "frontend-engineer",
-  },
-  {
-    label: "Full Stack Engineer",
-    value: "fullstack-engineer",
-  },
-  {
-    label: "AI Engineer",
-    value: "ai-engineer",
-  },
-  {
-    label: "Data Scientist",
-    value: "data-scientist",
-  },
-  {
-    label: "Cyber Security",
-    value: "cyber-security",
-  },
-  {
-    label: "Cloud Engineer",
-    value: "cloud-engineer",
-  },
-  {
-    label: "DevOps Engineer",
-    value: "devops-engineer",
-  },
-];
+export const TOTAL_STEPS = 12;
+
+export const CAREERS = fallbackCareers.map(({ value, label }) => ({
+  value,
+  label,
+}));
 
 export const LANGUAGES = [
   {
@@ -43,6 +15,10 @@ export const LANGUAGES = [
   {
     label: "اردو",
     value: "ur",
+  },
+  {
+    label: "Roman Urdu",
+    value: "ur-Latn",
   },
 ];
 
@@ -54,35 +30,39 @@ export const STEP_LABELS = [
   "Your name",
   "Language",
   "Career",
+  "About you",
   "Skill level",
   "Learning style",
   "Daily hours",
   "Target duration",
+  "Your plan",
   "Review",
   "Generating",
 ];
 
-// Groups the 10 granular steps into the 4 visible stages shown in the
-// stepper UI. Welcome (0) and Generating (9) are intro/outro splashes and
+// Groups the 12 granular steps into the 4 visible stages shown in the
+// stepper UI. Welcome (0) and Generating (11) are intro/outro splashes and
 // don't belong to any stage — the page hides the indicator for those.
 export const STAGES = [
-  { label: "Career" },
-  { label: "Skills" },
-  { label: "Learning Style" },
-  { label: "Goals" },
+  { label: "career" },
+  { label: "skills" },
+  { label: "style" },
+  { label: "goals" },
 ];
 
-// index = raw step (0-9), value = stage index (0-3), or null if the step
+// index = raw step (0-11), value = stage index (0-3), or null if the step
 // has no stage (Welcome / Generating).
 export const STEP_TO_STAGE: (number | null)[] = [
   null, // 0 Welcome
   0, // 1 Profile (name) -> Career
   0, // 2 Language -> Career
   0, // 3 Career -> Career
-  1, // 4 Skill level -> Skills
-  2, // 5 Learning style -> Learning Style
-  3, // 6 Daily hours -> Goals
-  3, // 7 Target duration -> Goals
-  3, // 8 Review -> Goals
-  null, // 9 Generating
+  1, // 4 About you -> Skills
+  1, // 5 Skill level -> Skills
+  2, // 6 Learning style -> Learning Style
+  3, // 7 Daily hours -> Goals
+  3, // 8 Target duration -> Goals
+  3, // 9 Your plan -> Goals
+  3, // 10 Review -> Goals
+  null, // 11 Generating
 ];

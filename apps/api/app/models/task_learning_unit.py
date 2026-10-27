@@ -1,5 +1,6 @@
 from uuid import UUID
 from enum import Enum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -10,6 +11,7 @@ class LearningUnitType(str, Enum):
     READING = "reading"
     VIDEO = "video"
     PROJECT = "project"
+    EXERCISE = "exercise"
 
 
 class TaskLearningUnit(BaseModel):
@@ -56,6 +58,13 @@ class TaskLearningUnit(BaseModel):
         nullable=True,
     )
 
+    # Type-specific data. Exercise: {language, problem, starter_code, hints,
+    # solution}. Project: {difficulty, skills, portfolio_value}.
+    details: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True,
+    )
+
     resource_url: Mapped[str | None] = mapped_column(
         String(1000),
         nullable=True,
@@ -77,3 +86,6 @@ class TaskLearningUnit(BaseModel):
         "RoadmapTask",
         back_populates="learning_units",
     )
+
+    # Which prompt version produced this (see app/ai/versions.py).
+    prompt_version: Mapped[str | None] = mapped_column(String(40), nullable=True)

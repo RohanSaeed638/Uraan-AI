@@ -70,3 +70,19 @@ class UserSettings(BaseModel):
         default=False,
         server_default="false",
     )
+
+    # Plain wording ("Tasks") or game wording ("Missions"): classic or gamified.
+    wording: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="classic",
+        server_default="classic",
+    )
+
+    # How the AI mentor talks: friendly, genz or professional.
+    ai_tone: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="friendly",
+        server_default="friendly",
+    )

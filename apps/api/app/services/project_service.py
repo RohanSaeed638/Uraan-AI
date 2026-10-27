@@ -16,6 +16,17 @@ from app.schemas.project import (
     ProjectDetailResponse,
 )
 
+def project_meta(unit) -> dict:
+    """Difficulty, skills and portfolio value (older projects have none)."""
+    details = unit.details or {}
+
+    return {
+        "difficulty": details.get("difficulty"),
+        "skills": list(details.get("skills") or []),
+        "portfolio_value": details.get("portfolio_value"),
+    }
+
+
 ProjectStatus = Literal[
     "all",
     "pending",
@@ -66,6 +77,7 @@ async def get_user_projects(
                 estimated_minutes=unit.estimated_minutes,
                 completed=unit.completed,
                 day=unit.day,
+                **project_meta(unit),
             )
         )
 
@@ -112,6 +124,7 @@ async def get_project_detail(
         estimated_minutes=unit.estimated_minutes,
         day=unit.day,
         completed=unit.completed,
+        **project_meta(unit),
 
         roadmap=ProjectContextResponse(
             id=roadmap.id,

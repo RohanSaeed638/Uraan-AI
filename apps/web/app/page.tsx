@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Sparkles,
   Target,
@@ -18,13 +19,14 @@ import Logo from "@/components/shared/Logo";
 import { buttonVariants } from "@/components/ui/button";
 
 const features = [
-  { icon: Sparkles, label: "AI-powered roadmaps" },
-  { icon: Target, label: "Personalized learning" },
-  { icon: TrendingUp, label: "Track your progress" },
-  { icon: Wrench, label: "Build real-world skills" },
-];
+  { icon: Sparkles, label: "f1" },
+  { icon: Target, label: "f2" },
+  { icon: TrendingUp, label: "f3" },
+  { icon: Wrench, label: "f4" },
+] as const;
 
 export default function HomePage() {
+  const t = useTranslations("landing");
   const { user, loading } = useAuthStore();
   const router = useRouter();
 
@@ -74,12 +76,10 @@ export default function HomePage() {
 
           <div className="max-w-md">
             <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">
-              Your AI-Powered
-              <br /> Career Growth Partner
+              {t("title")}
             </h1>
             <p className="mt-3 text-muted-foreground">
-              Personalized roadmaps &middot; Practical learning
-              <br /> Real career progress.
+              {t("subtitle")}
             </p>
 
             <ul className="mt-7 flex flex-col gap-3.5">
@@ -88,7 +88,7 @@ export default function HomePage() {
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-gold/15 text-brand-gold">
                     <Icon size={15} />
                   </span>
-                  <span className="text-sm font-medium">{label}</span>
+                  <span className="text-sm font-medium">{t(label)}</span>
                 </li>
               ))}
             </ul>
@@ -101,16 +101,19 @@ export default function HomePage() {
                   className: "w-full gap-2 sm:w-auto",
                 })}
               >
-                Get Started <ArrowRight size={16} />
+                {t("start")} <ArrowRight size={16} className="rtl:rotate-180" />
               </Link>
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-medium text-brand-violet hover:underline"
-                >
-                  Sign in
-                </Link>
+                {t.rich("haveAccount", {
+                  link: (chunks) => (
+                    <Link
+                      href="/login"
+                      className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </div>
           </div>

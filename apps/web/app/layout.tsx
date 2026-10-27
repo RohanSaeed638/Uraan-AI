@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { Geist, Geist_Mono, Inter, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import AppToaster from "@/components/shared/AppToaster";
+import DirectionSync from "@/components/shared/DirectionSync";
+import ErrorTranslator from "@/components/shared/ErrorTranslator";
+import { isRtl } from "@/i18n/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+// Urdu script; loaded for every page but only used when the language is Urdu.
+const urdu = Noto_Naskh_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-urdu",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,20 +37,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={isRtl(locale) ? "rtl" : "ltr"}
       className={cn(
         "h-full",
         "dark",
         "antialiased",
         geistSans.variable,
         geistMono.variable,
+        urdu.variable,
         "font-sans",
         inter.variable
       )}
@@ -60,10 +77,15 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          {children}
-          <AppToaster />
-        </AuthProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ErrorTranslator />
+          <DirectionSync>
+            <AuthProvider>
+              {children}
+              <AppToaster />
+            </AuthProvider>
+          </DirectionSync>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

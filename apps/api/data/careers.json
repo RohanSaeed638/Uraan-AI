@@ -1,0 +1,289 @@
+{
+  "_note": "DRAFT for review. Salaries are rough monthly PKR estimates (entry level to experienced) and must be checked against current Pakistan market data before launch. Resource URLs are verified reachable by scripts/seed_careers.py --check-urls.",
+  "careers": [
+    {
+      "slug": "backend-engineer",
+      "name": "Backend Engineer",
+      "category": "Software",
+      "icon": "Server",
+      "color": "#7C3AED",
+      "difficulty": "intermediate",
+      "estimated_months": 9,
+      "salary_min_pkr": 80000,
+      "salary_max_pkr": 450000,
+      "market_demand": "high",
+      "description": "Build the servers, databases and APIs that power web and mobile apps. You will learn a language like Python, design data models, secure and deploy services.",
+      "skills": ["Python", "Git and GitHub", "SQL and PostgreSQL", "REST API design", "FastAPI or Django", "Authentication and security", "Docker", "Testing", "Cloud deployment (AWS)"],
+      "resources": [
+        {"title": "Backend Developer Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/backend", "difficulty": "beginner"},
+        {"title": "CS50's Introduction to Programming with Python", "type": "course", "provider": "Harvard CS50", "url": "https://cs50.harvard.edu/python/", "difficulty": "beginner"},
+        {"title": "FastAPI Tutorial", "type": "docs", "provider": "FastAPI", "url": "https://fastapi.tiangolo.com/tutorial/", "difficulty": "intermediate"},
+        {"title": "PostgreSQL Tutorial", "type": "docs", "provider": "PostgreSQL", "url": "https://www.postgresql.org/docs/current/tutorial.html", "difficulty": "intermediate"},
+        {"title": "freeCodeCamp Back End Development and APIs", "type": "course", "provider": "freeCodeCamp", "url": "https://www.freecodecamp.org/learn/back-end-development-and-apis/", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "frontend-engineer",
+      "name": "Frontend Engineer",
+      "category": "Software",
+      "icon": "Layout",
+      "color": "#2563EB",
+      "difficulty": "beginner",
+      "estimated_months": 8,
+      "salary_min_pkr": 70000,
+      "salary_max_pkr": 400000,
+      "market_demand": "high",
+      "description": "Build the parts of websites and apps that people see and use. You will master HTML, CSS, JavaScript and a framework like React, with a focus on speed and accessibility.",
+      "skills": ["HTML and CSS", "JavaScript", "Git and GitHub", "Responsive design", "React", "TypeScript", "Accessibility", "Web performance", "Testing"],
+      "resources": [
+        {"title": "Frontend Developer Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/frontend", "difficulty": "beginner"},
+        {"title": "Learn web development", "type": "docs", "provider": "MDN", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development", "difficulty": "beginner"},
+        {"title": "freeCodeCamp Responsive Web Design", "type": "course", "provider": "freeCodeCamp", "url": "https://www.freecodecamp.org/learn/2022/responsive-web-design/", "difficulty": "beginner"},
+        {"title": "React: Learn", "type": "docs", "provider": "React", "url": "https://react.dev/learn", "difficulty": "intermediate"},
+        {"title": "TypeScript Handbook", "type": "docs", "provider": "TypeScript", "url": "https://www.typescriptlang.org/docs/handbook/intro.html", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "fullstack-engineer",
+      "name": "Full Stack Engineer",
+      "category": "Software",
+      "icon": "Layers",
+      "color": "#0EA5E9",
+      "difficulty": "intermediate",
+      "estimated_months": 12,
+      "salary_min_pkr": 90000,
+      "salary_max_pkr": 500000,
+      "market_demand": "very_high",
+      "description": "Work on both the interface and the server. You will ship complete products, from the database and API to the screen, and are especially valuable at startups and in freelancing.",
+      "skills": ["HTML, CSS and JavaScript", "Git and GitHub", "React", "Node.js or Python backend", "SQL and PostgreSQL", "REST APIs", "Authentication", "Docker", "Deployment"],
+      "resources": [
+        {"title": "Full Stack Developer Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/full-stack", "difficulty": "beginner"},
+        {"title": "The Odin Project", "type": "course", "provider": "The Odin Project", "url": "https://www.theodinproject.com/paths/full-stack-javascript", "difficulty": "beginner"},
+        {"title": "Full Stack Open", "type": "course", "provider": "University of Helsinki", "url": "https://fullstackopen.com/en/", "difficulty": "intermediate"},
+        {"title": "freeCodeCamp Curriculum", "type": "course", "provider": "freeCodeCamp", "url": "https://www.freecodecamp.org/learn/", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "mobile-app-developer",
+      "name": "Mobile App Developer",
+      "category": "Software",
+      "icon": "Smartphone",
+      "color": "#10B981",
+      "difficulty": "intermediate",
+      "estimated_months": 9,
+      "salary_min_pkr": 80000,
+      "salary_max_pkr": 420000,
+      "market_demand": "high",
+      "description": "Build apps for Android and iPhone. You will learn a cross-platform toolkit such as Flutter or React Native, design mobile screens and publish to the app stores.",
+      "skills": ["Programming basics (Dart or JavaScript)", "Git and GitHub", "Flutter or React Native", "Mobile UI design", "State management", "REST APIs", "Local storage", "Firebase", "Publishing to the app stores"],
+      "resources": [
+        {"title": "Android Developer Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/android", "difficulty": "beginner"},
+        {"title": "Flutter: Learn", "type": "docs", "provider": "Flutter", "url": "https://docs.flutter.dev/get-started/learn-flutter", "difficulty": "beginner"},
+        {"title": "Dart Language Tour", "type": "docs", "provider": "Dart", "url": "https://dart.dev/language", "difficulty": "beginner"},
+        {"title": "React Native: Learn the Basics", "type": "docs", "provider": "React Native", "url": "https://reactnative.dev/docs/getting-started", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "ai-engineer",
+      "name": "AI Engineer",
+      "category": "Data and AI",
+      "icon": "Brain",
+      "color": "#F59E0B",
+      "difficulty": "advanced",
+      "estimated_months": 12,
+      "salary_min_pkr": 100000,
+      "salary_max_pkr": 600000,
+      "market_demand": "very_high",
+      "description": "Build products powered by machine learning and large language models. You will learn Python, ML fundamentals, working with AI APIs, and shipping AI features reliably.",
+      "skills": ["Python", "Math for ML (linear algebra, statistics)", "Pandas and NumPy", "Machine learning basics", "Deep learning", "Working with LLM APIs", "Prompt engineering", "Retrieval and vector search", "Deploying AI services"],
+      "resources": [
+        {"title": "AI and Data Scientist Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/ai-data-scientist", "difficulty": "beginner"},
+        {"title": "Kaggle Learn: Intro to Machine Learning", "type": "course", "provider": "Kaggle", "url": "https://www.kaggle.com/learn/intro-to-machine-learning", "difficulty": "beginner"},
+        {"title": "CS50's Introduction to AI with Python", "type": "course", "provider": "Harvard CS50", "url": "https://cs50.harvard.edu/ai/", "difficulty": "intermediate"},
+        {"title": "Practical Deep Learning for Coders", "type": "course", "provider": "fast.ai", "url": "https://course.fast.ai/", "difficulty": "advanced"},
+        {"title": "Hugging Face Learn", "type": "course", "provider": "Hugging Face", "url": "https://huggingface.co/learn", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "data-scientist",
+      "name": "Data Scientist",
+      "category": "Data and AI",
+      "icon": "BarChart3",
+      "color": "#EC4899",
+      "difficulty": "advanced",
+      "estimated_months": 12,
+      "salary_min_pkr": 90000,
+      "salary_max_pkr": 500000,
+      "market_demand": "high",
+      "description": "Turn data into decisions. You will clean and analyse data, build statistical and machine learning models and explain the results clearly to non-technical people.",
+      "skills": ["Python", "SQL", "Statistics and probability", "Pandas and NumPy", "Data visualisation", "Machine learning", "Feature engineering", "Experiment design", "Communicating results"],
+      "resources": [
+        {"title": "Kaggle Learn: Python", "type": "course", "provider": "Kaggle", "url": "https://www.kaggle.com/learn/python", "difficulty": "beginner"},
+        {"title": "Kaggle Learn: Pandas", "type": "course", "provider": "Kaggle", "url": "https://www.kaggle.com/learn/pandas", "difficulty": "beginner"},
+        {"title": "Kaggle Learn: Data Visualization", "type": "course", "provider": "Kaggle", "url": "https://www.kaggle.com/learn/data-visualization", "difficulty": "beginner"},
+        {"title": "Khan Academy: Statistics and Probability", "type": "course", "provider": "Khan Academy", "url": "https://www.khanacademy.org/math/statistics-probability", "difficulty": "beginner"},
+        {"title": "AI and Data Scientist Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/ai-data-scientist", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "cyber-security",
+      "name": "Cybersecurity Analyst",
+      "category": "Security and Infrastructure",
+      "icon": "ShieldCheck",
+      "color": "#EF4444",
+      "difficulty": "intermediate",
+      "estimated_months": 12,
+      "salary_min_pkr": 80000,
+      "salary_max_pkr": 450000,
+      "market_demand": "high",
+      "description": "Protect systems and data from attacks. You will learn networking, operating systems, common vulnerabilities and how to detect, investigate and respond to incidents.",
+      "skills": ["Networking fundamentals", "Linux", "Operating system security", "Web application security (OWASP)", "Cryptography basics", "Security tools (Wireshark, Nmap)", "Incident response", "Scripting with Python", "Ethical hacking practice"],
+      "resources": [
+        {"title": "Cyber Security Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/cyber-security", "difficulty": "beginner"},
+        {"title": "OWASP Top Ten", "type": "docs", "provider": "OWASP", "url": "https://owasp.org/www-project-top-ten/", "difficulty": "intermediate"},
+        {"title": "TryHackMe: Complete Beginner path", "type": "practice", "provider": "TryHackMe", "url": "https://tryhackme.com/path/outline/beginner", "difficulty": "beginner"},
+        {"title": "Linux Journey", "type": "course", "provider": "Linux Journey", "url": "https://linuxjourney.com/", "difficulty": "beginner"},
+        {"title": "PortSwigger Web Security Academy", "type": "practice", "provider": "PortSwigger", "url": "https://portswigger.net/web-security", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "ui-ux-designer",
+      "name": "UI/UX Designer",
+      "category": "Design",
+      "icon": "Palette",
+      "color": "#A855F7",
+      "difficulty": "beginner",
+      "estimated_months": 6,
+      "salary_min_pkr": 60000,
+      "salary_max_pkr": 350000,
+      "market_demand": "high",
+      "description": "Design apps and websites that are easy and pleasant to use. You will learn user research, wireframing, visual design and prototyping in Figma, and build a portfolio of case studies.",
+      "skills": ["Design principles", "User research", "Wireframing", "Figma", "Visual design and typography", "Prototyping", "Usability testing", "Design systems", "Portfolio case studies"],
+      "resources": [
+        {"title": "UX Design Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/ux-design", "difficulty": "beginner"},
+        {"title": "Figma Learn", "type": "docs", "provider": "Figma", "url": "https://help.figma.com/hc/en-us/categories/360002051613-Get-started", "difficulty": "beginner"},
+        {"title": "Laws of UX", "type": "docs", "provider": "Laws of UX", "url": "https://lawsofux.com/", "difficulty": "beginner"},
+        {"title": "Nielsen Norman Group: Articles", "type": "docs", "provider": "NN/g", "url": "https://www.nngroup.com/articles/", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "devops-engineer",
+      "name": "DevOps Engineer",
+      "category": "Security and Infrastructure",
+      "icon": "Workflow",
+      "color": "#14B8A6",
+      "difficulty": "advanced",
+      "estimated_months": 12,
+      "salary_min_pkr": 100000,
+      "salary_max_pkr": 550000,
+      "market_demand": "high",
+      "description": "Automate how software is built, tested and deployed. You will learn Linux, scripting, CI/CD pipelines, containers, Kubernetes and monitoring.",
+      "skills": ["Linux", "Networking basics", "Git and GitHub", "Bash and Python scripting", "CI/CD (GitHub Actions)", "Docker", "Kubernetes", "Infrastructure as code (Terraform)", "Monitoring and logging"],
+      "resources": [
+        {"title": "DevOps Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/devops", "difficulty": "beginner"},
+        {"title": "Docker: Get Started", "type": "docs", "provider": "Docker", "url": "https://docs.docker.com/get-started/", "difficulty": "beginner"},
+        {"title": "Kubernetes Basics", "type": "docs", "provider": "Kubernetes", "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/", "difficulty": "intermediate"},
+        {"title": "GitHub Actions Documentation", "type": "docs", "provider": "GitHub", "url": "https://docs.github.com/en/actions", "difficulty": "intermediate"},
+        {"title": "Linux Journey", "type": "course", "provider": "Linux Journey", "url": "https://linuxjourney.com/", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "cloud-engineer",
+      "name": "Cloud Engineer",
+      "category": "Security and Infrastructure",
+      "icon": "Cloud",
+      "color": "#3B82F6",
+      "difficulty": "intermediate",
+      "estimated_months": 9,
+      "salary_min_pkr": 90000,
+      "salary_max_pkr": 500000,
+      "market_demand": "high",
+      "description": "Design and run applications on cloud platforms such as AWS. You will learn networking, compute, storage, security and cost control, and prepare for a cloud certification.",
+      "skills": ["Networking fundamentals", "Linux", "Cloud concepts", "AWS core services (EC2, S3, IAM, VPC)", "Databases in the cloud", "Infrastructure as code", "Cloud security", "Cost management", "Serverless"],
+      "resources": [
+        {"title": "AWS Cloud Practitioner Essentials", "type": "course", "provider": "AWS Skill Builder", "url": "https://explore.skillbuilder.aws/learn/course/external/view/elearning/134/aws-cloud-practitioner-essentials", "difficulty": "beginner"},
+        {"title": "AWS Roadmap", "type": "docs", "provider": "roadmap.sh", "url": "https://roadmap.sh/aws", "difficulty": "beginner"},
+        {"title": "AWS Documentation", "type": "docs", "provider": "AWS", "url": "https://docs.aws.amazon.com/", "difficulty": "intermediate"},
+        {"title": "Microsoft Learn: Azure Fundamentals", "type": "course", "provider": "Microsoft Learn", "url": "https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "digital-marketer",
+      "name": "Digital Marketer",
+      "category": "Business and Creative",
+      "icon": "Megaphone",
+      "color": "#F97316",
+      "difficulty": "beginner",
+      "estimated_months": 6,
+      "salary_min_pkr": 50000,
+      "salary_max_pkr": 300000,
+      "market_demand": "high",
+      "description": "Grow businesses online through search, social media, email and ads. You will learn to plan campaigns, create content, measure results and run paid advertising.",
+      "skills": ["Marketing fundamentals", "SEO", "Content marketing", "Social media marketing", "Email marketing", "Paid ads (Meta and Google)", "Analytics (GA4)", "Copywriting", "Campaign reporting"],
+      "resources": [
+        {"title": "Fundamentals of Digital Marketing", "type": "course", "provider": "Google Digital Garage", "url": "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing", "difficulty": "beginner"},
+        {"title": "HubSpot Academy", "type": "course", "provider": "HubSpot Academy", "url": "https://academy.hubspot.com/courses/digital-marketing", "difficulty": "beginner"},
+        {"title": "Google Search Central: SEO Starter Guide", "type": "docs", "provider": "Google", "url": "https://developers.google.com/search/docs/fundamentals/seo-starter-guide", "difficulty": "beginner"},
+        {"title": "Google Analytics: Get started", "type": "docs", "provider": "Google", "url": "https://support.google.com/analytics/answer/9304153", "difficulty": "intermediate"}
+      ]
+    },
+    {
+      "slug": "graphic-designer",
+      "name": "Graphic Designer",
+      "category": "Design",
+      "icon": "PenTool",
+      "color": "#D946EF",
+      "difficulty": "beginner",
+      "estimated_months": 6,
+      "salary_min_pkr": 40000,
+      "salary_max_pkr": 250000,
+      "market_demand": "medium",
+      "description": "Create logos, social posts, posters and brand identities. You will learn design principles, colour and typography, and professional tools, and build a client-ready portfolio.",
+      "skills": ["Design principles", "Colour theory", "Typography", "Layout and composition", "Adobe Illustrator or Affinity", "Adobe Photoshop or Canva", "Logo and brand identity", "Social media design", "Freelancing and client work"],
+      "resources": [
+        {"title": "Canva Design School", "type": "course", "provider": "Canva", "url": "https://www.canva.com/designschool/", "difficulty": "beginner"},
+        {"title": "Refactoring UI (free tips)", "type": "docs", "provider": "Refactoring UI", "url": "https://www.refactoringui.com/", "difficulty": "beginner"},
+        {"title": "Adobe Illustrator Tutorials", "type": "course", "provider": "Adobe", "url": "https://helpx.adobe.com/illustrator/tutorials.html", "difficulty": "beginner"},
+        {"title": "Google Fonts Knowledge", "type": "docs", "provider": "Google Fonts", "url": "https://fonts.google.com/knowledge", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "video-editor",
+      "name": "Video Editor",
+      "category": "Business and Creative",
+      "icon": "Clapperboard",
+      "color": "#E11D48",
+      "difficulty": "beginner",
+      "estimated_months": 5,
+      "salary_min_pkr": 40000,
+      "salary_max_pkr": 250000,
+      "market_demand": "high",
+      "description": "Edit videos for YouTube, social media, ads and clients. You will learn cutting, pacing, audio, colour and motion basics, and deliver polished work on a deadline.",
+      "skills": ["Editing fundamentals", "DaVinci Resolve or Premiere Pro", "Storytelling and pacing", "Audio editing", "Colour correction", "Titles and motion graphics", "Short-form video", "Export settings", "Freelancing and client work"],
+      "resources": [
+        {"title": "DaVinci Resolve Training", "type": "course", "provider": "Blackmagic Design", "url": "https://www.blackmagicdesign.com/products/davinciresolve/training", "difficulty": "beginner"},
+        {"title": "Adobe Premiere Pro Tutorials", "type": "course", "provider": "Adobe", "url": "https://helpx.adobe.com/premiere-pro/tutorials.html", "difficulty": "beginner"},
+        {"title": "CapCut Help Center", "type": "docs", "provider": "CapCut", "url": "https://www.capcut.com/resource", "difficulty": "beginner"}
+      ]
+    },
+    {
+      "slug": "content-creator",
+      "name": "Content Creator",
+      "category": "Business and Creative",
+      "icon": "Camera",
+      "color": "#8B5CF6",
+      "difficulty": "beginner",
+      "estimated_months": 6,
+      "salary_min_pkr": 30000,
+      "salary_max_pkr": 300000,
+      "market_demand": "medium",
+      "description": "Build an audience and earn from your content on YouTube, Instagram, TikTok or a blog. You will learn niche selection, scripting, filming, editing, growth and monetisation.",
+      "skills": ["Niche and audience research", "Scripting and storytelling", "Filming and lighting basics", "Basic video editing", "Thumbnails and visuals", "Platform growth (SEO and trends)", "Community building", "Monetisation", "Analytics"],
+      "resources": [
+        {"title": "YouTube Creator Academy", "type": "course", "provider": "YouTube", "url": "https://creatoracademy.youtube.com/", "difficulty": "beginner"},
+        {"title": "Canva Design School", "type": "course", "provider": "Canva", "url": "https://www.canva.com/designschool/", "difficulty": "beginner"},
+        {"title": "Fundamentals of Digital Marketing", "type": "course", "provider": "Google Digital Garage", "url": "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing", "difficulty": "beginner"}
+      ]
+    }
+  ]
+}

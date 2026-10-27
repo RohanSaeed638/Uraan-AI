@@ -139,3 +139,6 @@ class Quiz(BaseModel):
         cascade="all, delete-orphan",
         order_by="QuizQuestion.order",
     )
+
+    # Which prompt version produced this (see app/ai/versions.py).
+    prompt_version: Mapped[str | None] = mapped_column(String(40), nullable=True)

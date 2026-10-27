@@ -1,6 +1,7 @@
+from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_user
@@ -18,10 +19,13 @@ router = APIRouter(tags=["Notifications"])
 
 @router.get("/notifications", response_model=NotificationListResponse)
 async def list_notifications(
+    limit: int = Query(default=30, ge=1, le=100),
+    before: datetime | None = None,
+    unread: bool = False,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    return await NotificationService(db).list(current_user.id)
+    return await NotificationService(db).list(current_user.id, limit, before, unread)
 
 
 @router.post(

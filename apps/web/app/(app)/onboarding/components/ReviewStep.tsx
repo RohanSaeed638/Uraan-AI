@@ -5,59 +5,90 @@ import NavigationButtons from "@/components/onboarding/NavigationButtons";
 import SummaryCard from "@/components/onboarding/SummaryCard";
 import CheckIllustration from "@/components/illustrations/CheckIllustration";
 
-import { StepProps } from "../types";
+import { useTranslations } from "next-intl";
 
-/** "reading_video" -> "Reading Video", "backend-engineer" -> "Backend Engineer". */
-const pretty = (value: string) =>
-  value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+import { LOCALE_LABELS, isLocale } from "@/i18n/config";
+import { useCareerOptions } from "@/lib/careers";
+
+import { StepProps } from "../types";
 
 export default function ReviewStep({
   data,
   previous,
   next: submit,
 }: StepProps) {
+  const t = useTranslations("onboarding.review");
+  const o = useTranslations("options");
+  const { options: careers } = useCareerOptions();
+
+  const choice = (group: string, value: string | null) =>
+    value ? o(`${group}.${value}`) : null;
+
+  const extras: [string, string | null][] = [
+    [t("age"), data.age ? String(data.age) : null],
+    [t("education"), choice("education", data.education)],
+    [t("device"), choice("device", data.device)],
+    [t("goal"), choice("goal_type", data.goal_type)],
+    [t("hours"), choice("study_hours", data.preferred_study_hours)],
+    [t("pace"), choice("pace", data.learning_pace)],
+    [
+      t("weekend"),
+      data.weekend_study === null
+        ? null
+        : data.weekend_study
+          ? t("yes")
+          : t("no"),
+    ],
+  ];
+
   return (
     <OnboardingCard
-      title="Your profile is ready 🎉"
-      subtitle="Let's create your personalized roadmap."
+      title={t("title")}
+      subtitle={t("subtitle")}
       illustration={<CheckIllustration />}
     >
       <div className="grid grid-cols-2 gap-4">
 
         <SummaryCard
-          label="Name"
+          label={t("name")}
           value={data.full_name}
         />
 
         <SummaryCard
-          label="Language"
-          value={data.language === "ur" ? "اردو" : "English"}
+          label={t("language")}
+          value={LOCALE_LABELS[isLocale(data.language) ? data.language : "en"]}
         />
 
         <SummaryCard
-          label="Career"
-          value={pretty(data.career_slug)}
+          label={t("career")}
+          value={careers.find((c) => c.value === data.career_slug)?.label ?? data.career_slug}
         />
 
         <SummaryCard
-          label="Skill Level"
-          value={pretty(data.skill_level)}
+          label={t("skill")}
+          value={o(`skill_level.${data.skill_level}`)}
         />
 
         <SummaryCard
-          label="Learning Style"
-          value={pretty(data.learning_style)}
+          label={t("style")}
+          value={o(`learning_style.${data.learning_style}`)}
         />
 
         <SummaryCard
-          label="Daily Hours"
-          value={`${data.daily_hours} hrs`}
+          label={t("dailyHours")}
+          value={t("hrs", { count: data.daily_hours })}
         />
 
         <SummaryCard
-          label="Goal"
-          value={`${data.target_duration} months`}
+          label={t("target")}
+          value={t("months", { count: data.target_duration })}
         />
+
+        {extras
+          .filter(([, value]) => value)
+          .map(([label, value]) => (
+            <SummaryCard key={label} label={label} value={value as string} />
+          ))}
 
       </div>
 
@@ -65,7 +96,7 @@ export default function ReviewStep({
         showBack
         onBack={previous}
         onNext={submit}
-        nextLabel="Generate My Roadmap 🚀"
+        nextLabel={t("generate")}
       />
     </OnboardingCard>
   );

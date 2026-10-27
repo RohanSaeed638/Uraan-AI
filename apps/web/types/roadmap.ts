@@ -6,6 +6,7 @@ export interface RoadmapTask {
   resource_links?: string[] | null;
   completed: boolean;
   order: number;
+  week?: number | null;
   learning_units: LearningUnit[];
 }
 
@@ -14,6 +15,7 @@ export interface RoadmapPhase {
   title: string;
   description: string;
   duration_weeks: number;
+  milestones?: string[] | null;
   order: number;
   tasks: RoadmapTask[];
 }
@@ -22,14 +24,19 @@ export type RoadmapStatus =
   | "pending"
   | "generating"
   | "active"
+  | "paused"
   | "completed"
-  | "archived";
+  | "archived"
+  | "failed";
 
 export interface Roadmap {
   id: string;
   title: string;
   description: string;
   status: RoadmapStatus;
+  generation_error?: string | null;
+  daily_hours?: number | null;
+  target_duration?: number | null;
   created_at: string;
   updated_at: string;
   phases: RoadmapPhase[];
@@ -84,7 +91,24 @@ export interface GenerateRoadmapFormValues {
 export type LearningUnitType =
   | "reading"
   | "video"
-  | "project";
+  | "project"
+  | "exercise";
+
+/** Extra data on a coding exercise (the problem itself is `content`). */
+export interface ExerciseDetails {
+  language: string;
+  starter_code: string;
+  hints: string[];
+  solution: string;
+  expected_output?: string | null;
+}
+
+/** Extra data on a project lesson. */
+export interface ProjectDetails {
+  difficulty: "beginner" | "intermediate" | "advanced" | null;
+  skills: string[];
+  portfolio_value: string | null;
+}
 
 export interface LearningUnit {
   id: string;
@@ -101,7 +125,37 @@ export interface LearningUnit {
 
   resource_url: string | null;
 
+  /** ExerciseDetails for an exercise, ProjectDetails for a project. */
+  details?: Record<string, unknown> | null;
+
   estimated_minutes: number | null;
 
   completed: boolean;
+}
+
+/** What the browser polls while a roadmap is being built or rebuilt. */
+export interface RoadmapJobStatus {
+  id: string;
+  title: string;
+  status: RoadmapStatus;
+  error: string | null;
+}
+
+export type AdaptReason = "study_time" | "behind" | "goal";
+
+export interface AdaptRequest {
+  reason: AdaptReason;
+  daily_hours?: number;
+  months_left?: number;
+  note?: string;
+}
+
+export interface RoadmapVersion {
+  id: string;
+  version_number: number;
+  reason: "regenerate" | "adapt" | "restore";
+  created_at: string;
+  phases: number;
+  tasks: number;
+  completed: number;
 }

@@ -4,27 +4,13 @@ import { BookOpen, Video, Code2 } from "lucide-react";
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import OptionCard from "@/components/onboarding/OptionCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
+import { useTranslations } from "next-intl";
 import { StepProps, LearningStyle } from "../types";
 
 const learningStyles = [
-  {
-    value: "reading" as LearningStyle,
-    icon: BookOpen,
-    title: "Reading",
-    description: "Text-based learning with structured content.",
-  },
-  {
-    value: "reading_video" as LearningStyle,
-    icon: Video,
-    title: "Reading + Videos",
-    description: "Reading plus video tutorials and guides.",
-  },
-  {
-    value: "reading_video_project" as LearningStyle,
-    icon: Code2,
-    title: "Reading + Videos + Projects",
-    description: "Hands-on projects and real-world practice.",
-  },
+  { value: "reading" as LearningStyle, icon: BookOpen },
+  { value: "reading_video" as LearningStyle, icon: Video },
+  { value: "reading_video_project" as LearningStyle, icon: Code2 },
 ];
 
 export default function LearningStyleStep({
@@ -33,18 +19,20 @@ export default function LearningStyleStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.style");
+
   return (
     <OnboardingCard
-      title="Choose your learning style"
-      subtitle="Select how you prefer to learn. Each option builds on the last."
+      title={t("title")}
+      subtitle={t("subtitle")}
     >
       <div className="grid gap-4">
         {learningStyles.map((style) => (
           <OptionCard
             key={style.value}
             icon={<style.icon size={18} />}
-            title={style.title}
-            description={style.description}
+            title={t(style.value)}
+            description={t(`${style.value}Text`)}
             selected={data.learning_style === style.value}
             onClick={() =>
               updateData({

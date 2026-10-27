@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -14,13 +17,15 @@ export default function NavigationButtons({
   loading,
   onNext,
   onBack,
-  nextLabel = "Continue",
+  nextLabel,
 }: Props) {
+  const t = useTranslations("onboarding.nav");
+
   return (
     <div className="mt-10 flex justify-between">
       {showBack ? (
         <Button variant="outline" onClick={onBack} className="gap-1.5">
-          <ArrowLeft size={15} /> Back
+          <ArrowLeft size={15} className="rtl:rotate-180" /> {t("back")}
         </Button>
       ) : (
         <div />
@@ -31,7 +36,7 @@ export default function NavigationButtons({
           <Loader2 size={15} className="animate-spin" />
         ) : (
           <>
-            {nextLabel} <ArrowRight size={15} />
+            {nextLabel ?? t("continue")} <ArrowRight size={15} className="rtl:rotate-180" />
           </>
         )}
       </Button>

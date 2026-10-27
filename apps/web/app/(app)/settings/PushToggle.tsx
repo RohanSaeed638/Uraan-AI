@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import {
   disablePush,
@@ -12,14 +13,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-const messages: Partial<Record<PushStatus, string>> = {
-  unsupported: "This browser doesn't support push notifications.",
-  unconfigured: "Push notifications aren't set up on the server yet.",
-  denied:
-    "Notifications are blocked for this site. Allow them in your browser settings, then try again.",
-};
-
 export default function PushToggle() {
+  const t = useTranslations("settings.push");
   const [status, setStatus] = useState<PushStatus | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -38,9 +33,9 @@ export default function PushToggle() {
     try {
       const next = status === "on" ? await disablePush() : await enablePush();
       setStatus(next);
-      if (next === "on") toast.success("Push notifications are on.");
+      if (next === "on") toast.success(t("on"));
     } catch {
-      toast.error("Couldn't change push notifications.");
+      toast.error(t("failed"));
     } finally {
       setBusy(false);
     }
@@ -54,11 +49,12 @@ export default function PushToggle() {
     <div className="flex items-start justify-between gap-4">
       <span>
         <span className="block text-sm font-medium">
-          Push notifications on this device
+          {t("title")}
         </span>
         <span className="block text-xs text-muted-foreground">
-          {messages[status] ??
-            "Get your daily reminder even when Uraan AI is closed."}
+          {status === "unsupported" || status === "unconfigured" || status === "denied"
+            ? t(status)
+            : t("default")}
         </span>
       </span>
       {canToggle && (
@@ -69,7 +65,7 @@ export default function PushToggle() {
           disabled={busy}
           onClick={toggle}
         >
-          {status === "on" ? "Turn off" : "Turn on"}
+          {status === "on" ? t("turnOff") : t("turnOn")}
         </Button>
       )}
     </div>

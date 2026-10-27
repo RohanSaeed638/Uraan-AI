@@ -2,10 +2,13 @@ export default function ProgressRing({
   value,
   size = 88,
   strokeWidth = 8,
+  showValue = true,
 }: {
   value: number;
   size?: number;
   strokeWidth?: number;
+  /** Show the percentage in the middle (turn off to draw your own). */
+  showValue?: boolean;
 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -43,9 +46,11 @@ export default function ProgressRing({
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-lg font-bold text-foreground">{clamped}%</span>
-      </div>
+      {showValue && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-lg font-bold text-foreground">{clamped}%</span>
+        </div>
+      )}
     </div>
   );
 }

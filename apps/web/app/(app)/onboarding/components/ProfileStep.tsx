@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Input } from "@/components/ui/input";
 
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
@@ -13,13 +15,15 @@ export default function ProfileStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.profile");
+
   return (
     <OnboardingCard
-      title="Tell us about yourself"
-      subtitle="We'll personalize everything."
+      title={t("title")}
+      subtitle={t("subtitle")}
     >
       <Input
-        placeholder="Your Full Name"
+        placeholder={t("name")}
         value={data.full_name}
         onChange={(e) =>
           updateData({

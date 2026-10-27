@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Bot,
   BookOpen,
   Briefcase,
   CalendarDays,
   CheckSquare,
+  Compass,
+  Library,
+  Medal,
   FileText,
   FolderKanban,
   LayoutGrid,
@@ -26,24 +30,28 @@ import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
-  { title: "My Roadmaps", href: "/roadmaps", icon: Target },
-  { title: "Learning", href: "/learning", icon: BookOpen },
-  { title: "Calendar", href: "/calendar", icon: CalendarDays },
-  { title: "Tasks", href: "/tasks", icon: CheckSquare },
-  { title: "Projects", href: "/projects", icon: FolderKanban },
-  { title: "Progress", href: "/progress", icon: TrendingUp },
-  { title: "Resume", href: "/resume", icon: FileText },
-  { title: "Portfolio", href: "/portfolio", icon: Briefcase },
-  { title: "Interview", href: "/interview", icon: Mic },
-  { title: "AI Mentor", href: "/mentor", icon: Bot },
-  { title: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { title: "Profile", href: "/profile", icon: User },
-  { title: "Settings", href: "/settings", icon: Settings },
+  { key: "dashboard", href: "/dashboard", icon: LayoutGrid },
+  { key: "careers", href: "/careers", icon: Compass },
+  { key: "roadmaps", href: "/roadmaps", icon: Target },
+  { key: "resources", href: "/resources", icon: Library },
+  { key: "learning", href: "/learning", icon: BookOpen },
+  { key: "calendar", href: "/calendar", icon: CalendarDays },
+  { key: "tasks", href: "/tasks", icon: CheckSquare },
+  { key: "projects", href: "/projects", icon: FolderKanban },
+  { key: "progress", href: "/progress", icon: TrendingUp },
+  { key: "resume", href: "/resume", icon: FileText },
+  { key: "portfolio", href: "/portfolio", icon: Briefcase },
+  { key: "interview", href: "/interview", icon: Mic },
+  { key: "mentor", href: "/mentor", icon: Bot },
+  { key: "achievements", href: "/achievements", icon: Medal },
+  { key: "leaderboard", href: "/leaderboard", icon: Trophy },
+  { key: "profile", href: "/profile", icon: User },
+  { key: "settings", href: "/settings", icon: Settings },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <>
@@ -70,7 +78,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               )}
             >
               <item.icon size={18} strokeWidth={2} className="shrink-0" />
-              {item.title}
+              {t(item.key)}
             </Link>
           );
         })}
@@ -78,10 +86,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="mt-4 shrink-0 rounded-2xl bg-gradient-to-br from-brand-violet to-indigo-900 p-4 text-white">
         <Sparkles size={18} className="text-brand-gold-light" />
-        <p className="mt-2 text-sm font-semibold">Upgrade to Pro</p>
-        <p className="mt-1 text-xs text-white/70">
-          Unlock advanced roadmaps and AI features.
-        </p>
+        <p className="mt-2 text-sm font-semibold">{t("upgradeTitle")}</p>
+        <p className="mt-1 text-xs text-white/70">{t("upgradeText")}</p>
       </div>
     </>
   );
@@ -90,7 +96,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 /** Fixed sidebar on large screens. */
 export default function Sidebar() {
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-5 lg:flex print:hidden">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-e border-sidebar-border bg-sidebar p-5 lg:flex print:hidden">
       <SidebarContent />
     </aside>
   );
@@ -104,6 +110,8 @@ export function MobileSidebar({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("nav");
+
   useEffect(() => {
     if (!open) return;
 
@@ -122,20 +130,20 @@ export function MobileSidebar({
       className="fixed inset-0 z-50 lg:hidden print:hidden"
       role="dialog"
       aria-modal="true"
-      aria-label="Navigation"
+      aria-label={t("menu")}
     >
       <button
         type="button"
-        aria-label="Close menu"
+        aria-label={t("closeMenu")}
         className="absolute inset-0 bg-black/60"
         onClick={onClose}
       />
-      <aside className="relative flex h-full w-72 max-w-[85vw] flex-col border-r border-sidebar-border bg-sidebar p-5 shadow-xl">
+      <aside className="relative flex h-full w-72 max-w-[85vw] flex-col border-e border-sidebar-border bg-sidebar p-5 shadow-xl">
         <button
           type="button"
-          aria-label="Close menu"
+          aria-label={t("closeMenu")}
           onClick={onClose}
-          className="absolute right-3 top-3 rounded-full p-2 text-sidebar-foreground/70 transition hover:bg-sidebar-accent"
+          className="absolute end-3 top-3 rounded-full p-2 text-sidebar-foreground/70 transition hover:bg-sidebar-accent"
         >
           <X size={18} />
         </button>

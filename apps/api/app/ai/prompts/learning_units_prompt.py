@@ -9,6 +9,7 @@ Skill level: {skill}
 Goal: {learning_goal}
 Study time per day: {daily_hours} hours
 Learning style: {style_label}
+{learner_context}
 
 TASK
 
@@ -74,6 +75,20 @@ PROJECT_RULES = """PROJECT lesson ("type": "project"):
   is doable in the minutes given.
 - "outline": 4 to 6 points: what to build, the main requirements, and the
   skills it practises.
+- Add these keys to the project unit only: "difficulty": "beginner", "intermediate" or "advanced", for THIS learner.
+- "skills": 2 to 5 short skill names the project practises.
+- "portfolio_value": one sentence on what an employer or client learns about
+  the learner from seeing this project.
+- "notes" is null, "video_urls" is [] and "search_query" is null."""
+
+EXERCISE_RULES = """EXERCISE lessons ("type": "exercise"): a small coding problem the
+learner solves themselves, with starter code.
+- Use 1 to 3 per task (never more than 3), at most one per day, placed after
+  the reading that teaches what the problem needs. Not every day needs one.
+- Add the key "language" to exercise units only: the language the exercise is
+  written in, lower case ("python", "javascript", "sql", "bash").
+- "outline": 2 to 4 points: what the problem asks and the idea it practises.
+- "estimated_minutes": 10 to 40.
 - "notes" is null, "video_urls" is [] and "search_query" is null."""
 
 STYLE_LABELS = {
@@ -83,8 +98,11 @@ STYLE_LABELS = {
 }
 
 
-def rules_for(style: str) -> str:
+def rules_for(style: str, coding: bool = False) -> str:
     parts = [READING_RULES]
+
+    if coding:
+        parts.append(EXERCISE_RULES)
 
     if style in ("reading_video", "reading_video_project"):
         parts.append(VIDEO_RULES)
@@ -153,3 +171,36 @@ EXPAND_NOTE = (
     "\n\nYour previous answer was too short ({words} words). Write the full "
     "lesson again with more depth and more examples, at least {target} words."
 )
+
+EXERCISE_PROMPT = """
+Write one coding exercise for a learner. They solve it on their own computer
+(or in an online editor); nothing is run for them, so it must be unambiguous.
+
+Task: {task_title}
+Exercise: {title}
+What it is for: {description}
+Language: {language}
+Skill level: {skill}   Career: {career}   Time: about {minutes} minutes
+
+It should practise:
+{outline}
+
+Return ONLY valid JSON, no markdown fences:
+
+{{
+  "language": "{language}",
+  "problem": "Markdown. State exactly what to write, the inputs and outputs, and one or two worked examples. 40 to 150 words.",
+  "starter_code": "Code with the structure already there and the part to write left as a clearly marked TODO. It must be valid {language}.",
+  "hints": ["a gentle nudge", "a more specific one", "almost the answer, without the code"],
+  "solution": "A complete, correct, readable solution that keeps the starter code structure.",
+  "expected_output": "What running the solution prints for the example, or null."
+}}
+
+Rules:
+- 2 to 4 hints, each more revealing than the one before. Hints are plain text.
+- The solution must really solve the problem as stated. If you are unsure it is
+  correct, make the problem simpler.
+- Use only the standard library of the language. No installs, no network, no
+  files, no input from the keyboard.
+- Fit the time given: a small, focused problem, not a project.
+"""

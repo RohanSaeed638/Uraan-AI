@@ -55,7 +55,7 @@
 # """
 
 ROADMAP_PROMPT = """
-You are an expert software career mentor.
+You are an expert career mentor.
 
 Generate a COMPLETE and personalized learning roadmap based on the user's profile.
 
@@ -66,6 +66,8 @@ Name:
 
 Career:
 {career}
+
+{career_template}
 
 Career Stage:
 {career_stage}
@@ -116,7 +118,18 @@ If the user is a career_switcher:
 
 The roadmap must respect the user's available daily hours and target duration.
 
+{learner_context}
+
 The roadmap should directly support the user's learning goal.
+
+WEEKS AND MILESTONES
+
+- Every phase has 2 to 4 "milestones": short, concrete outcomes ("Build and
+  deploy a REST API"), not topics.
+- Every task has a "week": the week of the whole roadmap (1 = first week) in
+  which the learner starts it. Weeks must not go backwards, and the tasks of a
+  phase must fall inside that phase's weeks. The phases' estimated_weeks
+  together should roughly match the target duration.
 
 Return ONLY valid JSON.
 
@@ -131,6 +144,10 @@ The structure must be:
       "description": "",
       "order": 1,
       "estimated_weeks": 2,
+      "milestones": [
+        "What the learner can do by the end of this phase",
+        "Another concrete outcome"
+      ],
       "tasks": [
         {{
           "title": "",
@@ -140,7 +157,8 @@ The structure must be:
             "https://example.com/resource1",
             "https://example.com/resource2"
           ],
-          "estimated_hours": 5
+          "estimated_hours": 5,
+          "week": 1
         }}
       ]
     }}

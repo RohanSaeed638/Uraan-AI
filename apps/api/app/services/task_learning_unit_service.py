@@ -1,4 +1,5 @@
 import logging
+from app.ai.llm import use_profile
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -112,7 +113,8 @@ class TaskLearningUnitService:
             ).scalar_one()
 
             try:
-                units = await self.generator.generate(roadmap, task)
+                use_profile(profile.id, profile.language)
+                units = await self.generator.generate(roadmap, task, profile)
             except Exception as exc:
                 logger.exception("Lesson generation failed for %s", task.id)
                 raise HTTPException(

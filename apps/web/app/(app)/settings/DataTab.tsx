@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { api } from "@/lib/api";
 
@@ -10,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import LoadingButton from "@/components/shared/LoadingButton";
 
 export default function DataTab() {
+  const t = useTranslations("settings.data");
   const [busy, setBusy] = useState(false);
 
   async function download() {
@@ -31,9 +33,9 @@ export default function DataTab() {
       link.remove();
       URL.revokeObjectURL(url);
 
-      toast.success("Your data was downloaded.");
+      toast.success(t("done"));
     } catch {
-      toast.error("Couldn't prepare your data. Please try again.");
+      toast.error(t("failed"));
     } finally {
       setBusy(false);
     }
@@ -41,11 +43,9 @@ export default function DataTab() {
 
   return (
     <Card className="max-w-xl p-7">
-      <h2 className="text-sm font-semibold">Your data</h2>
+      <h2 className="text-sm font-semibold">{t("title")}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Download a copy of what Uraan AI stores about you as a JSON file: your
-        profile, settings, roadmaps, documents, portfolio, interviews, mentor
-        conversations and XP.
+        {t("text")}
       </p>
       <LoadingButton
         type="button"
@@ -53,7 +53,7 @@ export default function DataTab() {
         loading={busy}
         onClick={download}
       >
-        <Download size={15} /> Download my data
+        <Download size={15} /> {t("download")}
       </LoadingButton>
     </Card>
   );

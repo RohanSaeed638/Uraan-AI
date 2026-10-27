@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+import PageHeader from "@/components/shared/PageHeader";
+import FilterChips from "@/components/shared/FilterChips";
 import { useMutation } from "@tanstack/react-query";
 import { Copy, FileText, Printer, Save, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +14,7 @@ import {
   updateDocument,
 } from "@/lib/api/documents";
 import { CareerDocument, DocumentKind } from "@/types/api";
+import { apiErrorMessage } from "@/lib/profile-options";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,23 +25,14 @@ import LoadingButton from "@/components/shared/LoadingButton";
 import SimpleMarkdown from "@/components/shared/SimpleMarkdown";
 import { cn } from "@/lib/utils";
 
-const KINDS: { key: DocumentKind; label: string }[] = [
-  { key: "resume", label: "Resume" },
-  { key: "cover_letter", label: "Cover letter" },
-  { key: "linkedin_summary", label: "LinkedIn summary" },
-];
-
-function errorMessage(error: unknown, fallback: string) {
-  const detail = (error as { response?: { data?: { detail?: unknown } } })
-    ?.response?.data?.detail;
-  return typeof detail === "string" ? detail : fallback;
-}
+const KINDS: DocumentKind[] = ["resume", "cover_letter", "linkedin_summary"];
 
 export default function ResumeClient({
   initialDocuments,
 }: {
   initialDocuments: CareerDocument[];
 }) {
+  const t = useTranslations("resume");
   const [documents, setDocuments] = useState(initialDocuments);
   const [activeId, setActiveId] = useState<string | null>(
     initialDocuments[0]?.id ?? null
@@ -65,19 +60,19 @@ export default function ResumeClient({
     onSuccess: (doc) => {
       setDocuments((prev) => [doc, ...prev]);
       select(doc);
-      toast.success("Draft ready. Review it and fill in the [placeholders].");
+      toast.success(t("ready"));
     },
     onError: (e) =>
-      toast.error(errorMessage(e, "Couldn't write the document. Try again.")),
+      toast.error(apiErrorMessage(e, t("writeFailed"))),
   });
 
   const save = useMutation({
     mutationFn: () => updateDocument(active!.id, { title, content: draft }),
     onSuccess: (doc) => {
       setDocuments((prev) => prev.map((d) => (d.id === doc.id ? doc : d)));
-      toast.success("Saved.");
+      toast.success(t("savedToast"));
     },
-    onError: (e) => toast.error(errorMessage(e, "Couldn't save.")),
+    onError: (e) => toast.error(apiErrorMessage(e, t("saveFailed"))),
   });
 
   const remove = useMutation({
@@ -87,7 +82,7 @@ export default function ResumeClient({
       setDocuments(rest);
       if (id === activeId) select(rest[0] ?? null);
     },
-    onError: () => toast.error("Couldn't delete."),
+    onError: () => toast.error(t("deleteFailed")),
   });
 
   const dirty = !!active && (draft !== active.content || title !== active.title);
@@ -95,16 +90,16 @@ export default function ResumeClient({
   async function copy() {
     try {
       await navigator.clipboard.writeText(draft);
-      toast.success("Copied.");
+      toast.success(t("copied"));
     } catch {
-      toast.error("Couldn't copy. Select the text and copy it manually.");
+      toast.error(t("copyFailed"));
     }
   }
 
   function onGenerate(e: React.FormEvent) {
     e.preventDefault();
     if (targetRole.trim().length < 2) {
-      toast.error("Enter the role you are applying for.");
+      toast.error(t("roleRequired"));
       return;
     }
     generate.mutate({
@@ -118,53 +113,41 @@ export default function ResumeClient({
   return (
     <>
       <div className="mx-auto max-w-6xl print:hidden">
-        <h1 className="font-heading text-3xl font-bold">Resume Builder</h1>
-        <p className="mt-1 text-muted-foreground">
-          Draft a resume, cover letter or LinkedIn summary from what you have
-          actually completed. Nothing is invented: anything missing is left as
-          a [placeholder] for you to fill in.
-        </p>
+        <PageHeader
+          title={t("title")}
+          subtitle={t("subtitle")}
+        />
 
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
           <div className="min-w-0 space-y-6">
             <Card className="p-5">
               <form onSubmit={onGenerate} className="space-y-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {KINDS.map(({ key, label }) => (
-                    <button
-                      type="button"
-                      key={key}
-                      onClick={() => setKind(key)}
-                      className={cn(
-                        "rounded-full px-3 py-1 text-xs font-medium transition",
-                        kind === key
-                          ? "bg-brand-violet text-white"
-                          : "bg-muted text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
+                <FilterChips
+                  label={t("documentType")}
+                  size="sm"
+                  value={kind}
+                  onChange={setKind}
+                  options={KINDS.map((key) => ({ value: key, label: t(`kinds.${key}`) }))}
+                />
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="role">Target role</Label>
+                  <Label htmlFor="role">{t("targetRole")}</Label>
                   <Input
                     id="role"
                     value={targetRole}
                     onChange={(e) => setTargetRole(e.target.value)}
-                    placeholder="e.g. Junior Backend Developer"
+                    placeholder={t("targetRoleExample")}
                     maxLength={120}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="details">Your details (optional)</Label>
+                  <Label htmlFor="details">{t("details")}</Label>
                   <Textarea
                     id="details"
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
-                    placeholder="Education, experience, email, GitHub, LinkedIn…"
+                    placeholder={t("detailsHint")}
                     maxLength={4000}
                     className="min-h-24"
                   />
@@ -172,12 +155,12 @@ export default function ResumeClient({
 
                 {kind === "cover_letter" && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="jd">Job description (optional)</Label>
+                    <Label htmlFor="jd">{t("jd")}</Label>
                     <Textarea
                       id="jd"
                       value={jobDescription}
                       onChange={(e) => setJobDescription(e.target.value)}
-                      placeholder="Paste the job posting to tailor the letter."
+                      placeholder={t("jdHint")}
                       maxLength={6000}
                       className="min-h-24"
                     />
@@ -189,38 +172,38 @@ export default function ResumeClient({
                   loading={generate.isPending}
                   className="w-full gap-2"
                 >
-                  <Sparkles size={15} /> Write my {KINDS.find((k) => k.key === kind)!.label.toLowerCase()}
+                  <Sparkles size={15} /> {t(`write.${kind}`)}
                 </LoadingButton>
               </form>
             </Card>
 
             <Card className="gap-1 p-3">
-              <p className="px-2 pt-1 text-sm font-semibold">Saved documents</p>
+              <p className="px-2 pt-1 text-sm font-semibold">{t("saved")}</p>
               {documents.length === 0 && (
                 <p className="px-2 py-3 text-sm text-muted-foreground">
-                  Nothing yet.
+                  {t("nothing")}
                 </p>
               )}
               {documents.map((d) => (
                 <div
                   key={d.id}
                   className={cn(
-                    "group flex items-center gap-1 rounded-xl pr-1",
+                    "group flex items-center gap-1 rounded-xl pe-1",
                     d.id === activeId
-                      ? "bg-brand-violet/10 text-brand-violet"
+                      ? "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
                       : "hover:bg-muted"
                   )}
                 >
                   <button
                     onClick={() => select(d)}
-                    className="min-w-0 flex-1 truncate px-2 py-2 text-left text-sm font-medium"
+                    className="min-w-0 flex-1 truncate px-2 py-2 text-start text-sm font-medium"
                   >
                     {d.title}
                   </button>
                   <button
-                    aria-label={`Delete ${d.title}`}
+                    aria-label={t("delete", { title: d.title })}
                     onClick={() => {
-                      if (window.confirm(`Delete "${d.title}"?`)) {
+                      if (window.confirm(t("confirmDelete", { title: d.title }))) {
                         remove.mutate(d.id);
                       }
                     }}
@@ -240,7 +223,7 @@ export default function ResumeClient({
                   <FileText className="size-6 text-brand-violet" />
                 </span>
                 <p className="mt-4 text-sm text-muted-foreground">
-                  Generate a document to edit it here.
+                  {t("generateHint")}
                 </p>
               </div>
             ) : (
@@ -249,7 +232,7 @@ export default function ResumeClient({
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    aria-label="Document title"
+                    aria-label={t("docTitle")}
                     maxLength={200}
                     className="min-w-48 flex-1 font-medium"
                   />
@@ -258,10 +241,10 @@ export default function ResumeClient({
                     size="sm"
                     onClick={() => setPreview((v) => !v)}
                   >
-                    {preview ? "Edit" : "Preview"}
+                    {preview ? t("edit") : t("preview")}
                   </Button>
                   <Button variant="outline" size="sm" className="gap-2" onClick={copy}>
-                    <Copy size={14} /> Copy
+                    <Copy size={14} /> {t("copy")}
                   </Button>
                   <Button
                     variant="outline"
@@ -269,7 +252,7 @@ export default function ResumeClient({
                     className="gap-2"
                     onClick={() => window.print()}
                   >
-                    <Printer size={14} /> Print / PDF
+                    <Printer size={14} /> {t("print")}
                   </Button>
                   <Button
                     size="sm"
@@ -277,7 +260,7 @@ export default function ResumeClient({
                     disabled={!dirty || save.isPending || !draft.trim() || !title.trim()}
                     onClick={() => save.mutate()}
                   >
-                    <Save size={14} /> {save.isPending ? "Saving…" : "Save"}
+                    <Save size={14} /> {save.isPending ? t("saving") : t("save")}
                   </Button>
                 </div>
 
@@ -289,14 +272,13 @@ export default function ResumeClient({
                   <Textarea
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
-                    aria-label="Document content"
+                    aria-label={t("docContent")}
                     maxLength={30000}
                     className="min-h-[24rem] font-mono text-sm"
                   />
                 )}
                 <p className="text-xs text-muted-foreground">
-                  AI drafts can contain mistakes. Check every fact and replace
-                  each [placeholder] before sending.
+                  {t("warning")}
                 </p>
               </>
             )}

@@ -17,21 +17,21 @@ export default function WelcomeBirdIllustration({
         style={{ margin: size * 0.15 }}
       />
       <Star
-        className="absolute left-2 top-4 text-brand-gold-light"
+        className="absolute start-2 top-4 text-brand-gold-light"
         size={size * 0.14}
         fill="currentColor"
       />
       <Star
-        className="absolute bottom-6 left-6 text-brand-violet-light"
+        className="absolute bottom-6 start-6 text-brand-violet-light"
         size={size * 0.1}
         fill="currentColor"
       />
       <Sparkles
-        className="absolute right-0 top-10 text-brand-gold-light"
+        className="absolute end-0 top-10 text-brand-gold-light"
         size={size * 0.16}
       />
       <Star
-        className="absolute bottom-2 right-4 text-brand-gold-light"
+        className="absolute bottom-2 end-4 text-brand-gold-light"
         size={size * 0.12}
         fill="currentColor"
       />

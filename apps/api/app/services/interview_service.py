@@ -1,4 +1,5 @@
 import logging
+from app.ai.llm import use_profile
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -81,6 +82,8 @@ class InterviewService:
 
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
+
+        use_profile(profile.id, profile.language)
 
         return profile
 

@@ -2,13 +2,24 @@ from datetime import time
 from enum import Enum
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, computed_field, field_validator
 
 
 class ThemePreference(str, Enum):
     LIGHT = "light"
     DARK = "dark"
     SYSTEM = "system"
+
+
+class Wording(str, Enum):
+    CLASSIC = "classic"
+    GAMIFIED = "gamified"
+
+
+class AiTone(str, Enum):
+    FRIENDLY = "friendly"
+    GENZ = "genz"
+    PROFESSIONAL = "professional"
 
 
 class UserSettingsResponse(BaseModel):
@@ -21,9 +32,19 @@ class UserSettingsResponse(BaseModel):
     reminder_time: time
     timezone: str
     ai_mentor_enabled: bool
+    ai_tone: AiTone = AiTone.FRIENDLY
+    wording: Wording = Wording.CLASSIC
     show_on_leaderboard: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def email_available(self) -> bool:
+        """Whether this server can send email at all (a sender is configured)."""
+        from app.services.email_service import email_available
+
+        return email_available()
 
 
 class UpdateUserSettingsRequest(BaseModel):
@@ -33,6 +54,8 @@ class UpdateUserSettingsRequest(BaseModel):
     reminder_time: time | None = None
     timezone: str | None = None
     ai_mentor_enabled: bool | None = None
+    ai_tone: AiTone | None = None
+    wording: Wording | None = None
     show_on_leaderboard: bool | None = None
 
     model_config = ConfigDict(extra="forbid")
@@ -57,6 +80,8 @@ class UpdateUserSettingsRequest(BaseModel):
         "reminder_time",
         "timezone",
         "ai_mentor_enabled",
+        "ai_tone",
+        "wording",
         "show_on_leaderboard",
     )
     @classmethod

@@ -42,7 +42,7 @@ class _Mentor:
     async def get_recent_messages(self, conversation_id, limit):
         return [SimpleNamespace(role="user", content="earlier question")]
 
-    async def create_message(self, conversation_id, role, content):
+    async def create_message(self, conversation_id, role, content, prompt_version=None):
         message = SimpleNamespace(
             id=uuid4(),
             role=role,
@@ -62,8 +62,9 @@ class _AI:
         self.error = error
         self.received = None
 
-    async def generate_response(self, messages):
+    async def generate_response(self, messages, system_prompt=None, profile_id=None):
         self.received = messages
+        self.system_prompt = system_prompt
         if self.error:
             raise self.error
         return self.reply

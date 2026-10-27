@@ -24,6 +24,25 @@ export interface OnboardingForm {
 
   target_duration: number;
 
+  // Optional "About you" / "Your plan" answers (null = skipped).
+  age: number | null;
+
+  education: string | null;
+
+  device: string | null;
+
+  goal_type: string | null;
+
+  preferred_study_hours: string | null;
+
+  learning_pace: string | null;
+
+  weekend_study: boolean | null;
+
+  career_stage?: string;
+
+  learning_goal?: string;
+
   onboarding_completed: boolean;
 }
 

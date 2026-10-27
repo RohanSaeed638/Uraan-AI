@@ -3,7 +3,7 @@ from app.services.profile_service import ProfileService
 from app.dependencies.services import get_roadmap_service, get_task_learning_unit_service
 from app.dependencies.services import get_profile_service
 from app.services.task_learning_unit_service import TaskLearningUnitService
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import get_db
 from app.api.dependencies import get_current_user
@@ -11,30 +11,160 @@ from app.schemas.roadmap import LearningUnitResponse, RoadmapResponse, UpdateTas
 from app.services.roadmap_service import RoadmapService
 from app.schemas.progress import RoadmapProgressResponse
 from app.services.progress_service import get_roadmap_progress
-from app.schemas.roadmap import RoadmapActivateResponse
+from app.schemas.roadmap import (
+    AdaptRequest,
+    RoadmapActivateResponse,
+    RoadmapStatusResponse,
+    RoadmapVersionResponse,
+)
+from app.services.roadmap_jobs import run_job
 
 router = APIRouter(
     prefix="/roadmaps",
     tags=["Roadmaps"],
 )
 
+def _status_of(roadmap) -> dict:
+    return {
+        "id": roadmap.id,
+        "title": roadmap.title,
+        "status": roadmap.status,
+        "error": roadmap.generation_error,
+    }
+
+
+# Generation takes a minute, so these return 202 straight away and the work
+# continues in the background. The browser polls GET /roadmaps/{id}/status.
 @router.post(
     "/generate",
-    response_model=RoadmapResponse,
+    response_model=RoadmapStatusResponse,
+    status_code=status.HTTP_202_ACCEPTED,
 )
 async def generate_roadmap(
     data: RoadmapGenerateRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-
-    service = RoadmapService(db)
-
-    return await service.generate(
+    roadmap = await RoadmapService(db).start_generation(
         current_user.id,
-        data=data,
-
+        data,
     )
+
+    background_tasks.add_task(run_job, roadmap.id, "generate")
+
+    return _status_of(roadmap)
+
+
+@router.post(
+    "/{roadmap_id}/regenerate",
+    response_model=RoadmapStatusResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def regenerate_roadmap(
+    roadmap_id: UUID,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    roadmap = await RoadmapService(db).start_regenerate(
+        roadmap_id, current_user.id
+    )
+
+    background_tasks.add_task(run_job, roadmap.id, "regenerate")
+
+    return _status_of(roadmap)
+
+
+@router.post(
+    "/{roadmap_id}/adapt",
+    response_model=RoadmapStatusResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def adapt_roadmap(
+    roadmap_id: UUID,
+    payload: AdaptRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    roadmap = await RoadmapService(db).start_adapt(
+        roadmap_id, current_user.id, payload
+    )
+
+    background_tasks.add_task(
+        run_job, roadmap.id, "adapt", payload.model_dump()
+    )
+
+    return _status_of(roadmap)
+
+
+@router.get(
+    "/{roadmap_id}/status",
+    response_model=RoadmapStatusResponse,
+)
+async def roadmap_status(
+    roadmap_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await RoadmapService(db).get_status(roadmap_id, current_user.id)
+
+
+@router.patch(
+    "/{roadmap_id}/pause",
+    response_model=RoadmapStatusResponse,
+)
+async def pause_roadmap(
+    roadmap_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return _status_of(
+        await RoadmapService(db).pause(roadmap_id, current_user.id)
+    )
+
+
+@router.patch(
+    "/{roadmap_id}/resume",
+    response_model=RoadmapStatusResponse,
+)
+async def resume_roadmap(
+    roadmap_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return _status_of(
+        await RoadmapService(db).resume(roadmap_id, current_user.id)
+    )
+
+
+@router.get(
+    "/{roadmap_id}/versions",
+    response_model=list[RoadmapVersionResponse],
+)
+async def roadmap_versions(
+    roadmap_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await RoadmapService(db).list_versions(roadmap_id, current_user.id)
+
+
+@router.post(
+    "/{roadmap_id}/versions/{version_id}/restore",
+    response_model=RoadmapResponse,
+)
+async def restore_roadmap_version(
+    roadmap_id: UUID,
+    version_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await RoadmapService(db).restore_version(
+        roadmap_id, version_id, current_user.id
+    )
+
 
 @router.get(
     "/current",

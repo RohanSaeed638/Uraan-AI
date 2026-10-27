@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import PageHeader from "@/components/shared/PageHeader";
+import FilterChips from "@/components/shared/FilterChips";
 import { Trophy } from "lucide-react";
 
 import { getLeaderboard } from "@/lib/server/data";
@@ -7,9 +10,9 @@ import { LeaderboardPeriod } from "@/types/api";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const periods: { key: LeaderboardPeriod; label: string }[] = [
-  { key: "weekly", label: "This week" },
-  { key: "all_time", label: "All time" },
+const periods: { key: LeaderboardPeriod; label: "weekly" | "allTime" }[] = [
+  { key: "weekly", label: "weekly" },
+  { key: "all_time", label: "allTime" },
 ];
 
 export default async function LeaderboardPage({
@@ -18,53 +21,48 @@ export default async function LeaderboardPage({
   searchParams: Promise<{ period?: string }>;
 }) {
   const { period: raw } = await searchParams;
+  const t = await getTranslations("leaderboard");
   const period: LeaderboardPeriod = raw === "all_time" ? "all_time" : "weekly";
 
   const board = await getLeaderboard(period);
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-heading text-3xl font-bold">Leaderboard</h1>
-      <p className="mt-1 text-muted-foreground">
-        Top learners by XP. Only people who opted in appear here.
-      </p>
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="mt-6 flex gap-2">
-        {periods.map(({ key, label }) => (
-          <Link
-            key={key}
-            href={`/leaderboard?period=${key}`}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition",
-              period === key
-                ? "bg-brand-violet text-white"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {label}
-          </Link>
-        ))}
-      </div>
+      <FilterChips
+        className="mt-6"
+        label={t("period")}
+        value={period}
+        options={periods.map(({ key, label }) => ({
+          value: key,
+          label: t(label),
+          href: `/leaderboard?period=${key}`,
+        }))}
+      />
 
       {board && (
         <Card className="mt-6 gap-1 p-5">
-          <p className="text-sm font-semibold">Your standing</p>
+          <p className="text-sm font-semibold">{t("standing")}</p>
           {board.me.on_leaderboard ? (
             <p className="text-sm text-muted-foreground">
               {board.me.rank
-                ? `Rank #${board.me.rank} with ${board.me.xp} XP.`
-                : "Earn some XP this period to get ranked."}
+                ? t("rank", { rank: board.me.rank, xp: board.me.xp })
+                : t("noRank")}
             </p>
           ) : (
             <p className="text-sm text-muted-foreground">
-              You have {board.me.xp} XP but you&apos;re hidden from the board.{" "}
-              <Link
-                href="/settings"
-                className="font-medium text-brand-violet hover:underline"
-              >
-                Turn on leaderboard visibility
-              </Link>{" "}
-              in Settings to join.
+              {t.rich("hidden", {
+                xp: board.me.xp,
+                link: (chunks) => (
+                  <Link
+                    href="/settings"
+                    className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           )}
         </Card>
@@ -76,10 +74,10 @@ export default async function LeaderboardPage({
             <Trophy className="size-7 text-brand-violet" />
           </span>
           <h2 className="font-heading mt-5 text-xl font-bold">
-            No one is on the board yet
+            {t("emptyTitle")}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Complete lessons, tasks and quizzes to earn XP and be the first.
+            {t("emptyText")}
           </p>
         </div>
       ) : (
@@ -99,16 +97,16 @@ export default async function LeaderboardPage({
                 <p className="truncate font-medium">
                   {entry.display_name}
                   {entry.is_me && (
-                    <span className="ml-2 text-xs font-normal text-brand-violet">
-                      you
+                    <span className="ms-2 text-xs font-normal text-brand-violet">
+                      {t("you")}
                     </span>
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Level {entry.level}
+                  {t("level", { level: entry.level })}
                 </p>
               </div>
-              <span className="text-sm font-semibold">{entry.xp} XP</span>
+              <span className="text-sm font-semibold">{t("xp", { xp: entry.xp })}</span>
             </div>
           ))}
         </Card>

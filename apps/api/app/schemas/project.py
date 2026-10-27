@@ -21,6 +21,10 @@ class ProjectResponse(BaseModel):
     completed: bool
     day: int
 
+    difficulty: str | None = None
+    skills: list[str] = Field(default_factory=list)
+    portfolio_value: str | None = None
+
 
 class ProjectListResponse(BaseModel):
     total: int = 0
@@ -47,6 +51,10 @@ class ProjectDetailResponse(BaseModel):
     estimated_minutes: int | None = None
     day: int
     completed: bool
+
+    difficulty: str | None = None
+    skills: list[str] = Field(default_factory=list)
+    portfolio_value: str | None = None
 
     roadmap: ProjectContextResponse
     phase: ProjectContextResponse

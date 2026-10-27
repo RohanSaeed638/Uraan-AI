@@ -13,6 +13,7 @@ import selectors
 import sys
 
 from app.db.session import SessionLocal
+from app.services.email_service import wait_for_pending
 from app.services.reminder_service import ReminderService
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +24,7 @@ async def main() -> None:
     async with SessionLocal() as db:
         try:
             result = await ReminderService(db).run()
+            await wait_for_pending()
         except Exception:
             await db.rollback()
             raise

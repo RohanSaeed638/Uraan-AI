@@ -30,6 +30,7 @@
 // }
 
 import { createClient } from "@/lib/supabase/client";
+import { clearRememberPreference } from "@/services/auth/session-preference";
 
 const supabase = createClient();
 
@@ -46,6 +47,7 @@ export const isEndingSession = () => ending;
 
 async function endSession(scope: "local" | "global") {
   ending = true;
+  clearRememberPreference();
 
   try {
     await fetch(`/auth/signout?scope=${scope}`, {
@@ -107,7 +109,7 @@ export class AuthService {
 
   async resetPassword(email: string) {
     return await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     });
   }
 

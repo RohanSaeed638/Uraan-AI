@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import PageHeader from "@/components/shared/PageHeader";
 import { BookOpen, Clock } from "lucide-react";
 
 import { getProfileServer, getRoadmapDetails } from "@/lib/server/data";
@@ -6,6 +8,7 @@ import {
   flattenUnits,
   formatMinutes,
   getUnitMeta,
+  unitLabel,
   unitHref,
   UnitContext,
 } from "@/lib/units";
@@ -13,12 +16,15 @@ import {
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 
-function UnitRow({ c, cta }: { c: UnitContext; cta: string }) {
-  const { icon: Icon, label } = getUnitMeta(c.unit.type);
+type Translate = Awaited<ReturnType<typeof getTranslations>>;
+
+function UnitRow({ c, cta, tUnit }: { c: UnitContext; cta: string; tUnit: Translate }) {
+  const { icon: Icon } = getUnitMeta(c.unit.type);
+  const label = unitLabel(c.unit.type, tUnit);
 
   return (
     <div className="flex items-center gap-4 border-b border-border px-5 py-4 last:border-b-0">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/10 text-brand-violet">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
         <Icon size={18} />
       </span>
       <div className="min-w-0 flex-1">
@@ -29,7 +35,7 @@ function UnitRow({ c, cta }: { c: UnitContext; cta: string }) {
       </div>
       {c.unit.estimated_minutes != null && (
         <span className="hidden shrink-0 items-center gap-1 text-xs text-muted-foreground sm:flex">
-          <Clock size={13} /> {c.unit.estimated_minutes} min
+          <Clock size={13} /> {tUnit("min", { count: c.unit.estimated_minutes })}
         </span>
       )}
       <Link
@@ -43,6 +49,9 @@ function UnitRow({ c, cta }: { c: UnitContext; cta: string }) {
 }
 
 export default async function LearningPage() {
+  const t = await getTranslations("learning");
+  const tUnit = await getTranslations("unit");
+
   const [roadmaps, profile] = await Promise.all([
     getRoadmapDetails(),
     getProfileServer(),
@@ -78,15 +87,15 @@ export default async function LearningPage() {
         <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
           <BookOpen className="size-7 text-brand-violet" />
         </span>
-        <h1 className="font-heading mt-6 text-2xl font-bold">No lessons yet</h1>
+        <h1 className="font-heading mt-6 text-2xl font-bold">{t("emptyTitle")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Lessons appear here once you have a roadmap with learning units.
+          {t("emptyText")}
         </p>
         <Link
           href="/roadmaps"
           className={buttonVariants({ size: "lg", className: "mt-7" })}
         >
-          Go to My Roadmaps
+          {t("goRoadmaps")}
         </Link>
       </div>
     );
@@ -94,52 +103,55 @@ export default async function LearningPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="font-heading text-3xl font-bold">Learning</h1>
-      <p className="mt-1 text-muted-foreground">
-        {focus ? (
-          <>
-            Your next lessons from{" "}
-            <span className="font-medium text-foreground">{focus.title}</span>.
-          </>
-        ) : (
-          "Every lesson is complete."
-        )}
-      </p>
+      <PageHeader
+        title={t("title")}
+        subtitle={
+          focus ? (
+            t.rich("nextFrom", {
+              roadmap: focus.title,
+              b: (chunks) => (
+                <span className="font-medium text-foreground">{chunks}</span>
+              ),
+            })
+          ) : (
+            t("allComplete")
+          )
+        }
+      />
 
       {today.length === 0 ? (
         <Card className="mt-6 items-center p-10 text-center">
           <p className="font-heading text-xl font-semibold">
-            You&apos;re all caught up 🎉
+            {t("caughtUp")}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every lesson across your roadmaps is complete.
+            {t("caughtUpText")}
           </p>
         </Card>
       ) : (
         <>
           <div className="mt-6 flex items-end justify-between">
             <h2 className="font-heading text-lg font-semibold">
-              Suggested for today
+              {t("suggested")}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {formatMinutes(planned)} planned · target{" "}
-              {formatMinutes(dailyMinutes)}/day
+              {t("planned", { planned: formatMinutes(planned, tUnit), target: formatMinutes(dailyMinutes, tUnit) })}
             </p>
           </div>
           <Card className="mt-3 gap-0 p-0">
             {today.map((c, i) => (
-              <UnitRow key={c.unit.id} c={c} cta={i === 0 ? "Start" : "Open"} />
+              <UnitRow key={c.unit.id} c={c} tUnit={tUnit} cta={i === 0 ? t("start") : t("open")} />
             ))}
           </Card>
 
           {upNext.length > 0 && (
             <>
               <h2 className="font-heading mt-8 text-lg font-semibold">
-                Coming up
+                {t("comingUp")}
               </h2>
               <Card className="mt-3 gap-0 p-0">
                 {upNext.map((c) => (
-                  <UnitRow key={c.unit.id} c={c} cta="Open" />
+                  <UnitRow key={c.unit.id} c={c} tUnit={tUnit} cta={t("open")} />
                 ))}
               </Card>
             </>

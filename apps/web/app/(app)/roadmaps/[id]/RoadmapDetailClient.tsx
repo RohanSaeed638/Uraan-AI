@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, Clock, BookOpen, Target } from "lucide-react";
 
+import RoadmapActions from "./RoadmapActions";
 import TaskList from "./TaskList";
 import { Card } from "@/components/ui/card";
 import ProgressRing from "@/components/shared/ProgressRing";
@@ -17,12 +19,16 @@ interface RoadmapDetailClientProps {
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-500",
   completed: "bg-brand-violet/15 text-brand-violet",
-  paused: "bg-muted text-muted-foreground",
+  paused: "bg-amber-500/15 text-amber-500",
+  generating: "bg-sky-500/15 text-sky-500",
+  failed: "bg-destructive/15 text-destructive",
 };
 
 export default function RoadmapDetailClient({
   roadmap: initialRoadmap,
 }: RoadmapDetailClientProps) {
+  const t = useTranslations("roadmaps.detail");
+  const tStatus = useTranslations("status");
   const [roadmap, setRoadmap] = useState<Roadmap>(initialRoadmap);
 
   function calculateProgress(roadmap: Roadmap) {
@@ -48,7 +54,7 @@ export default function RoadmapDetailClient({
         href="/roadmaps"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft size={14} /> Back to Roadmaps
+        <ArrowLeft size={14} className="rtl:rotate-180" /> {t("back")}
       </Link>
 
       {/* Header */}
@@ -60,12 +66,12 @@ export default function RoadmapDetailClient({
                 {roadmap.title}
               </h1>
               <span
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize ${
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                   statusStyles[roadmap.status] ??
                   "bg-muted text-muted-foreground"
                 }`}
               >
-                {roadmap.status}
+                {tStatus(roadmap.status)}
               </span>
             </div>
             <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
@@ -84,7 +90,7 @@ export default function RoadmapDetailClient({
             </span>
             <div>
               <p className="text-lg font-bold leading-none">{progress}%</p>
-              <p className="mt-1 text-xs text-muted-foreground">Completion</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("completion")}</p>
             </div>
           </div>
 
@@ -95,7 +101,7 @@ export default function RoadmapDetailClient({
             <div>
               <p className="text-lg font-bold leading-none">{totalHours}h</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Total learning hours
+                {t("hours")}
               </p>
             </div>
           </div>
@@ -108,14 +114,18 @@ export default function RoadmapDetailClient({
               <p className="text-lg font-bold leading-none">
                 {roadmap.phases.length}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">Phases</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("phases")}</p>
             </div>
           </div>
         </div>
+
+        <RoadmapActions roadmap={roadmap} dailyHours={roadmap.daily_hours ?? 2} />
       </Card>
 
       {/* Tasks */}
-      <TaskList roadmap={roadmap} onRoadmapChange={handleRoadmapChange} />
+      {roadmap.phases.length > 0 && (
+        <TaskList roadmap={roadmap} onRoadmapChange={handleRoadmapChange} />
+      )}
     </div>
   );
 }

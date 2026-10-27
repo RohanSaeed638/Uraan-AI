@@ -1,16 +1,10 @@
-from openai import AsyncOpenAI
-
+from app.ai.llm import complete_text
+from app.ai.versions import prompt_version
 from app.ai.prompts.document_prompt import (
     DOCUMENT_PROMPT,
     KIND_INSTRUCTIONS,
     KIND_LABELS,
 )
-from app.core.config import settings
-
-client = AsyncOpenAI(
-    api_key=settings.OPENAI_API_KEY
-)
-
 NONE_YET = "(none yet)"
 
 
@@ -65,9 +59,8 @@ class DocumentGenerator:
             job_description,
         )
 
-        response = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            messages=[
+        content = await complete_text(
+            [
                 {
                     "role": "system",
                     "content": (
@@ -77,13 +70,10 @@ class DocumentGenerator:
                 },
                 {"role": "user", "content": prompt},
             ],
+            purpose="document",
             temperature=0.4,
-            max_completion_tokens=1500,
+            max_tokens=1500,
+            prompt_version=prompt_version("document"),
         )
-
-        content = response.choices[0].message.content
-
-        if not content or not content.strip():
-            raise ValueError("AI returned an empty document.")
 
         return content.strip()

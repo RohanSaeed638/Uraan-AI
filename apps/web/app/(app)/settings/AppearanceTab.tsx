@@ -1,28 +1,32 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 
 export default function AppearanceTab() {
+  const t = useTranslations("settings.appearance");
+
   return (
-    <Card className="max-w-xl p-7">
-      <h2 className="text-sm font-semibold">Appearance</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Choose how Uraan AI looks. &ldquo;System&rdquo; follows your device and
-        switches automatically between light and dark. Your choice follows you
-        to your other devices.
-      </p>
-      <div className="mt-5">
-        <ThemeToggle
-          onSaveError={() =>
-            toast.error(
-              "Applied here, but couldn't save it to your account. It may not carry over to other devices."
-            )
-          }
-        />
-      </div>
-    </Card>
+    <div className="space-y-6">
+      <Card className="max-w-xl p-7">
+        <h2 className="text-sm font-semibold">{t("title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("text")}</p>
+        <div className="mt-5">
+          <ThemeToggle onSaveError={() => toast.error(t("saveFailed"))} />
+        </div>
+      </Card>
+
+      <Card className="max-w-xl p-7">
+        <h2 className="text-sm font-semibold">{t("languageTitle")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("languageText")}</p>
+        <div className="mt-5">
+          <LanguageSwitcher />
+        </div>
+      </Card>
+    </div>
   );
 }

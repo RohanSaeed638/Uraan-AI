@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Clock, ExternalLink, Loader2 } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,6 +22,7 @@ export function TaskCard({
   onToggle,
   onOpen,
 }: TaskCardProps) {
+  const t = useTranslations("roadmaps.tasks");
   const resourceLink = task.resource_links?.[0];
 
   return (
@@ -60,7 +62,7 @@ export function TaskCard({
             {task.estimated_hours != null && (
               <div className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs text-muted-foreground">
                 <Clock className="h-3.5 w-3.5" />
-                {task.estimated_hours}h
+                {t("hoursShort", { count: task.estimated_hours })}
               </div>
             )}
           </div>
@@ -77,9 +79,9 @@ export function TaskCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => event.stopPropagation()}
-              className="inline-flex items-center gap-1 text-sm font-medium text-brand-violet hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
             >
-              Open resource
+              {t("openResource")}
               <ExternalLink className="h-3 w-3" />
             </a>
           )}

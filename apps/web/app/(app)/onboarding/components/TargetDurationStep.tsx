@@ -7,6 +7,8 @@ import TargetIllustration from "@/components/illustrations/TargetIllustration";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
+import { useTranslations } from "next-intl";
+
 import { StepProps } from "../types";
 
 const DURATIONS = [3, 6, 9, 12, 18, 24];
@@ -17,10 +19,12 @@ export default function TargetDurationStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.duration");
+
   return (
     <OnboardingCard
-      title="When do you want to become job ready?"
-      subtitle="Choose a realistic goal."
+      title={t("title")}
+      subtitle={t("subtitle")}
       illustration={<TargetIllustration />}
     >
       <div className="space-y-8">
@@ -29,7 +33,7 @@ export default function TargetDurationStep({
             {data.target_duration}
           </h2>
 
-          <p className="mt-2 text-muted-foreground">Months</p>
+          <p className="mt-2 text-muted-foreground">{t("months")}</p>
         </div>
 
         <Slider
@@ -55,7 +59,7 @@ export default function TargetDurationStep({
                 })
               }
             >
-              {duration} Months
+              {t("preset", { count: duration })}
             </Button>
           ))}
         </div>

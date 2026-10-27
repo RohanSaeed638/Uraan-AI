@@ -2,20 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { BookOpen, FolderKanban, Loader2, PlayCircle } from "lucide-react";
 
 import { generateLearningPlan } from "@/lib/api/units";
+import { apiErrorMessage } from "@/lib/profile-options";
 
 import { Button } from "@/components/ui/button";
-
-function errorMessage(error: unknown) {
-  const detail = (error as { response?: { data?: { detail?: unknown } } })
-    ?.response?.data?.detail;
-
-  return typeof detail === "string"
-    ? detail
-    : "We couldn't prepare the lessons. Please try again.";
-}
 
 /**
  * Shown for a task with no lessons yet. Asks the server to write them, then
@@ -24,6 +17,7 @@ function errorMessage(error: unknown) {
  */
 export default function LessonPlanLoader({ taskId }: { taskId: string }) {
   const router = useRouter();
+  const t = useTranslations("lessonPlan");
   const started = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +26,7 @@ export default function LessonPlanLoader({ taskId }: { taskId: string }) {
       await generateLearningPlan(taskId);
       router.refresh();
     } catch (e) {
-      setError(errorMessage(e));
+      setError(apiErrorMessage(e, t("failed")));
     }
   }
 
@@ -52,31 +46,30 @@ export default function LessonPlanLoader({ taskId }: { taskId: string }) {
     <section className="flex flex-col items-center rounded-xl border bg-card px-6 py-14 text-center">
       {error ? (
         <>
-          <h2 className="text-lg font-semibold">Lessons aren&apos;t ready</h2>
+          <h2 className="text-lg font-semibold">{t("failedTitle")}</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
           <Button className="mt-5" onClick={retry}>
-            Try again
+            {t("retry")}
           </Button>
         </>
       ) : (
         <>
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <h2 className="mt-5 text-lg font-semibold">
-            Preparing your lessons
+            {t("preparing")}
           </h2>
           <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            We&apos;re writing a day-by-day plan for this task. It usually takes
-            20 to 40 seconds, and you only wait the first time.
+            {t("preparingText")}
           </p>
           <div className="mt-6 flex gap-5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <BookOpen className="h-4 w-4" /> Reading
+              <BookOpen className="h-4 w-4" /> {t("reading")}
             </span>
             <span className="flex items-center gap-1.5">
-              <PlayCircle className="h-4 w-4" /> Videos
+              <PlayCircle className="h-4 w-4" /> {t("videos")}
             </span>
             <span className="flex items-center gap-1.5">
-              <FolderKanban className="h-4 w-4" /> Project
+              <FolderKanban className="h-4 w-4" /> {t("project")}
             </span>
           </div>
         </>

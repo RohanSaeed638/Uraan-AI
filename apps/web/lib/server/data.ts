@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Roadmap, RoadmapSummary } from "@/types/roadmap";
 import {
   CalendarSchedule,
+  CareerDetail,
+  CareerList,
   ProfileData,
   CareerDocument,
   DashboardSummary,
@@ -102,6 +104,37 @@ export async function getProfileServer(): Promise<Profile | null> {
   try {
     const res = await authedFetch("/profile/me");
     return res.ok ? ((await res.json()) as Profile) : null;
+  } catch {
+    return null;
+  }
+}
+
+export const getCareersServer = () =>
+  getJson<CareerList>("/careers?page_size=50");
+
+export const getCareerDetailServer = (slug: string) =>
+  getJson<CareerDetail>(`/careers/${encodeURIComponent(slug)}`);
+
+export async function compareCareersServer(
+  slugs: string[]
+): Promise<CareerDetail[] | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/careers/compare`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+      body: JSON.stringify({ slugs }),
+      cache: "no-store",
+    });
+
+    return res.ok ? (await res.json()).careers : null;
   } catch {
     return null;
   }

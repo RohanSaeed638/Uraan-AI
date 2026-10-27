@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,6 +8,8 @@ from app.db.base import get_db
 from app.schemas.calendar import (
     CalendarScheduleResponse,
     CalendarSubscriptionResponse,
+    MoveRequest,
+    OptimiseRequest,
 )
 from app.services.calendar_service import CalendarService
 
@@ -21,6 +25,45 @@ async def calendar_schedule(
     current_user=Depends(get_current_user),
 ):
     return await CalendarService(db).schedule(current_user.id)
+
+
+@router.put("/units/{unit_id}/date", response_model=CalendarScheduleResponse)
+async def move_unit(
+    unit_id: UUID,
+    payload: MoveRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """Moves a lesson to a day. It stays there until it is unpinned."""
+    return await CalendarService(db).move(current_user.id, unit_id, payload.date)
+
+
+@router.delete("/units/{unit_id}/date", response_model=CalendarScheduleResponse)
+async def unpin_unit(
+    unit_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """Lets the planner place the lesson again."""
+    return await CalendarService(db).unpin(current_user.id, unit_id)
+
+
+@router.post("/optimise", response_model=CalendarScheduleResponse)
+async def optimise_schedule(
+    payload: OptimiseRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """Turns "exams next week, evenings only" into planner rules."""
+    return await CalendarService(db).optimise(current_user.id, payload.request)
+
+
+@router.delete("/preferences", response_model=CalendarScheduleResponse)
+async def reset_schedule_preferences(
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await CalendarService(db).reset_preferences(current_user.id)
 
 
 @router.get("/subscription", response_model=CalendarSubscriptionResponse)

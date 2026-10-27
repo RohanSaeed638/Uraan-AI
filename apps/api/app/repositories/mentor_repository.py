@@ -143,12 +143,14 @@ class MentorRepository:
         conversation_id: UUID,
         role: str,
         content: str,
+        prompt_version: str | None = None,
     ) -> MentorMessage:
 
         message = MentorMessage(
             conversation_id=conversation_id,
             role=role,
             content=content,
+            prompt_version=prompt_version,
         )
 
         self.db.add(message)

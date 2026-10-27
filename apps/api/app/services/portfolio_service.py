@@ -1,4 +1,6 @@
 import re
+from app.services.achievement_service import AchievementService
+from app.ai.llm import use_profile
 import secrets
 from uuid import UUID
 
@@ -144,6 +146,7 @@ class PortfolioService:
                 portfolio.slug = await self._free_slug(profile)
             portfolio.is_public = changes["is_public"]
 
+        await AchievementService(self.db).safe_evaluate(profile)
         await self._commit()
 
         return await self._response(profile, portfolio)
@@ -265,6 +268,7 @@ class PortfolioService:
         auth_user_id: UUID,
     ) -> DraftDescriptionResponse:
         profile = await self._profile(auth_user_id)
+        use_profile(profile.id, profile.language)
         project = await self._project(project_id, profile.id)
 
         brief = task_title = None

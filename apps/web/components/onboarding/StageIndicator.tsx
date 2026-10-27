@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +14,8 @@ interface Props {
 }
 
 export default function StageIndicator({ stages, activeStage }: Props) {
+  const t = useTranslations("onboarding");
+
   return (
     <div className="mx-auto mb-10 flex w-full max-w-2xl items-start">
       {stages.map((stage, index) => {
@@ -24,9 +29,9 @@ export default function StageIndicator({ stages, activeStage }: Props) {
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors",
                   isActive &&
-                    "border-brand-violet bg-brand-violet text-white ring-4 ring-brand-violet/20",
+                    "border-brand-gold bg-brand-gold text-[#241a05] ring-4 ring-brand-gold/25",
                   isComplete &&
-                    "border-brand-violet bg-brand-violet/10 text-brand-violet",
+                    "border-brand-gold bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold",
                   !isActive &&
                     !isComplete &&
                     "border-border bg-card text-muted-foreground"
@@ -37,10 +42,10 @@ export default function StageIndicator({ stages, activeStage }: Props) {
               <span
                 className={cn(
                   "whitespace-nowrap text-xs font-medium",
-                  isActive ? "text-brand-violet" : "text-muted-foreground"
+                  isActive ? "text-brand-gold-deep dark:text-brand-gold" : "text-muted-foreground"
                 )}
               >
-                {stage.label}
+                {t(`stages.${stage.label}`)}
               </span>
             </div>
 

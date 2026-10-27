@@ -1,4 +1,7 @@
 from uuid import UUID
+from app.services.achievement_service import AchievementService
+from app.ai.llm import use_profile
+from app.ai.versions import prompt_version
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,6 +62,7 @@ class DocumentService:
         auth_user_id: UUID,
     ) -> DocumentResponse:
         profile = await self._profile(auth_user_id)
+        use_profile(profile.id, profile.language)
 
         if await self.repository.count(profile.id) >= MAX_DOCUMENTS:
             raise HTTPException(
@@ -94,10 +98,12 @@ class DocumentService:
             title=default_title(payload.kind, payload.target_role),
             target_role=payload.target_role,
             content=content,
+            prompt_version=prompt_version("document"),
         )
 
         try:
             await self.repository.create(document)
+            await AchievementService(self.db).safe_evaluate(profile)
             await self.db.commit()
             await self.db.refresh(document)
         except Exception:

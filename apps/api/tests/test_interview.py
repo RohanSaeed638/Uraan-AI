@@ -144,7 +144,7 @@ class _Repo:
 class _Profiles:
     async def get_by_auth_user_id(self, auth_user_id):
         return SimpleNamespace(
-            id=uuid4(), skill_level=SimpleNamespace(value="beginner"), career_slug="backend"
+            id=uuid4(), language="en", skill_level=SimpleNamespace(value="beginner"), career_slug="backend"
         )
 
 

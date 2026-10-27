@@ -40,6 +40,12 @@ class RoadmapTask(BaseModel):
         nullable=False,
     )
 
+    # The roadmap week (1 = first) this task is planned for.
+    week: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
     completed: Mapped[bool] = mapped_column(
         Boolean,
         default=False,

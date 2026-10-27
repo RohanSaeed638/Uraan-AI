@@ -19,6 +19,10 @@ class LearningUnitResponse(BaseModel):
 
     resource_url: str | None = None
 
+    # Exercise: language, starter_code, hints, solution. Project: difficulty,
+    # skills, portfolio_value.
+    details: dict | None = None
+
     estimated_minutes: int | None = None
 
     completed: bool

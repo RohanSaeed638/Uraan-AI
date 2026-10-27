@@ -47,3 +47,6 @@ class MentorMessage(BaseModel):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+    # Which prompt version produced this (see app/ai/versions.py).
+    prompt_version: Mapped[str | None] = mapped_column(String(40), nullable=True)

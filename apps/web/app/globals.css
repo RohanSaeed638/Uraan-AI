@@ -52,6 +52,8 @@
   --color-brand-violet-light: #a78bfa;
   --color-brand-gold: #f5a83c;
   --color-brand-gold-light: #ffcf7a;
+  /* readable gold for text on light backgrounds */
+  --color-brand-gold-deep: #b45f06;
 
   /* available as bg-brand-gradient, used for progress bars/CTAs that
      want the gold->violet brand treatment rather than a flat color */
@@ -81,7 +83,7 @@
   --destructive: #dc2626;
   --border: #e4dff5;
   --input: #e4dff5;
-  --ring: #8b5cf6;
+  --ring: #d98a0b;
   --chart-1: #7c3aed;
   --chart-2: #f5a83c;
   --chart-3: #22d3ee;
@@ -90,12 +92,12 @@
   --radius: 1rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #1a1530;
-  --sidebar-primary: #7c3aed;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #f5a83c;
+  --sidebar-primary-foreground: #241a05;
   --sidebar-accent: #f1eef9;
   --sidebar-accent-foreground: #4c1d95;
   --sidebar-border: #e4dff5;
-  --sidebar-ring: #8b5cf6;
+  --sidebar-ring: #f5a83c;
 }
 
 .dark {
@@ -116,7 +118,7 @@
   --destructive: #f87171;
   --border: color-mix(in oklch, white 8%, transparent);
   --input: #211d43;
-  --ring: #8b5cf6;
+  --ring: #f5a83c;
   --chart-1: #a78bfa;
   --chart-2: #f5a83c;
   --chart-3: #22d3ee;
@@ -124,12 +126,22 @@
   --chart-5: #34d399;
   --sidebar: #100c24;
   --sidebar-foreground: #f3f1fa;
-  --sidebar-primary: #7c3aed;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #f5a83c;
+  --sidebar-primary-foreground: #241a05;
   --sidebar-accent: #1d1840;
   --sidebar-accent-foreground: #f3f1fa;
   --sidebar-border: color-mix(in oklch, white 6%, transparent);
-  --sidebar-ring: #8b5cf6;
+  --sidebar-ring: #f5a83c;
+}
+
+/* Urdu script: its own face, and a taller line so the marks above and below
+   a line do not collide. */
+html[lang="ur"] {
+  --font-sans: var(--font-urdu), ui-sans-serif, system-ui, sans-serif;
+}
+
+html[lang="ur"] body {
+  line-height: 1.85;
 }
 
 @layer base {
@@ -148,4 +160,45 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ---- design layer ------------------------------------------------------ */
+
+@layer base {
+  ::selection {
+    background: color-mix(in oklch, var(--color-brand-gold) 35%, transparent);
+  }
+
+  /* Slim scrollbars that match the theme. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--color-brand-gold) 35%, transparent) transparent;
+  }
+}
+
+/* A card that reacts to the pointer: lifts a little and warms its border. */
+@utility card-lift {
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--color-brand-gold) 55%, transparent);
+    box-shadow: 0 10px 30px -12px color-mix(in oklch, var(--color-brand-gold) 35%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Native checkboxes and radios in the brand gold. */
+@utility accent-gold {
+  accent-color: var(--color-brand-gold);
 }

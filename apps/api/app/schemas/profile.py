@@ -1,25 +1,29 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.ai.prompts.language import SUPPORTED
+from app.core.career_catalog import catalog_slugs
 from app.models.enums import CareerStage, SkillLevel
 from app.models.enums import LearningStyle
 
-# Keep in step with the careers offered in onboarding (web: CAREERS).
-CAREER_SLUGS = {
-    "backend-engineer",
-    "frontend-engineer",
-    "fullstack-engineer",
-    "ai-engineer",
-    "data-scientist",
-    "cyber-security",
-    "cloud-engineer",
-    "devops-engineer",
-}
+# The slugs of data/careers.json, so validation cannot drift from the catalogue.
+CAREER_SLUGS = catalog_slugs()
 
-LANGUAGES = {"en", "ur"}
+LANGUAGES = set(SUPPORTED)
+
+Education = Literal["school", "college", "bachelors", "masters", "self_taught", "other"]
+Device = Literal["laptop", "desktop", "mobile"]
+GoalType = Literal["local_job", "remote_job", "freelancing", "startup", "study_abroad"]
+StudyHours = Literal["morning", "afternoon", "evening", "night", "flexible"]
+Pace = Literal["relaxed", "steady", "intensive"]
+
+_NEW_CHOICES = (
+    "education", "device", "goal_type", "preferred_study_hours", "learning_pace",
+)
 
 
 def _check_timezone(value: str | None) -> str | None:
@@ -62,9 +66,26 @@ class UpdateProfileRequest(BaseModel):
 
     learning_goal: str | None = None
 
+    age: int | None = Field(default=None, ge=10, le=100)
+
+    education: Education | None = None
+
+    device: Device | None = None
+
+    goal_type: GoalType | None = None
+
+    preferred_study_hours: StudyHours | None = None
+
+    learning_pace: Pace | None = None
+
+    weekend_study: bool | None = None
+
     onboarding_completed: bool
 
-    @field_validator("learning_style", "skill_level", "career_stage", mode="before")
+    @field_validator(
+        "learning_style", "skill_level", "career_stage", *_NEW_CHOICES,
+        mode="before",
+    )
     @classmethod
     def lower_enums(cls, value):
         return _lower_choice(value)
@@ -84,6 +105,13 @@ class PatchProfileRequest(BaseModel):
     daily_hours: int | None = Field(default=None, ge=1, le=12)
     target_duration: int | None = Field(default=None, ge=1, le=36)
     learning_goal: str | None = Field(default=None, max_length=255)
+    age: int | None = Field(default=None, ge=10, le=100)
+    education: Education | None = None
+    device: Device | None = None
+    goal_type: GoalType | None = None
+    preferred_study_hours: StudyHours | None = None
+    learning_pace: Pace | None = None
+    weekend_study: bool | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -129,7 +157,10 @@ class PatchProfileRequest(BaseModel):
 
         return value.strip() or None
 
-    @field_validator("learning_style", "skill_level", "career_stage", mode="before")
+    @field_validator(
+        "learning_style", "skill_level", "career_stage", *_NEW_CHOICES,
+        mode="before",
+    )
     @classmethod
     def lower_enums(cls, value):
         return _lower_choice(value)
@@ -174,6 +205,20 @@ class ProfileResponse(BaseModel):
     career_stage: CareerStage | None
 
     learning_goal: str | None
+
+    age: int | None = None
+
+    education: str | None = None
+
+    device: str | None = None
+
+    goal_type: str | None = None
+
+    preferred_study_hours: str | None = None
+
+    learning_pace: str | None = None
+
+    weekend_study: bool | None = None
 
     streak_days: int = 0
 

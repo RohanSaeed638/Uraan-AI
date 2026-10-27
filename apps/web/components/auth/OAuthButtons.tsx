@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
 import { authService } from "@/services/auth/auth";
@@ -39,6 +40,7 @@ function GitHubIcon() {
 }
 
 export default function OAuthButtons() {
+  const tErrors = useTranslations("auth.errors");
   const [loading, setLoading] = useState<"google" | "github" | null>(null);
 
   async function handleOAuth(provider: "google" | "github") {
@@ -51,7 +53,7 @@ export default function OAuthButtons() {
       }
       // on success, Supabase redirects away — no need to reset loading
     } catch {
-      toast.error("Something went wrong.");
+      toast.error(tErrors("generic"));
       setLoading(null);
     }
   }

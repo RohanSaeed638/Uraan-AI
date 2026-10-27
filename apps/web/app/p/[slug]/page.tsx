@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { PublicPortfolio } from "@/types/api";
 
@@ -25,13 +26,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const portfolio = await getPublicPortfolio(slug);
+  const t = await getTranslations("public");
 
   return portfolio
     ? {
-        title: `${portfolio.name} - Portfolio`,
+        title: t("titleOf", { name: portfolio.name }),
         description: portfolio.headline ?? undefined,
       }
-    : { title: "Portfolio not found" };
+    : { title: t("notFound") };
 }
 
 export default async function PublicPortfolioPage({
@@ -43,6 +45,8 @@ export default async function PublicPortfolioPage({
   const portfolio = await getPublicPortfolio(slug);
 
   if (!portfolio) notFound();
+
+  const t = await getTranslations("public");
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -56,9 +60,9 @@ export default async function PublicPortfolioPage({
         <p className="mt-6 whitespace-pre-wrap leading-7">{portfolio.bio}</p>
       )}
 
-      <h2 className="font-heading mt-12 text-2xl font-semibold">Projects</h2>
+      <h2 className="font-heading mt-12 text-2xl font-semibold">{t("projects")}</h2>
       {portfolio.projects.length === 0 ? (
-        <p className="mt-3 text-muted-foreground">No projects to show yet.</p>
+        <p className="mt-3 text-muted-foreground">{t("none")}</p>
       ) : (
         <div className="mt-4 space-y-4">
           {portfolio.projects.map((p, i) => (
@@ -71,12 +75,12 @@ export default async function PublicPortfolioPage({
               )}
               {p.tech.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  {p.tech.map((t) => (
+                  {p.tech.map((tech) => (
                     <span
-                      key={t}
-                      className="rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-brand-violet"
+                      key={tech}
+                      className="rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-brand-gold-deep dark:text-brand-gold"
                     >
-                      {t}
+                      {tech}
                     </span>
                   ))}
                 </div>
@@ -87,9 +91,9 @@ export default async function PublicPortfolioPage({
                     href={p.repo_url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="flex items-center gap-1 text-brand-violet hover:underline"
+                    className="flex items-center gap-1 text-brand-gold-deep dark:text-brand-gold hover:underline"
                   >
-                    Code <ExternalLink size={13} />
+                    {t("code")} <ExternalLink size={13} />
                   </a>
                 )}
                 {p.live_url && (
@@ -97,9 +101,9 @@ export default async function PublicPortfolioPage({
                     href={p.live_url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="flex items-center gap-1 text-brand-violet hover:underline"
+                    className="flex items-center gap-1 text-brand-gold-deep dark:text-brand-gold hover:underline"
                   >
-                    Live demo <ExternalLink size={13} />
+                    {t("demo")} <ExternalLink size={13} />
                   </a>
                 )}
               </div>
@@ -109,7 +113,7 @@ export default async function PublicPortfolioPage({
       )}
 
       <p className="mt-16 text-center text-xs text-muted-foreground">
-        Built with Uraan AI
+        {t("built")}
       </p>
     </main>
   );

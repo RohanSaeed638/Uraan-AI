@@ -19,19 +19,22 @@ from app.api.routes.documents import router as documents_router
 from app.api.routes.portfolio import router as portfolio_router
 from app.api.routes.interviews import router as interviews_router
 from app.api.routes.account import router as account_router
-from app.core.exceptions import global_exception_handler
+from app.api.routes.careers import router as careers_router
+from app.api.routes.library import router as library_router
+from app.api.routes.achievements import router as achievements_router
+from app.api.routes.email import router as email_router
+from app.core.config import settings
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.core.exceptions import global_exception_handler, http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(title="Uraan AI")
 
-origins = [
-    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,6 +60,11 @@ app.include_router(documents_router)
 app.include_router(portfolio_router)
 app.include_router(interviews_router)
 app.include_router(account_router)
+app.include_router(careers_router)
+app.include_router(library_router)
+app.include_router(achievements_router)
+app.include_router(email_router)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(
     Exception,
     global_exception_handler

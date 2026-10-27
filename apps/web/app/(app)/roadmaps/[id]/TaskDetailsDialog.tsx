@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Clock, ExternalLink, BookOpen, ArrowRight } from "lucide-react";
 
 import {
@@ -30,6 +31,7 @@ export default function TaskDetailsDialog({
   onOpenChange,
 }: TaskDetailsDialogProps) {
   const router = useRouter();
+  const t = useTranslations("roadmaps.tasks");
 
   if (!task) {
     return null;
@@ -43,7 +45,7 @@ export default function TaskDetailsDialog({
         <DialogHeader>
           <DialogTitle>{task.title}</DialogTitle>
           <DialogDescription>
-            Task details and learning resources.
+            {t("dialogText")}
           </DialogDescription>
         </DialogHeader>
 
@@ -51,7 +53,7 @@ export default function TaskDetailsDialog({
           {task.description && (
             <div>
               <h3 className="mb-2 text-sm font-semibold">
-                What you need to do
+                {t("whatToDo")}
               </h3>
               <p className="text-sm leading-6 text-muted-foreground">
                 {task.description}
@@ -65,10 +67,9 @@ export default function TaskDetailsDialog({
                 <Clock className="h-4 w-4 text-brand-gold" />
               </span>
               <div>
-                <p className="text-sm font-medium">Estimated time</p>
+                <p className="text-sm font-medium">{t("estimated")}</p>
                 <p className="text-sm text-muted-foreground">
-                  {task.estimated_hours}{" "}
-                  {task.estimated_hours === 1 ? "hour" : "hours"}
+                  {t("hours", { count: task.estimated_hours })}
                 </p>
               </div>
             </div>
@@ -78,7 +79,7 @@ export default function TaskDetailsDialog({
             <div>
               <div className="mb-3 flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-brand-violet" />
-                <h3 className="text-sm font-semibold">Learning resources</h3>
+                <h3 className="text-sm font-semibold">{t("resources")}</h3>
               </div>
 
               <div className="space-y-2">
@@ -91,7 +92,7 @@ export default function TaskDetailsDialog({
                     className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm transition-colors hover:bg-muted"
                   >
                     <span className="min-w-0 truncate text-brand-violet">
-                      Resource {index + 1}
+                      {t("resource", { number: index + 1 })}
                     </span>
                     <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </a>
@@ -103,7 +104,7 @@ export default function TaskDetailsDialog({
           {!hasResources && (
             <div className="rounded-xl border border-dashed border-border p-4">
               <p className="text-sm text-muted-foreground">
-                No learning resources are available for this task yet.
+                {t("noResources")}
               </p>
             </div>
           )}
@@ -116,7 +117,7 @@ export default function TaskDetailsDialog({
                 router.push(`/roadmaps/${roadmapId}/task/${task.id}`);
               }}
             >
-              Start learning <ArrowRight size={15} />
+              {t("start")} <ArrowRight size={15} className="rtl:rotate-180" />
             </Button>
           </div>
         </div>

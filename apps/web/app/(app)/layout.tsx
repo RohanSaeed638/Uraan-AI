@@ -5,6 +5,8 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import Navbar from "@/components/dashboard/Navbar";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import ThemeSync from "@/components/shared/ThemeSync";
+import ConfettiHost from "@/components/shared/ConfettiHost";
+import LocaleSync from "@/components/shared/LocaleSync";
 export default async function DashboardLayout({
   children,
 }: Readonly<{
@@ -25,6 +27,8 @@ export default async function DashboardLayout({
   return (
     <ReactQueryProvider>
       <ThemeSync />
+      <LocaleSync />
+      <ConfettiHost />
       <div className="h-screen flex overflow-hidden bg-background print:block print:h-auto print:overflow-visible">
         <Sidebar />
 

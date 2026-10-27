@@ -1,6 +1,6 @@
-from openai import AsyncOpenAI
-
+from app.ai.llm import complete_text
 from app.ai.parser import parse_ai_json
+from app.ai.versions import prompt_version
 from app.ai.prompts.interview_prompt import (
     ANSWER_PROMPT,
     QUESTIONS_PROMPT,
@@ -12,30 +12,21 @@ from app.ai.schemas.interview_schema import (
     QuestionsOutput,
     SummaryOutput,
 )
-from app.core.config import settings
-
-client = AsyncOpenAI(
-    api_key=settings.OPENAI_API_KEY
-)
-
 SYSTEM = "You are a fair, specific interview coach. You output only JSON."
 
 
 async def _ask(prompt: str, max_tokens: int) -> dict:
-    response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
+    content = await complete_text(
+        [
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": prompt},
         ],
+        purpose="interview",
         temperature=0.4,
-        max_completion_tokens=max_tokens,
+        max_tokens=max_tokens,
+        json_mode=True,
+        prompt_version=prompt_version("interview"),
     )
-
-    content = response.choices[0].message.content
-
-    if not content or not content.strip():
-        raise ValueError("AI returned an empty response.")
 
     return parse_ai_json(content)
 

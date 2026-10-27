@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
+import PageHeader from "@/components/shared/PageHeader";
 import { Check, Copy, ExternalLink, Plus, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,6 +16,7 @@ import {
   updateProject,
 } from "@/lib/api/portfolio";
 import { Portfolio, PortfolioProject } from "@/types/api";
+import { apiErrorMessage } from "@/lib/profile-options";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,14 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-
-function errorMessage(error: unknown, fallback: string) {
-  const detail = (error as { response?: { data?: { detail?: unknown } } })
-    ?.response?.data?.detail;
-  if (typeof detail === "string") return detail;
-  if (Array.isArray(detail) && detail[0]?.msg) return String(detail[0].msg);
-  return fallback;
-}
 
 const origin = () => window.location.origin;
 const noSubscription = () => () => {};
@@ -42,6 +37,7 @@ function ProjectCard({
   onChange: (p: PortfolioProject) => void;
   onDelete: (id: string) => void;
 }) {
+  const t = useTranslations("portfolio.card");
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description ?? "");
   const [repo, setRepo] = useState(project.repo_url ?? "");
@@ -61,9 +57,9 @@ function ProjectCard({
         ...extra,
       });
       onChange(updated);
-      toast.success("Project saved.");
+      toast.success(t("saved"));
     } catch (e) {
-      toast.error(errorMessage(e, "Couldn't save the project."));
+      toast.error(apiErrorMessage(e, t("saveFailed")));
     } finally {
       setBusy(null);
     }
@@ -75,9 +71,9 @@ function ProjectCard({
       // Saves current fields first so the draft sees the latest tech list.
       await save();
       setDescription(await draftProjectDescription(project.id));
-      toast.success("Draft added. Edit it, then save.");
+      toast.success(t("drafted"));
     } catch (e) {
-      toast.error(errorMessage(e, "Couldn't write a draft right now."));
+      toast.error(apiErrorMessage(e, t("draftFailed")));
     } finally {
       setBusy(null);
     }
@@ -89,16 +85,16 @@ function ProjectCard({
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          aria-label="Project title"
+          aria-label={t("title")}
           maxLength={160}
           className="font-medium"
         />
         <Button
           variant="ghost"
           size="icon"
-          aria-label={`Delete ${project.title}`}
+          aria-label={t("delete", { title: project.title })}
           onClick={() => {
-            if (window.confirm(`Remove "${project.title}" from your portfolio?`)) {
+            if (window.confirm(t("confirmDelete", { title: project.title }))) {
               onDelete(project.id);
             }
           }}
@@ -110,8 +106,8 @@ function ProjectCard({
       <Textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        aria-label="Project description"
-        placeholder="What does it do and what did you use?"
+        aria-label={t("description")}
+        placeholder={t("descriptionHint")}
         maxLength={4000}
         className="min-h-20"
       />
@@ -121,25 +117,25 @@ function ProjectCard({
           value={repo}
           onChange={(e) => setRepo(e.target.value)}
           placeholder="https://github.com/you/project"
-          aria-label="Repository link"
+          aria-label={t("repo")}
         />
         <Input
           value={live}
           onChange={(e) => setLive(e.target.value)}
           placeholder="https://your-demo.app"
-          aria-label="Live demo link"
+          aria-label={t("live")}
         />
       </div>
       <Input
         value={tech}
         onChange={(e) => setTech(e.target.value)}
-        placeholder="Technologies, comma separated"
-        aria-label="Technologies"
+        placeholder={t("techHint")}
+        aria-label={t("tech")}
       />
 
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" disabled={busy !== null} onClick={() => save()}>
-          {busy === "save" ? "Saving…" : "Save"}
+          {busy === "save" ? t("saving") : t("save")}
         </Button>
         <Button
           size="sm"
@@ -148,16 +144,16 @@ function ProjectCard({
           disabled={busy !== null}
           onClick={draft}
         >
-          <Sparkles size={14} /> {busy === "draft" ? "Writing…" : "Draft with AI"}
+          <Sparkles size={14} /> {busy === "draft" ? t("writing") : t("draft")}
         </Button>
-        <label className="ml-auto flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+        <label className="ms-auto flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
           <input
             type="checkbox"
-            className="size-4 accent-brand-violet"
+            className="size-4 accent-gold"
             checked={project.visible}
             onChange={(e) => save({ visible: e.target.checked })}
           />
-          Show on public page
+          {t("visible")}
         </label>
       </div>
     </Card>
@@ -169,6 +165,7 @@ export default function PortfolioClient({
 }: {
   initial: Portfolio | null;
 }) {
+  const t = useTranslations("portfolio");
   const [data, setData] = useState(initial);
   const [headline, setHeadline] = useState(initial?.headline ?? "");
   const [bio, setBio] = useState(initial?.bio ?? "");
@@ -179,7 +176,7 @@ export default function PortfolioClient({
   if (!data) {
     return (
       <p className="text-muted-foreground">
-        Couldn&apos;t load your portfolio. Refresh the page to try again.
+        {t("loadFailed")}
       </p>
     );
   }
@@ -203,9 +200,9 @@ export default function PortfolioClient({
           ...extra,
         })
       );
-      toast.success("Portfolio saved.");
+      toast.success(t("saved"));
     } catch (e) {
-      toast.error(errorMessage(e, "Couldn't save your portfolio."));
+      toast.error(apiErrorMessage(e, t("saveFailed")));
     } finally {
       setBusy(false);
     }
@@ -226,7 +223,7 @@ export default function PortfolioClient({
           : prev
       );
     } catch (e) {
-      toast.error(errorMessage(e, "Couldn't add the project."));
+      toast.error(apiErrorMessage(e, t("addFailed")));
     }
   }
 
@@ -234,7 +231,7 @@ export default function PortfolioClient({
     try {
       apply(await setChecklistItem(id, done));
     } catch {
-      toast.error("Couldn't update the checklist.");
+      toast.error(t("checklistFailed"));
     }
   }
 
@@ -242,26 +239,21 @@ export default function PortfolioClient({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="font-heading text-3xl font-bold">Portfolio</h1>
-        <p className="mt-1 text-muted-foreground">
-          Showcase what you have built. It stays private until you publish it.
-        </p>
-      </div>
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="gap-4 p-6">
         <div className="space-y-1.5">
-          <Label htmlFor="headline">Headline</Label>
+          <Label htmlFor="headline">{t("headline")}</Label>
           <Input
             id="headline"
             value={headline}
             onChange={(e) => setHeadline(e.target.value)}
-            placeholder="Aspiring backend developer"
+            placeholder={t("headlineExample")}
             maxLength={160}
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="bio">About you</Label>
+          <Label htmlFor="bio">{t("about")}</Label>
           <Textarea
             id="bio"
             value={bio}
@@ -271,14 +263,14 @@ export default function PortfolioClient({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="slug">Public address</Label>
+          <Label htmlFor="slug">{t("address")}</Label>
           <div className="flex items-center gap-2">
-            <span className="shrink-0 whitespace-nowrap text-sm text-muted-foreground">/p/</span>
+            <span dir="ltr" className="shrink-0 whitespace-nowrap text-sm text-muted-foreground">/p/</span>
             <Input
               id="slug"
               value={slug}
               onChange={(e) => setSlug(e.target.value.toLowerCase())}
-              placeholder="auto-generated when you publish"
+              placeholder={t("addressHint")}
               maxLength={40}
             />
           </div>
@@ -286,14 +278,14 @@ export default function PortfolioClient({
 
         <div className="flex flex-wrap items-center gap-3">
           <Button disabled={busy} onClick={() => savePage()}>
-            Save
+            {t("save")}
           </Button>
           <Button
             variant={data.is_public ? "outline" : "default"}
             disabled={busy}
             onClick={() => savePage({ is_public: !data.is_public })}
           >
-            {data.is_public ? "Make private" : "Publish"}
+            {data.is_public ? t("makePrivate") : t("publish")}
           </Button>
           {publicUrl && (
             <>
@@ -301,18 +293,18 @@ export default function PortfolioClient({
                 href={publicUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-sm font-medium text-brand-violet hover:underline"
+                className="flex items-center gap-1 text-sm font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
               >
-                View public page <ExternalLink size={13} />
+                {t("view")} <ExternalLink size={13} />
               </a>
               <button
-                aria-label="Copy public link"
+                aria-label={t("copyLink")}
                 className="text-muted-foreground hover:text-foreground"
                 onClick={() =>
                   navigator.clipboard
                     .writeText(publicUrl)
-                    .then(() => toast.success("Link copied."))
-                    .catch(() => toast.error("Couldn't copy."))
+                    .then(() => toast.success(t("copied")))
+                    .catch(() => toast.error(t("copyFailed")))
                 }
               >
                 <Copy size={14} />
@@ -322,29 +314,28 @@ export default function PortfolioClient({
         </div>
         {data.is_public && (
           <p className="text-xs text-muted-foreground">
-            Public pages show your name, headline, about text and the projects
-            marked visible. Never your email.
+            {t("publicNote")}
           </p>
         )}
       </Card>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-heading text-xl font-semibold">Projects</h2>
+          <h2 className="font-heading text-xl font-semibold">{t("projects")}</h2>
           <Button
             size="sm"
             variant="outline"
             className="gap-2"
-            onClick={() => addProject({ title: "New project" })}
+            onClick={() => addProject({ title: t("newProject") })}
           >
-            <Plus size={14} /> Add project
+            <Plus size={14} /> {t("addProject")}
           </Button>
         </div>
 
         {data.suggestions.length > 0 && (
           <Card className="gap-2 p-4">
             <p className="text-sm font-medium">
-              From your completed roadmap projects
+              {t("fromRoadmap")}
             </p>
             <div className="flex flex-wrap gap-2">
               {data.suggestions.map((s) => (
@@ -353,7 +344,7 @@ export default function PortfolioClient({
                   onClick={() =>
                     addProject({ source_unit_id: s.unit_id })
                   }
-                  className="rounded-2xl bg-brand-violet/10 px-3 py-1.5 text-left text-xs font-medium text-brand-violet transition hover:bg-brand-violet/20"
+                  className="rounded-2xl bg-brand-violet/10 px-3 py-1.5 text-start text-xs font-medium text-brand-violet transition hover:bg-brand-violet/20"
                   title={s.task_title}
                 >
                   + {s.title}
@@ -365,8 +356,7 @@ export default function PortfolioClient({
 
         {data.projects.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No projects yet. Add one above, or finish a project lesson in your
-            roadmap and it will show up here.
+            {t("noProjects")}
           </p>
         ) : (
           data.projects.map((p) => (
@@ -397,7 +387,7 @@ export default function PortfolioClient({
                       : prev
                   );
                 } catch {
-                  toast.error("Couldn't remove the project.");
+                  toast.error(t("removeFailed"));
                 }
               }}
             />
@@ -408,7 +398,7 @@ export default function PortfolioClient({
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-xl font-semibold">
-            GitHub checklist
+            {t("github")}
           </h2>
           <span className="text-sm text-muted-foreground">
             {doneCount}/{data.checklist.length}
@@ -422,7 +412,7 @@ export default function PortfolioClient({
             >
               <input
                 type="checkbox"
-                className="mt-0.5 size-4 accent-brand-violet"
+                className="mt-0.5 size-4 accent-gold"
                 checked={item.done}
                 onChange={(e) => toggleItem(item.id, e.target.checked)}
               />
@@ -432,10 +422,10 @@ export default function PortfolioClient({
                   item.done && "text-muted-foreground line-through"
                 )}
               >
-                {item.label}
+                {t.has(`checklist.${item.id}`) ? t(`checklist.${item.id}`) : item.label}
               </span>
               {item.done && (
-                <Check size={14} className="ml-auto text-emerald-600" />
+                <Check size={14} className="ms-auto text-emerald-600" />
               )}
             </label>
           ))}

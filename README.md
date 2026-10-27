@@ -23,6 +23,15 @@ mentor).
 - **XP and streaks:** XP for lessons, tasks, passed quizzes and finished
   interviews (each awarded once); a daily streak on the learner's own
   timezone; levels every 100 XP.
+- **Achievements and titles:** 23 badges (`app/core/achievement_catalog.py`)
+  unlock from what the learner actually does and each pays bonus XP once; a
+  toast and confetti announce them as they happen. XP also sets a career title
+  (Explorer, Apprentice, Builder, Professional, Master). Each month one pending
+  project lesson becomes the **boss project**, worth 150 bonus XP if finished
+  that month.
+- **Career readiness (0 to 100):** tasks done 35, projects 20, consistency 15,
+  mock interviews 15, portfolio 15 (`app/services/readiness.py`), with the three
+  biggest gaps turned into next steps.
 - **Leaderboard:** weekly and all-time. Opt-in only (Settings), showing first
   name and last initial.
 - **Notifications:** in-app bell plus optional web push, driven by a daily
@@ -36,6 +45,46 @@ mentor).
 - **Interview coach:** 5-question text mock interviews scored on technical,
   communication and confidence (confidence is judged from wording only).
 
+- **Careers:** a curated catalogue of 14 careers (`apps/api/data/careers.json`,
+  loaded with `python scripts/seed_careers.py`) with skills, free resources,
+  Pakistan salary ranges and demand. Browse, compare and get an AI
+  recommendation (always picked from the catalogue). A roadmap is built from a
+  career's curated skills and resources: the file decides what is taught, the
+  AI decides order, pacing and projects.
+- **Roadmap engine:** roadmaps are built **in the background** (`POST
+  /roadmaps/generate` answers 202; poll `GET /roadmaps/{id}/status`). Each task
+  has a week and each phase has milestones. A roadmap can be paused and
+  resumed, rebuilt, or **adapted** (only the unfinished part is re-planned;
+  finished work is kept). A copy of the plan is saved before every rebuild,
+  adapt or restore, and can be restored from the version history. A failed or
+  lost job puts the roadmap back as it was (or marks a first generation
+  `failed`).
+
+- **Resource library:** `/resources`, a searchable library of the catalogue's
+  free resources (filter by career, type, level, free only), with bookmarks,
+  1 to 5 star ratings and sharing. Each task page recommends the library
+  resources that fit its topic. The library is filled from the same
+  `careers.json` by `scripts/seed_careers.py`.
+- **Coding exercises:** coding careers (software, data and AI, security and
+  infrastructure) get 1 to 3 exercises per task: a problem, starter code, hints
+  shown one at a time and a solution hidden behind a confirmation. Python is
+  syntax-checked before saving; nothing is run. Project lessons also record a
+  difficulty, the skills practised and their portfolio value.
+
+- **AI mentor:** knows the learner (profile, language, level, current roadmap,
+  phase, next lesson and recent progress) and talks in the tone they choose in
+  Settings (friendly, Gen-Z or professional). Suggestion chips come from their
+  own roadmap. "Review my code" gives structured feedback on a public GitHub
+  repository (read through api.github.com only, with strict limits), pasted
+  code, or their portfolio; 10 reviews a day. The dashboard shows a short daily
+  message written from real progress, saved for the day and reused in the
+  reminder.
+- **AI providers:** every AI call goes through `app/ai/llm`. Providers are
+  tried in `AI_PROVIDERS` order (OpenAI, Gemini, Anthropic) and a provider that
+  fails is skipped for a minute after three failures. Each call is recorded in
+  `ai_requests` (purpose, provider, model, latency, tokens, success), and the
+  prompt version (`app/ai/versions.py`) is stored with the content it produced.
+
 ## Setup
 
 ### API (`apps/api`)
@@ -48,7 +97,13 @@ pip install -r requirements.txt
 
 Create `apps/api/.env` with: `DATABASE_URL`, `SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `OPENAI_API_KEY`
-(optionally `OPENAI_MODEL`).
+(optionally `OPENAI_MODEL`, and `CORS_ORIGINS`: the website addresses allowed to call the
+API, comma separated, default `http://localhost:3000`).
+
+Optional AI settings: `GEMINI_API_KEY` and `ANTHROPIC_API_KEY` enable the
+fallback providers (with `GEMINI_MODEL` / `ANTHROPIC_MODEL`), `AI_PROVIDERS`
+sets the order (default `openai,gemini,anthropic`; a provider without a key is
+skipped) and `GITHUB_TOKEN` raises GitHub's rate limit for project reviews.
 
 ```bash
 alembic upgrade head
@@ -80,6 +135,40 @@ python -m app.workers.send_reminders
 It is safe to run more often or twice: each reminder is sent at most once per
 day per user, at the reminder time and timezone set in Settings.
 
+#### Email
+
+Email is off until a sender is set; in-app and push notifications work without
+it. The API sends through [Resend](https://resend.com): create an account, verify
+a sending domain, create an API key, then in `apps/api/.env`:
+
+```
+RESEND_API_KEY=re_...
+EMAIL_FROM=Uraan AI <noreply@your-domain.com>
+WEB_URL=https://your-web-app
+API_PUBLIC_URL=https://your-api
+```
+
+`WEB_URL` and `API_PUBLIC_URL` are used for the links inside emails. For local
+development set `EMAIL_OUTBOX_DIR=./outbox` instead of a key: each email is
+written to a JSON file there, nothing is sent.
+
+What is emailed (when the learner has email notifications on, the default):
+the daily reminder, the Monday summary, achievements, the monthly boss project
+and streak milestones (3, 7, 14, 30... days). Schedule updates stay in the app.
+Emails use the learner's language (Urdu is right to left). Every email carries a
+signed one-click unsubscribe link (the `/unsubscribe` page, and the
+`List-Unsubscribe` header that mail apps use); it turns the Settings switch off
+without signing in. The reminder script above sends the emails, so run it on a
+schedule.
+
+**Sign-up emails (Supabase Auth):** confirmation and password-reset mail comes
+from Supabase, not from this API. Supabase's built-in mailer only delivers to
+your own team, so before real users sign up set **custom SMTP** in the Supabase
+dashboard: *Authentication > Emails > SMTP Settings*. For Resend: host
+`smtp.resend.com`, port `465`, username `resend`, password your API key, sender
+an address on your verified domain. Also set *Authentication > URL
+Configuration > Site URL* and add `<WEB_URL>/auth/callback` to the redirect URLs.
+
 ### Web (`apps/web`)
 
 Create `apps/web/.env.local` with `NEXT_PUBLIC_SUPABASE_URL`,
@@ -98,3 +187,86 @@ alembic revision --autogenerate -m "describe the change"
 alembic upgrade head
 alembic check                     # fails if models and migrations drift
 ```
+
+## Database rules
+
+- **Every table must have Row Level Security enabled.** Supabase exposes all
+  `public` tables to the public browser key; with RLS on and no policies that
+  key can read and write nothing. The API connects as the table owner, which
+  bypasses RLS, so it is unaffected. A new table needs
+  `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` in its migration;
+  `pytest tests/test_rls.py` fails if one is missed.
+- The web app talks to Supabase only for sign-in. All data goes through the API.
+
+## Study planner
+
+`/calendar` lays the active roadmap's lessons out on the days and times the
+learner can study (week, day and month views).
+
+- The pure packing logic is `app/services/planner.py`: lessons keep their order,
+  each day is filled to that weekday's minutes, a lesson is never split, and
+  completed lessons are left out. Availability comes from the profile
+  (daily hours, weekend study, preferred time of day), overridden by the
+  learner's `schedule_preferences`.
+- **Moving a lesson** (drag and drop, or the Move button) pins it to a date in
+  `schedule_overrides`; everything else flows around it. "Let the planner
+  decide" removes the pin.
+- **AI optimise** turns free text ("exams next week, 30 minutes a day") into
+  validated rules (`PlannerRules`) saved as preferences; 10 requests a day.
+- **Missed lessons**: unpinned ones are replanned from today by themselves and
+  the learner gets a "schedule updated" notification (once a day, run by
+  `reminder_service`); pinned ones that pass are flagged for rescheduling.
+- The private `.ics` feed has one event per study day at the planned time.
+
+## Design system
+
+Brand gold marks selection and focus: filter chips, toggles, active navigation,
+focus rings and links (`text-brand-gold-deep` on light). Violet stays a
+secondary accent. Reusable pieces live in `components/shared/`: `FilterChips`,
+`ToggleChip`, `SearchField`, `PageHeader`, `EmptyState`, `StatTile`,
+`FilterGroup`; the `card-lift` utility gives cards a hover lift.
+
+## Languages
+
+The app, the AI-written content and the messages the server sends come in three
+languages: **English (`en`)**, **Urdu in Urdu script (`ur`, right to left)** and
+**Roman Urdu (`ur-Latn`)**, Urdu in English letters.
+
+- **Choosing:** onboarding (Language step), Settings > Appearance, and the
+  Profile page. The choice is saved on the account (`profiles.language`) and in
+  the `NEXT_LOCALE` cookie; a new device picks it up on first visit
+  (`LocaleSync`). There are no URL prefixes.
+- **Messages:** the web app uses next-intl. **New UI text goes in
+  `apps/web/messages/en.json`, never in the component**, read with
+  `useTranslations("namespace")`. `ur.json` and `ur-Latn.json` are merged over
+  the English file, so a missing translation shows the English text, never a
+  key. `python <scratchpad>/check_keys.py`-style checks (see below) and
+  `tests/test_error_codes.py` guard that every key exists.
+- **Drafting translations:** `python scripts/translate_messages.py` (from
+  `apps/api`) asks the AI layer to translate whatever is missing from `ur` and
+  `ur-Latn`, with a glossary, and validates placeholders, plurals and tags.
+  Existing translations are never overwritten (use `--force` to redo all), so a
+  reviewer's edits are safe. **The drafts need a native speaker's review before
+  launch.**
+- **Right to left:** `ur` sets `dir="rtl"` on `<html>` and uses Noto Naskh
+  Arabic. Styles use logical properties (`ms-`, `pe-`, `start-`, `text-start`),
+  and direction arrows carry `rtl:rotate-180`. Roman Urdu is left to right.
+- **Dates and numbers:** `lib/format.ts` (`intlLocale`) and `lib/planner.ts`
+  format with `Intl` in the active language; Roman Urdu uses English forms.
+- **AI content:** roadmaps, lessons, quizzes, career advice and project reviews
+  are written in the learner's language (`complete()` adds a language rule from
+  `app/ai/prompts/language.py`). The mentor and the daily motivation line follow
+  the same language. Resumes, portfolios and mock interviews stay in English,
+  the language employers read.
+- **Server messages:** notifications and the dashboard fallback line come from
+  `app/core/texts.py` in all three languages.
+- **API errors:** every error response carries an `error_code` (the message as
+  lowercase words, `app/core/error_codes.py`). The web looks up
+  `errors.<code>` and falls back to the English text. After adding a fixed
+  message to the API, run `python scripts/sync_error_messages.py`.
+- **Wording:** Settings > Preferences switches between *Classic* (Tasks,
+  Projects) and *Gamified* (Missions, Quests, Claim XP) by merging a small
+  overlay (`messages/gamified/<locale>.json`) over the messages. Saved on the
+  account (`user_settings.wording`) and in the `NEXT_WORDING` cookie.
+- **Not translated yet:** the careers catalogue text (`data/careers.json`),
+  achievement titles inside notifications, and the AI's saved planner summaries.

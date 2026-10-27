@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ChevronDown, Flag } from "lucide-react";
 
 import { TaskCard } from "./TaskCard";
 import TaskDetailsDialog from "./TaskDetailsDialog";
@@ -16,6 +17,24 @@ import {
   RoadmapTask,
 } from "@/types/roadmap";
 
+/** Tasks under their week heading; older roadmaps with no weeks stay one list. */
+function groupByWeek(tasks: RoadmapTask[]) {
+  const groups: { week: number | null; tasks: RoadmapTask[] }[] = [];
+
+  for (const task of tasks) {
+    const week = task.week ?? null;
+    const last = groups[groups.length - 1];
+
+    if (last && last.week === week) {
+      last.tasks.push(task);
+    } else {
+      groups.push({ week, tasks: [task] });
+    }
+  }
+
+  return groups;
+}
+
 interface TaskListProps {
   roadmap: Roadmap;
   onRoadmapChange?: (roadmap: Roadmap) => void;
@@ -25,6 +44,8 @@ export default function TaskList({
   roadmap: initialRoadmap,
   onRoadmapChange,
 }: TaskListProps) {
+  const t = useTranslations("roadmaps.tasks");
+
   /*
    * Local roadmap state.
    *
@@ -291,7 +312,7 @@ export default function TaskList({
                     "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
                     phaseProgress === 100
                       ? "bg-emerald-500/15 text-emerald-500"
-                      : "bg-brand-violet/10 text-brand-violet"
+                      : "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
                   )}
                 >
                   {index + 1}
@@ -325,20 +346,45 @@ export default function TaskList({
               {/* ============================= */}
 
               <div className="border-t border-border p-3 sm:p-6">
+                {phase.milestones && phase.milestones.length > 0 && (
+                  <div className="mb-5 rounded-2xl bg-brand-violet/10 p-4">
+                    <p className="flex items-center gap-2 text-sm font-semibold text-brand-violet">
+                      <Flag size={14} /> {t("milestones")}
+                    </p>
+                    <ul className="mt-2 space-y-1 text-sm">
+                      {phase.milestones.map((milestone) => (
+                        <li key={milestone} className="flex gap-2">
+                          <span aria-hidden className="text-brand-violet">&#8226;</span>
+                          <span className="min-w-0 break-words">{milestone}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {phase.tasks.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    No tasks available for this phase.
+                    {t("none")}
                   </p>
                 ) : (
-                  <div className="space-y-3">
-                    {phase.tasks.map((task: RoadmapTask) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        loading={updatingTaskId === task.id}
-                        onToggle={updateTask}
-                        onOpen={handleOpenTask}
-                      />
+                  <div className="space-y-5">
+                    {groupByWeek(phase.tasks).map((group) => (
+                      <div key={group.week ?? "none"} className="space-y-3">
+                        {group.week !== null && (
+                          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            {t("week", { week: group.week })}
+                          </h3>
+                        )}
+                        {group.tasks.map((task: RoadmapTask) => (
+                          <TaskCard
+                            key={task.id}
+                            task={task}
+                            loading={updatingTaskId === task.id}
+                            onToggle={updateTask}
+                            onOpen={handleOpenTask}
+                          />
+                        ))}
+                      </div>
                     ))}
                   </div>
                 )}

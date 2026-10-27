@@ -45,12 +45,20 @@ class NotificationRepository:
         self,
         profile_id: UUID,
         limit: int = 30,
+        before: datetime | None = None,
+        unread_only: bool = False,
     ) -> list[Notification]:
+        """Newest first. `before` continues after the last one already shown."""
+        query = select(Notification).where(Notification.profile_id == profile_id)
+
+        if before is not None:
+            query = query.where(Notification.created_at < before)
+
+        if unread_only:
+            query = query.where(Notification.read_at.is_(None))
+
         result = await self.db.execute(
-            select(Notification)
-            .where(Notification.profile_id == profile_id)
-            .order_by(Notification.created_at.desc())
-            .limit(limit)
+            query.order_by(Notification.created_at.desc(), Notification.id.desc()).limit(limit)
         )
 
         return list(result.scalars().all())

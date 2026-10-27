@@ -1,8 +1,15 @@
 import { api } from "./client";
 import { NotificationList } from "@/types/api";
 
-export async function listNotifications() {
-  const { data } = await api.get<NotificationList>("/notifications");
+export interface NotificationQuery {
+  limit?: number;
+  /** created_at of the last one already shown: continues after it. */
+  before?: string;
+  unread?: boolean;
+}
+
+export async function listNotifications(params: NotificationQuery = {}) {
+  const { data } = await api.get<NotificationList>("/notifications", { params });
   return data;
 }
 

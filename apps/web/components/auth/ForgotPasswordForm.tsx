@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, MailCheck } from "lucide-react";
 
 import { useForm } from "react-hook-form";
@@ -23,6 +24,8 @@ import { Label } from "@/components/ui/label";
 import { buttonVariants } from "@/components/ui/button";
 
 export default function ForgotPasswordForm() {
+  const t = useTranslations("auth");
+  const tErrors = useTranslations("auth.errors");
   const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
@@ -47,7 +50,7 @@ export default function ForgotPasswordForm() {
       setSentTo(data.email);
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong.");
+      toast.error(tErrors("generic"));
     } finally {
       setLoading(false);
     }
@@ -61,17 +64,21 @@ export default function ForgotPasswordForm() {
             <MailCheck className="size-6 text-brand-violet" />
           </span>
           <h1 className="font-heading mt-5 text-xl font-bold text-foreground">
-            Check your email
+            {t("checkEmail")}
           </h1>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-            We sent a password reset link to{" "}
-            <span className="font-medium text-foreground">{sentTo}</span>.
+            {t.rich("sentTo", {
+              email: sentTo,
+              b: (chunks) => (
+                <span className="font-medium text-foreground">{chunks}</span>
+              ),
+            })}
           </p>
           <Link
             href="/login"
             className={buttonVariants({ variant: "outline", className: "mt-7 w-full" })}
           >
-            Back to sign in
+            {t("backToSignIn")}
           </Link>
         </div>
       </AuthCard>
@@ -84,28 +91,28 @@ export default function ForgotPasswordForm() {
         href="/login"
         className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft size={14} /> Back to sign in
+        <ArrowLeft size={14} className="rtl:rotate-180" /> {t("backToSignIn")}
       </Link>
 
       <AuthHeader
-        title="Forgot password?"
-        subtitle="Enter your email and we'll send you a reset link."
+        title={t("forgotTitle")}
+        subtitle={t("forgotSubtitle")}
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email address</Label>
+          <Label htmlFor="email">{t("email")}</Label>
 
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             {...register("email")}
           />
 
           {errors.email && (
             <p className="text-sm text-destructive">
-              {errors.email.message}
+              {tErrors(errors.email.message as "emailInvalid")}
             </p>
           )}
         </div>
@@ -116,7 +123,7 @@ export default function ForgotPasswordForm() {
           className="w-full"
           size="lg"
         >
-          Send Reset Link
+          {t("sendLink")}
         </LoadingButton>
       </form>
     </AuthCard>

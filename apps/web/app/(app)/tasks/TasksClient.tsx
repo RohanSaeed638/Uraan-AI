@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import PageHeader from "@/components/shared/PageHeader";
+import FilterChips from "@/components/shared/FilterChips";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { CheckSquare, Clock } from "lucide-react";
 
@@ -23,29 +26,27 @@ export interface FlatTask {
 
 type Filter = "all" | "todo" | "completed";
 
-const tabs: { key: Filter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "todo", label: "To Do" },
-  { key: "completed", label: "Completed" },
-];
+const tabs: Filter[] = ["all", "todo", "completed"];
 
 export default function TasksClient({
   initialTasks,
 }: {
   initialTasks: FlatTask[];
 }) {
+  const t = useTranslations("tasks");
+  const tFilters = useTranslations("filters");
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState<Filter>("all");
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   const counts: Record<Filter, number> = {
     all: tasks.length,
-    todo: tasks.filter((t) => !t.completed).length,
-    completed: tasks.filter((t) => t.completed).length,
+    todo: tasks.filter((task) => !task.completed).length,
+    completed: tasks.filter((task) => task.completed).length,
   };
 
-  const visible = tasks.filter((t) =>
-    filter === "all" ? true : filter === "todo" ? !t.completed : t.completed
+  const visible = tasks.filter((task) =>
+    filter === "all" ? true : filter === "todo" ? !task.completed : task.completed
   );
 
   async function toggle(taskId: string, completed: boolean) {
@@ -54,14 +55,14 @@ export default function TasksClient({
     const previous = tasks;
     setPendingId(taskId);
     setTasks((current) =>
-      current.map((t) => (t.id === taskId ? { ...t, completed } : t))
+      current.map((task) => (task.id === taskId ? { ...task, completed } : task))
     );
 
     try {
       await api.patch(`/roadmaps/tasks/${taskId}`, { completed });
     } catch {
       setTasks(previous);
-      toast.error("Couldn't update the task. Please try again.");
+      toast.error(t("failed"));
     } finally {
       setPendingId(null);
     }
@@ -73,15 +74,15 @@ export default function TasksClient({
         <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
           <CheckSquare className="size-7 text-brand-violet" />
         </span>
-        <h1 className="font-heading mt-6 text-2xl font-bold">No tasks yet</h1>
+        <h1 className="font-heading mt-6 text-2xl font-bold">{t("emptyTitle")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Tasks appear here once you&apos;ve generated a roadmap.
+          {t("emptyText")}
         </p>
         <Link
           href="/roadmaps"
           className={buttonVariants({ size: "lg", className: "mt-7" })}
         >
-          Go to My Roadmaps
+          {t("goRoadmaps")}
         </Link>
       </div>
     );
@@ -89,33 +90,20 @@ export default function TasksClient({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="font-heading text-3xl font-bold">Tasks</h1>
-      <p className="mt-1 text-muted-foreground">
-        Every task across your roadmaps, in one place.
-      </p>
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="mt-6 flex gap-2">
-        {tabs.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition",
-              filter === key
-                ? "bg-brand-violet text-white"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {label}
-            <span className="ml-1.5 opacity-70">{counts[key]}</span>
-          </button>
-        ))}
-      </div>
+      <FilterChips
+        className="mt-6"
+        label={tFilters("status")}
+        value={filter}
+        onChange={setFilter}
+        options={tabs.map((key) => ({ value: key, label: tFilters(key), count: counts[key] }))}
+      />
 
       <Card className="mt-5 gap-0 p-0">
         {visible.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">
-            Nothing here yet.
+            {tFilters("nothing")}
           </p>
         ) : (
           visible.map((task) => (
@@ -148,7 +136,7 @@ export default function TasksClient({
 
               {task.estimatedHours != null && (
                 <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                  <Clock size={13} /> {task.estimatedHours}h
+                  <Clock size={13} /> {t("hours", { count: task.estimatedHours })}
                 </span>
               )}
             </div>

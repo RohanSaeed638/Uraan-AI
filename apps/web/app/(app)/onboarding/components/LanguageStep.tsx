@@ -1,47 +1,9 @@
-// "use client";
-
-// import { useOnboardingStore } from "@/store/onboarding";
-
-// export default function LanguageStep() {
-//   const { language, update } = useOnboardingStore();
-
-//   const options = [
-//     { value: "en", label: "English" },
-//     { value: "ur", label: "اردو" },
-//   ];
-
-//   return (
-//     <div className="space-y-4">
-//       <h2 className="text-2xl font-bold">
-//         Choose Your Language
-//       </h2>
-
-//       <div className="grid gap-4">
-//         {options.map((option) => (
-//           <button
-//             key={option.value}
-//             type="button"
-//             onClick={() =>
-//               update({
-//                 language: option.value,
-//               })
-//             }
-//             className={`rounded-lg border p-4 text-left transition ${
-//               language === option.value
-//                 ? "border-violet-600 bg-violet-50"
-//                 : "border-gray-200"
-//             }`}
-//           >
-//             {option.label}
-//           </button>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+
+import { setLocaleCookie } from "@/app/actions/locale";
 import { LANGUAGES } from "../constants";
 
 import OptionCard from "@/components/onboarding/OptionCard";
@@ -56,10 +18,24 @@ export default function LanguageStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.language");
+  const router = useRouter();
+  const current = useLocale();
+
+  // The rest of the onboarding switches to the chosen language at once.
+  async function choose(value: string) {
+    updateData({ language: value });
+
+    if (value !== current) {
+      await setLocaleCookie(value);
+      router.refresh();
+    }
+  }
+
   return (
     <OnboardingCard
-      title="Choose Language"
-      subtitle="You can change it later."
+      title={t("title")}
+      subtitle={t("subtitle")}
     >
       <div className="grid gap-4">
 
@@ -70,11 +46,7 @@ export default function LanguageStep({
             selected={
               data.language === lang.value
             }
-            onClick={() =>
-              updateData({
-                language: lang.value,
-              })
-            }
+            onClick={() => choose(lang.value)}
           />
         ))}
 

@@ -1,61 +1,18 @@
-import {
-  Brain,
-  Code2,
-  Database,
-  Server,
-  Shield,
-  Cloud,
-  Smartphone,
-  Monitor,
-} from "lucide-react";
-
+// Offline fallback for the career pickers. The live list comes from the API
+// (`useCareerOptions`); keep these slugs in step with apps/api/data/careers.json.
 export const careers = [
-  {
-    label: "AI Engineer",
-    value: "ai-engineer",
-    icon: Brain,
-    description: "Build AI products and agents.",
-  },
-  {
-    label: "Backend Engineer",
-    value: "backend-engineer",
-    icon: Server,
-    description: "Design APIs and scalable systems.",
-  },
-  {
-    label: "Frontend Engineer",
-    value: "frontend-engineer",
-    icon: Monitor,
-    description: "Create beautiful web interfaces.",
-  },
-  {
-    label: "Full Stack Engineer",
-    value: "fullstack-engineer",
-    icon: Code2,
-    description: "Work across frontend and backend.",
-  },
-  {
-    label: "Data Scientist",
-    value: "data-scientist",
-    icon: Database,
-    description: "Analyze and model data.",
-  },
-  {
-    label: "Cloud Engineer",
-    value: "cloud-engineer",
-    icon: Cloud,
-    description: "Build and manage cloud infrastructure.",
-  },
-  {
-    label: "Cybersecurity Engineer",
-    value: "cybersecurity-engineer",
-    icon: Shield,
-    description: "Protect systems and networks.",
-  },
-  {
-    label: "Mobile Developer",
-    value: "mobile-developer",
-    icon: Smartphone,
-    description: "Create Android and iOS apps.",
-  },
+  { value: "backend-engineer", label: "Backend Engineer", description: "Build the servers and APIs behind apps." },
+  { value: "frontend-engineer", label: "Frontend Engineer", description: "Create fast, accessible web interfaces." },
+  { value: "fullstack-engineer", label: "Full Stack Engineer", description: "Work across frontend and backend." },
+  { value: "mobile-app-developer", label: "Mobile App Developer", description: "Create Android and iOS apps." },
+  { value: "ai-engineer", label: "AI Engineer", description: "Build products powered by AI." },
+  { value: "data-scientist", label: "Data Scientist", description: "Turn data into decisions." },
+  { value: "cyber-security", label: "Cybersecurity Analyst", description: "Protect systems and data." },
+  { value: "ui-ux-designer", label: "UI/UX Designer", description: "Design products people love to use." },
+  { value: "devops-engineer", label: "DevOps Engineer", description: "Automate building and deploying software." },
+  { value: "cloud-engineer", label: "Cloud Engineer", description: "Run applications on the cloud." },
+  { value: "digital-marketer", label: "Digital Marketer", description: "Grow businesses online." },
+  { value: "graphic-designer", label: "Graphic Designer", description: "Create logos, posts and brands." },
+  { value: "video-editor", label: "Video Editor", description: "Edit videos for creators and clients." },
+  { value: "content-creator", label: "Content Creator", description: "Build an audience and earn from content." },
 ];

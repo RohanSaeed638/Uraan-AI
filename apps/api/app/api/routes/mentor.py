@@ -15,8 +15,14 @@ from app.schemas.mentor import (
     MentorConversationDetailResponse,
     MentorConversationListResponse,
     MentorMessageCreateRequest,
-    MentorMessageCreateResponse
+    MentorMessageCreateResponse,
+    MentorSuggestionsResponse,
+    MotivationResponse,
+    ReviewRequest,
+    ReviewResponse,
 )
+from app.services.motivation_service import MotivationService
+from app.services.review_service import ReviewService
 from app.api.dependencies import get_current_user
 from uuid import UUID
 
@@ -24,6 +30,42 @@ router = APIRouter(
     prefix="/mentor",
     tags=["AI Mentor"],
 )
+
+@router.get(
+    "/suggestions",
+    response_model=MentorSuggestionsResponse,
+)
+async def mentor_suggestions(
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    chips = await MentorService(db).suggestions(current_user.id)
+
+    return {"chips": [vars(chip) for chip in chips]}
+
+
+@router.get(
+    "/motivation",
+    response_model=MotivationResponse,
+)
+async def daily_motivation(
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await MotivationService(db).today(current_user.id)
+
+
+@router.post(
+    "/review",
+    response_model=ReviewResponse,
+)
+async def review_work(
+    payload: ReviewRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await ReviewService(db).review(current_user.id, payload.model_dump())
+
 
 @router.post(
     "/conversations",

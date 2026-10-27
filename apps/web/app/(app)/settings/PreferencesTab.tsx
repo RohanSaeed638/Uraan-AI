@@ -1,7 +1,11 @@
 "use client";
 
 import { useTimezones } from "@/lib/use-timezones";
-import { UserSettings } from "@/types/api";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { setWordingCookie } from "@/app/actions/locale";
+import { AiTone, UserSettings, Wording } from "@/types/api";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,25 +15,11 @@ import NativeSelect from "@/components/shared/NativeSelect";
 
 import PushToggle from "./PushToggle";
 
+const TONES = ["friendly", "genz", "professional"] as const;
+
 type ToggleKey = "learning_reminders" | "ai_mentor_enabled" | "show_on_leaderboard";
 
-const TOGGLES: { key: ToggleKey; label: string; hint: string }[] = [
-  {
-    key: "learning_reminders",
-    label: "Daily learning reminders",
-    hint: "A nudge at your reminder time on days you haven't studied yet.",
-  },
-  {
-    key: "ai_mentor_enabled",
-    label: "AI mentor",
-    hint: "Turn the AI mentor chat on or off. When off, the mentor page is disabled.",
-  },
-  {
-    key: "show_on_leaderboard",
-    label: "Show me on the leaderboard",
-    hint: "Others see your first name, last initial and XP. Off by default.",
-  },
-];
+const TOGGLES: ToggleKey[] = ["learning_reminders", "ai_mentor_enabled", "show_on_leaderboard"];
 
 export default function PreferencesTab({
   settings,
@@ -39,14 +29,15 @@ export default function PreferencesTab({
   onUpdate: (patch: Partial<UserSettings>) => void;
 }) {
   const { options: timezones, device } = useTimezones(settings?.timezone);
+  const t = useTranslations("mentorTone");
+  const tp = useTranslations("settings.prefs");
+  const router = useRouter();
 
   if (!settings) {
     return (
       <Card className="max-w-xl p-7">
-        <h2 className="text-sm font-semibold">Preferences</h2>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Preferences are unavailable right now. Refresh the page to try again.
-        </p>
+        <h2 className="text-sm font-semibold">{tp("title")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{tp("unavailable")}</p>
       </Card>
     );
   }
@@ -55,46 +46,79 @@ export default function PreferencesTab({
 
   return (
     <Card className="max-w-xl gap-0 p-7">
-      <h2 className="text-sm font-semibold">Preferences</h2>
+      <h2 className="text-sm font-semibold">{tp("title")}</h2>
 
       <div className="mt-5 space-y-5">
-        {TOGGLES.map(({ key, label, hint }) => (
+        {TOGGLES.map((key) => (
           <label
             key={key}
             className="flex cursor-pointer items-start justify-between gap-4"
           >
             <span className="min-w-0">
-              <span className="block text-sm font-medium">{label}</span>
-              <span className="block text-xs text-muted-foreground">{hint}</span>
+              <span className="block text-sm font-medium">{tp(key)}</span>
+              <span className="block text-xs text-muted-foreground">{tp(`${key}_hint`)}</span>
             </span>
             <input
               type="checkbox"
-              className="mt-1 size-4 shrink-0 accent-brand-violet"
+              className="mt-1 size-4 shrink-0 accent-gold"
               checked={settings[key]}
               onChange={(e) => onUpdate({ [key]: e.target.checked })}
             />
           </label>
         ))}
 
-        <label className="flex items-start justify-between gap-4 opacity-60">
+        <div className="space-y-1.5">
+          <Label htmlFor="wording">{tp("wording")}</Label>
+          <NativeSelect
+            id="wording"
+            value={settings.wording ?? "classic"}
+            onChange={async (e) => {
+              const wording = e.target.value as Wording;
+
+              onUpdate({ wording });
+              await setWordingCookie(wording);
+              router.refresh();
+            }}
+          >
+            <option value="classic">{tp("classic")}</option>
+            <option value="gamified">{tp("gamified")}</option>
+          </NativeSelect>
+          <p className="text-xs text-muted-foreground">{tp("wordingHint")}</p>
+        </div>
+
+        {settings.ai_mentor_enabled && (
+          <div className="space-y-1.5">
+            <Label htmlFor="aiTone">{t("tone")}</Label>
+            <NativeSelect
+              id="aiTone"
+              value={settings.ai_tone}
+              onChange={(e) => onUpdate({ ai_tone: e.target.value as AiTone })}
+            >
+              {TONES.map((tone) => (
+                <option key={tone} value={tone}>
+                  {t(`tones.${tone}`)}
+                </option>
+              ))}
+            </NativeSelect>
+            <p className="text-xs text-muted-foreground">{t("toneHint")}</p>
+          </div>
+        )}
+
+        <label className="flex cursor-pointer items-start justify-between gap-4">
           <span className="min-w-0">
-            <span className="block text-sm font-medium">
-              Email notifications{" "}
-              <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                Coming soon
+            <span className="block text-sm font-medium">{tp("emailOn")}</span>
+            <span className="block text-xs text-muted-foreground">{tp("emailOnHint")}</span>
+            {!settings.email_available && (
+              <span className="mt-1 block text-xs text-amber-600 dark:text-amber-400">
+                {tp("emailUnavailable")}
               </span>
-            </span>
-            <span className="block text-xs text-muted-foreground">
-              Uraan AI doesn&apos;t send emails yet. Reminders arrive in the app
-              and as push notifications.
-            </span>
+            )}
           </span>
           <input
             type="checkbox"
-            disabled
-            className="mt-1 size-4 shrink-0"
-            checked={false}
-            readOnly
+            className="mt-1 size-4 shrink-0 accent-gold"
+            checked={settings.email_notifications}
+            onChange={(e) => onUpdate({ email_notifications: e.target.checked })}
           />
         </label>
 
@@ -102,7 +126,7 @@ export default function PreferencesTab({
 
         <div className="grid gap-4 border-t pt-5 sm:grid-cols-2">
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="reminderTime">Reminder time</Label>
+            <Label htmlFor="reminderTime">{tp("reminderTime")}</Label>
             <Input
               id="reminderTime"
               type="time"
@@ -115,7 +139,7 @@ export default function PreferencesTab({
           </div>
 
           <div className="min-w-0 space-y-1.5">
-            <Label htmlFor="timezone">Timezone</Label>
+            <Label htmlFor="timezone">{tp("timezone")}</Label>
             <NativeSelect
               id="timezone"
               value={settings.timezone}
@@ -131,8 +155,7 @@ export default function PreferencesTab({
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Reminders are sent at your reminder time in this timezone. Your streak
-          also counts days in this timezone.
+          {tp("timezoneHint")}
         </p>
 
         {differsFromDevice && (
@@ -142,7 +165,7 @@ export default function PreferencesTab({
             size="sm"
             onClick={() => onUpdate({ timezone: device })}
           >
-            Use my device timezone ({device})
+            {tp("useDevice", { zone: device })}
           </Button>
         )}
       </div>

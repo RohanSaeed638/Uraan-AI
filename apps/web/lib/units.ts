@@ -1,4 +1,4 @@
-import { BookOpen, FolderKanban, PlayCircle, LucideIcon } from "lucide-react";
+import { BookOpen, Code2, FolderKanban, PlayCircle, LucideIcon } from "lucide-react";
 import { LearningUnit, Roadmap } from "@/types/roadmap";
 
 export interface UnitContext {
@@ -40,21 +40,42 @@ export function unitHref(c: UnitContext) {
   return `/roadmaps/${c.roadmapId}/task/${c.taskId}/learn/${c.unit.id}`;
 }
 
-const meta: Record<string, { label: string; icon: LucideIcon }> = {
-  reading: { label: "Reading", icon: BookOpen },
-  video: { label: "Video", icon: PlayCircle },
-  project: { label: "Project", icon: FolderKanban },
+const icons: Record<string, LucideIcon> = {
+  reading: BookOpen,
+  video: PlayCircle,
+  project: FolderKanban,
+  exercise: Code2,
 };
 
+/** Icon and message key for a lesson type; labels live in messages/*.json under `unit`. */
 export function getUnitMeta(type: string) {
-  return meta[type?.toLowerCase()] ?? { label: type, icon: BookOpen };
+  const key = type?.toLowerCase();
+
+  return { key: key in icons ? key : null, icon: icons[key] ?? BookOpen };
 }
 
-export function formatMinutes(total: number) {
-  if (total < 60) return `${total}m`;
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return m ? `${h}h ${m}m` : `${h}h`;
+/** The `unit` translator from next-intl (`useTranslations("unit")` / `getTranslations("unit")`). */
+type UnitT = (key: string, values?: Record<string, string | number>) => string;
+
+export function unitLabel(type: string, t: UnitT) {
+  const { key } = getUnitMeta(type);
+
+  return key ? t(`type.${key}`) : type;
+}
+
+export function unitAction(type: string, t: UnitT) {
+  const { key } = getUnitMeta(type);
+
+  return key ? t(`action.${key}`) : t("action.start");
+}
+
+export function formatMinutes(total: number, t: UnitT) {
+  if (total < 60) return t("minutesShort", { count: total });
+
+  const hours = Math.floor(total / 60);
+  const minutes = total % 60;
+
+  return minutes ? t("hoursMinutesShort", { hours, minutes }) : t("hoursShort", { hours });
 }
 
 /** A YouTube results page, used when no specific video could be verified. */
@@ -66,18 +87,9 @@ const typeColors: Record<string, string> = {
   reading: "text-sky-600 dark:text-sky-400",
   video: "text-rose-600 dark:text-rose-400",
   project: "text-amber-600 dark:text-amber-400",
+  exercise: "text-emerald-600 dark:text-emerald-400",
 };
 
 export function unitColor(type: string) {
   return typeColors[type?.toLowerCase()] ?? "text-primary";
-}
-
-const actionLabels: Record<string, string> = {
-  reading: "Read",
-  video: "Watch",
-  project: "Start project",
-};
-
-export function unitAction(type: string) {
-  return actionLabels[type?.toLowerCase()] ?? "Start";
 }

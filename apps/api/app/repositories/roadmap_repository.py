@@ -16,62 +16,49 @@ class RoadmapRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create(
-        self,
-        profile,
-        roadmap_data: dict,
-    ) -> Roadmap:
-
+    async def create_placeholder(self, profile, request) -> Roadmap:
+        """An empty roadmap in the 'generating' state; a background job fills
+        it in. Commits."""
         roadmap = Roadmap(
             profile_id=profile.id,
-            title=roadmap_data["title"],
-            description=roadmap_data.get("description"),
-            status="completed",
+            title="Creating your roadmap",
+            description="",
+            status=RoadmapStatus.GENERATING,
+            **self._request_fields(request),
         )
 
         self.db.add(roadmap)
-
-        await self.db.flush()
-
-        for phase_index, phase_data in enumerate(
-            roadmap_data["phases"],
-            start=1,
-        ):
-
-            phase = RoadmapPhase(
-                roadmap_id=roadmap.id,
-                title=phase_data["title"],
-                description=phase_data.get("description"),
-                order=phase_index,
-                duration_weeks=phase_data.get("estimated_weeks", 0)
-            )
-
-            self.db.add(phase)
-
-            await self.db.flush()
-
-            for task_index, task_data in enumerate(
-                phase_data["tasks"],
-                start=1,
-            ):
-
-                task = RoadmapTask(
-                    phase_id=phase.id,
-                    title=task_data["title"],
-                    description=task_data.get("description"),
-                    resource_links=task_data.get("resource_links", []),
-                    estimated_hours=task_data.get(
-                        "estimated_hours"
-                    ),
-                    completed=False,
-                    order=task_index,
-                )
-
-                self.db.add(task)
-
         await self.db.commit()
+        await self.db.refresh(roadmap)
 
-        return await self.get_latest(profile.id)
+        return roadmap
+
+    async def get_generating(self, profile_id) -> list[Roadmap]:
+        return list(
+            (
+                await self.db.execute(
+                    select(Roadmap).where(
+                        Roadmap.profile_id == profile_id,
+                        Roadmap.status == RoadmapStatus.GENERATING,
+                    )
+                )
+            ).scalars()
+        )
+
+    @staticmethod
+    def _request_fields(request) -> dict:
+        if request is None:
+            return {}
+
+        return {
+            "career_slug": request.career_slug,
+            "career_stage": request.career_stage,
+            "skill_level": request.skill_level,
+            "learning_goal": request.learning_goal,
+            "learning_style": request.learning_style,
+            "daily_hours": request.daily_hours,
+            "target_duration": request.target_duration,
+        }
 
     async def get_by_profile_id(
         self,
@@ -117,7 +104,12 @@ class RoadmapRepository:
             )
 
             .where(
-                Roadmap.profile_id == profile_id
+                Roadmap.profile_id == profile_id,
+                # Roadmaps still being built, or that failed, are not
+                # something to show as "current".
+                Roadmap.status.notin_(
+                    [RoadmapStatus.GENERATING, RoadmapStatus.FAILED]
+                ),
             )
 
             .order_by(
@@ -164,6 +156,18 @@ class RoadmapRepository:
 
         if not roadmap:
            return None
+
+        # Ticking a task must not quietly change a roadmap that is archived,
+        # paused or being rebuilt; only the explicit actions do that. Only
+        # active and finished roadmaps move between active and completed.
+        if status == RoadmapStatus.ACTIVE and roadmap.status not in (
+            RoadmapStatus.ACTIVE,
+            RoadmapStatus.COMPLETED,
+        ):
+            return roadmap
+
+        if roadmap.status in (RoadmapStatus.GENERATING, RoadmapStatus.FAILED):
+            return roadmap
 
         roadmap.status = status
 
@@ -250,14 +254,20 @@ class RoadmapRepository:
     async def archive_active_roadmaps(
         self,
         profile_id: UUID,
+        except_id: UUID | None = None,
     ) -> None:
+
+        conditions = [
+            Roadmap.profile_id == profile_id,
+            Roadmap.status == RoadmapStatus.ACTIVE,
+        ]
+
+        if except_id is not None:
+            conditions.append(Roadmap.id != except_id)
 
         stmt = (
             update(Roadmap)
-            .where(
-                Roadmap.profile_id == profile_id,
-                Roadmap.status == RoadmapStatus.ACTIVE,
-            )
+            .where(*conditions)
             .values(status=RoadmapStatus.ARCHIVED)
             .execution_options(synchronize_session="fetch")
         )
@@ -275,6 +285,8 @@ class RoadmapRepository:
                 Roadmap.profile_id == profile_id,
                 Roadmap.status == RoadmapStatus.ACTIVE,
             )
+            .order_by(Roadmap.created_at.desc())
+            .limit(1)
         )
 
         result = await self.db.execute(stmt)

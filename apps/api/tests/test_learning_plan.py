@@ -368,7 +368,7 @@ class _Db:
 
 class _Profiles:
     async def get_by_auth_user_id(self, auth_user_id):
-        return SimpleNamespace(id=uuid4())
+        return SimpleNamespace(id=uuid4(), language="en")
 
 
 class _Tasks:
@@ -397,7 +397,7 @@ class _Generator:
         self.calls = 0
         self.fail = fail
 
-    async def generate(self, roadmap, task):
+    async def generate(self, roadmap, task, profile=None):
         self.calls += 1
         if self.fail:
             raise ValueError("bad plan")

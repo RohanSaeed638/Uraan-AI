@@ -6,6 +6,8 @@ import NavigationButtons from "@/components/onboarding/NavigationButtons";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
+import { useTranslations } from "next-intl";
+
 import { StepProps } from "../types";
 
 const PRESETS = [1, 2, 3, 4, 5, 6];
@@ -16,20 +18,22 @@ export default function DailyHoursStep({
   next,
   previous,
 }: StepProps) {
+  const t = useTranslations("onboarding.hours");
+
   return (
     <OnboardingCard
-      title="How much time can you study daily?"
-      subtitle="Don't worry, you can change this later."
+      title={t("title")}
+      subtitle={t("subtitle")}
     >
       <div className="space-y-8">
 
         <div className="text-center">
           <h2 className="text-5xl font-bold text-brand-violet">
-            {data.daily_hours}h
+            {t("short", { count: data.daily_hours })}
           </h2>
 
           <p className="mt-2 text-muted-foreground">
-            Every day
+            {t("everyDay")}
           </p>
         </div>
 
@@ -60,7 +64,7 @@ export default function DailyHoursStep({
                 })
               }
             >
-              {hour} Hour{hour > 1 && "s"}
+              {t("preset", { count: hour })}
             </Button>
           ))}
         </div>

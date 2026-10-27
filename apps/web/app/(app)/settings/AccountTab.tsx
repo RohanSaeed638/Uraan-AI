@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
@@ -26,11 +27,12 @@ function providersOf(user: User): string[] {
   return user.app_metadata?.provider ? [user.app_metadata.provider as string] : [];
 }
 
-const providerLabel = (p: string) =>
-  p === "email" ? "email and password" : p[0].toUpperCase() + p.slice(1);
-
 export default function AccountTab({ user }: { user: User }) {
   const router = useRouter();
+  const t = useTranslations("settings.account");
+
+  const providerLabel = (p: string) =>
+    p === "email" ? t("providerEmail") : p[0].toUpperCase() + p.slice(1);
   const setUser = useAuthStore((state) => state.setUser);
   const clearUser = useAuthStore((state) => state.logout);
 
@@ -57,7 +59,7 @@ export default function AccountTab({ user }: { user: User }) {
     const name = fullName.trim().replace(/\s+/g, " ");
 
     if (!name) {
-      setNameError("Please enter your name.");
+      setNameError(t("nameRequired"));
       return;
     }
 
@@ -74,10 +76,10 @@ export default function AccountTab({ user }: { user: User }) {
       if (data.user) setUser(data.user);
 
       setFullName(name);
-      toast.success("Name updated.");
+      toast.success(t("nameUpdated"));
       router.refresh();
     } catch (err) {
-      setNameError(apiErrorMessage(err, "Couldn't update your name."));
+      setNameError(apiErrorMessage(err, t("nameFailed")));
     } finally {
       setSavingName(false);
     }
@@ -93,12 +95,12 @@ export default function AccountTab({ user }: { user: User }) {
     const next = newEmail.trim().toLowerCase();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next)) {
-      setEmailError("Enter a valid email address.");
+      setEmailError(t("emailInvalid"));
       return;
     }
 
     if (next === email.toLowerCase()) {
-      setEmailError("That is already your email address.");
+      setEmailError(t("emailSame"));
       return;
     }
 
@@ -110,12 +112,10 @@ export default function AccountTab({ user }: { user: User }) {
       if (error) throw error;
 
       setNewEmail("");
-      toast.success(
-        "Check your inbox. Open the confirmation link we sent to finish changing your email."
-      );
+      toast.success(t("emailSent"));
     } catch (err) {
       setEmailError(
-        err instanceof Error ? err.message : "Couldn't change your email."
+        err instanceof Error ? err.message : t("emailFailed")
       );
     } finally {
       setSavingEmail(false);
@@ -132,16 +132,14 @@ export default function AccountTab({ user }: { user: User }) {
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!current) return setPasswordError("Enter your current password.");
+    if (!current) return setPasswordError(t("currentRequired"));
     if (next.length < MIN_PASSWORD) {
-      return setPasswordError(
-        `The new password must be at least ${MIN_PASSWORD} characters.`
-      );
+      return setPasswordError(t("passwordShort", { count: MIN_PASSWORD }));
     }
     if (next === current) {
-      return setPasswordError("Choose a password different from your current one.");
+      return setPasswordError(t("passwordSame"));
     }
-    if (next !== confirm) return setPasswordError("The new passwords don't match.");
+    if (next !== confirm) return setPasswordError(t("passwordMismatch"));
 
     setSavingPassword(true);
     setPasswordError(null);
@@ -151,7 +149,7 @@ export default function AccountTab({ user }: { user: User }) {
       // take over the account.
       const check = await authService.verifyPassword(email, current);
       if (check.error) {
-        setPasswordError("Your current password is incorrect.");
+        setPasswordError(t("currentWrong"));
         return;
       }
 
@@ -161,10 +159,10 @@ export default function AccountTab({ user }: { user: User }) {
       setCurrent("");
       setNext("");
       setConfirm("");
-      toast.success("Password changed.");
+      toast.success(t("passwordChanged"));
     } catch (err) {
       setPasswordError(
-        err instanceof Error ? err.message : "Couldn't change your password."
+        err instanceof Error ? err.message : t("passwordFailed")
       );
     } finally {
       setSavingPassword(false);
@@ -176,9 +174,7 @@ export default function AccountTab({ user }: { user: User }) {
 
   async function signOutEverywhere() {
     if (
-      !window.confirm(
-        "Sign out of Uraan AI on every device, including this one?"
-      )
+      !window.confirm(t("signOutConfirm"))
     ) {
       return;
     }
@@ -196,7 +192,7 @@ export default function AccountTab({ user }: { user: User }) {
   return (
     <div className="max-w-xl space-y-6">
       <Card className="p-7">
-        <h2 className="text-sm font-semibold">Profile information</h2>
+        <h2 className="text-sm font-semibold">{t("profileTitle")}</h2>
 
         <div className="mt-5 flex items-center gap-4">
           <Avatar size="lg">
@@ -207,7 +203,7 @@ export default function AccountTab({ user }: { user: User }) {
           </Avatar>
           <div className="min-w-0">
             <p className="break-words text-sm font-medium">
-              {fullName || "Your name"}
+              {fullName || t("yourName")}
             </p>
             <p className="break-all text-xs text-muted-foreground">{email}</p>
           </div>
@@ -215,7 +211,7 @@ export default function AccountTab({ user }: { user: User }) {
 
         <form onSubmit={saveName} className="mt-6 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="fullName">Full name</Label>
+            <Label htmlFor="fullName">{t("fullName")}</Label>
             <Input
               id="fullName"
               value={fullName}
@@ -223,7 +219,7 @@ export default function AccountTab({ user }: { user: User }) {
               onChange={(e) => setFullName(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Shown on your leaderboard entry, resume and public portfolio.
+              {t("fullNameHint")}
             </p>
           </div>
 
@@ -234,19 +230,19 @@ export default function AccountTab({ user }: { user: User }) {
           )}
 
           <LoadingButton type="submit" loading={savingName}>
-            Save name
+            {t("saveName")}
           </LoadingButton>
         </form>
       </Card>
 
       <Card className="p-7">
-        <h2 className="text-sm font-semibold">Email address</h2>
+        <h2 className="text-sm font-semibold">{t("emailTitle")}</h2>
         <p className="mt-1 break-all text-sm text-muted-foreground">{email}</p>
 
         {hasPassword ? (
           <form onSubmit={changeEmail} className="mt-5 space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="newEmail">New email</Label>
+              <Label htmlFor="newEmail">{t("newEmail")}</Label>
               <Input
                 id="newEmail"
                 type="email"
@@ -255,8 +251,7 @@ export default function AccountTab({ user }: { user: User }) {
                 onChange={(e) => setNewEmail(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                We&apos;ll send a confirmation link. Your email only changes
-                after you open it.
+                {t("newEmailHint")}
               </p>
             </div>
 
@@ -267,25 +262,25 @@ export default function AccountTab({ user }: { user: User }) {
             )}
 
             <LoadingButton type="submit" loading={savingEmail}>
-              Change email
+              {t("changeEmail")}
             </LoadingButton>
           </form>
         ) : (
           <p className="mt-3 text-xs text-muted-foreground">
-            Your email comes from{" "}
-            {providers.map(providerLabel).join(", ") || "your sign-in provider"}
-            , so it can&apos;t be changed here.
+            {t("emailFromProvider", {
+              providers: providers.map(providerLabel).join(", ") || t("providerFallback"),
+            })}
           </p>
         )}
       </Card>
 
       <Card className="p-7">
-        <h2 className="text-sm font-semibold">Security</h2>
+        <h2 className="text-sm font-semibold">{t("security")}</h2>
 
         {hasPassword ? (
           <form onSubmit={changePassword} className="mt-5 space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="currentPassword">Current password</Label>
+              <Label htmlFor="currentPassword">{t("currentPassword")}</Label>
               <Input
                 id="currentPassword"
                 type="password"
@@ -295,7 +290,7 @@ export default function AccountTab({ user }: { user: User }) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="newPassword">New password</Label>
+              <Label htmlFor="newPassword">{t("newPassword")}</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -304,11 +299,11 @@ export default function AccountTab({ user }: { user: User }) {
                 onChange={(e) => setNext(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                At least {MIN_PASSWORD} characters.
+                {t("newPasswordHint", { count: MIN_PASSWORD })}
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -325,21 +320,21 @@ export default function AccountTab({ user }: { user: User }) {
             )}
 
             <LoadingButton type="submit" loading={savingPassword}>
-              Change password
+              {t("changePassword")}
             </LoadingButton>
           </form>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">
-            You sign in with {providers.map(providerLabel).join(", ") || "a provider"}
-            , so there is no Uraan AI password to change.
+            {t("noPassword", {
+              providers: providers.map(providerLabel).join(", ") || t("providerGeneric"),
+            })}
           </p>
         )}
 
         <div className="mt-6 border-t pt-5">
-          <p className="text-sm font-medium">Sign out everywhere</p>
+          <p className="text-sm font-medium">{t("signOutEverywhere")}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Ends your session on all devices, including this one. Useful if you
-            used a shared computer.
+            {t("signOutText")}
           </p>
           <LoadingButton
             type="button"
@@ -348,7 +343,7 @@ export default function AccountTab({ user }: { user: User }) {
             loading={signingOut}
             onClick={signOutEverywhere}
           >
-            Sign out of all devices
+            {t("signOutAll")}
           </LoadingButton>
         </div>
       </Card>

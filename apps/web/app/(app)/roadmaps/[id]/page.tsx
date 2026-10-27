@@ -4,6 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 import RoadmapDetailClient from "./RoadmapDetailClient";
 import { Roadmap } from "@/types/roadmap";
 
+/** Changes whenever the plan itself changes (rebuilt, adapted, restored,
+ * paused...), so the client component starts over from the new data. Ticking
+ * tasks does not change it. */
+function contentKey(roadmap: Roadmap) {
+  const ids = roadmap.phases.flatMap((p) => p.tasks.map((t) => t.id));
+
+  return [roadmap.status, roadmap.title, roadmap.generation_error ?? "", ids.length, ids[0], ids.at(-1)].join("|");
+}
+
 export default async function RoadmapDetailPage({
   params,
 }: {
@@ -42,7 +51,7 @@ export default async function RoadmapDetailPage({
 
   return (
     <main className="mx-auto max-w-5xl">
-      <RoadmapDetailClient roadmap={roadmap} />
+      <RoadmapDetailClient key={contentKey(roadmap)} roadmap={roadmap} />
     </main>
   );
 }

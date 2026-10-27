@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import PageHeader from "@/components/shared/PageHeader";
+import FilterChips from "@/components/shared/FilterChips";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Mic, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,19 +18,9 @@ import { Label } from "@/components/ui/label";
 import LoadingButton from "@/components/shared/LoadingButton";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
+import { apiErrorMessage } from "@/lib/profile-options";
 
-const LEVELS: { key: Difficulty | ""; label: string }[] = [
-  { key: "", label: "Match my level" },
-  { key: "beginner", label: "Beginner" },
-  { key: "intermediate", label: "Intermediate" },
-  { key: "advanced", label: "Advanced" },
-];
-
-function errorMessage(error: unknown, fallback: string) {
-  const detail = (error as { response?: { data?: { detail?: unknown } } })
-    ?.response?.data?.detail;
-  return typeof detail === "string" ? detail : fallback;
-}
+const LEVELS: (Difficulty | "")[] = ["", "beginner", "intermediate", "advanced"];
 
 export default function InterviewHome({
   initialSessions,
@@ -35,6 +28,9 @@ export default function InterviewHome({
   initialSessions: InterviewListItem[];
 }) {
   const router = useRouter();
+  const t = useTranslations("interview");
+  const tLevel = useTranslations("options.skill_level");
+  const locale = useLocale();
   const [sessions, setSessions] = useState(initialSessions);
   const [role, setRole] = useState("");
   const [level, setLevel] = useState<Difficulty | "">("");
@@ -43,7 +39,7 @@ export default function InterviewHome({
   async function start(e: React.FormEvent) {
     e.preventDefault();
     if (role.trim().length < 2) {
-      toast.error("Enter the role you are interviewing for.");
+      toast.error(t("roleRequired"));
       return;
     }
     setStarting(true);
@@ -51,7 +47,7 @@ export default function InterviewHome({
       const session = await startInterview(role.trim(), level || undefined);
       router.push(`/interview/${session.id}`);
     } catch (err) {
-      toast.error(errorMessage(err, "Couldn't start the interview."));
+      toast.error(apiErrorMessage(err, t("startFailed")));
       setStarting(false);
     }
   }
@@ -61,63 +57,48 @@ export default function InterviewHome({
       await deleteInterview(id);
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch {
-      toast.error("Couldn't delete the interview.");
+      toast.error(t("deleteFailed"));
     }
   }
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-heading text-3xl font-bold">Interview Coach</h1>
-      <p className="mt-1 text-muted-foreground">
-        Practice with 5 questions for your target role and get scored feedback
-        on each answer. This is text-only, so confidence is judged from your
-        wording, not your voice.
-      </p>
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="mt-6 p-6">
         <form onSubmit={start} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="role">Role you are interviewing for</Label>
+            <Label htmlFor="role">{t("role")}</Label>
             <Input
               id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              placeholder="e.g. Junior Backend Developer"
+              placeholder={t("roleExample")}
               maxLength={120}
             />
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
-            {LEVELS.map(({ key, label }) => (
-              <button
-                type="button"
-                key={label}
-                onClick={() => setLevel(key)}
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs font-medium transition",
-                  level === key
-                    ? "bg-brand-violet text-white"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <FilterChips
+            label={t("difficulty")}
+            size="sm"
+            value={level}
+            onChange={setLevel}
+            options={LEVELS.map((key) => ({ value: key, label: key ? tLevel(key) : t("levelAny") }))}
+          />
 
           <LoadingButton type="submit" loading={starting} className="gap-2">
-            <Mic size={15} /> Start mock interview
+            <Mic size={15} /> {t("start")}
           </LoadingButton>
         </form>
       </Card>
 
       <h2 className="font-heading mt-10 text-lg font-semibold">
-        Your interviews
+        {t("yours")}
       </h2>
       <Card className="mt-3 gap-0 p-0">
         {sessions.length === 0 ? (
           <p className="px-5 py-8 text-center text-sm text-muted-foreground">
-            No interviews yet.
+            {t("none")}
           </p>
         ) : (
           sessions.map((s) => (
@@ -126,12 +107,16 @@ export default function InterviewHome({
               className="flex items-center gap-3 border-b px-5 py-3.5 last:border-b-0"
             >
               <Link href={`/interview/${s.id}`} className="min-w-0 flex-1">
-                <p className="truncate font-medium hover:text-brand-violet">
+                <p className="truncate font-medium hover:text-brand-gold-deep dark:hover:text-brand-gold">
                   {s.role}
                 </p>
-                <p className="text-xs capitalize text-muted-foreground">
-                  {s.difficulty} · {s.answered}/{s.total} answered ·{" "}
-                  {formatDate(s.created_at)}
+                <p className="text-xs text-muted-foreground">
+                  {t("answered", {
+                    level: tLevel(s.difficulty),
+                    answered: s.answered,
+                    total: s.total,
+                    date: formatDate(s.created_at, undefined, locale),
+                  })}
                 </p>
               </Link>
               <span
@@ -144,12 +129,12 @@ export default function InterviewHome({
               >
                 {s.status === "completed"
                   ? `${Math.round(s.overall_score ?? 0)}%`
-                  : "In progress"}
+                  : t("inProgress")}
               </span>
               <button
-                aria-label={`Delete interview for ${s.role}`}
+                aria-label={t("delete", { role: s.role })}
                 onClick={() => {
-                  if (window.confirm("Delete this interview?")) remove(s.id);
+                  if (window.confirm(t("confirmDelete"))) remove(s.id);
                 }}
                 className="rounded-lg p-1.5 text-muted-foreground transition hover:text-destructive"
               >

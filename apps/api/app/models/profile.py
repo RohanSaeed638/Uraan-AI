@@ -78,12 +78,39 @@ class Profile(BaseModel):
         default=False,
     )
 
+    # The database type holds the lowercase values ("job_ready"), not the
+    # member names, so map by value.
     career_stage : Mapped[CareerStage | None] = mapped_column(
-        Enum(CareerStage),
+        Enum(CareerStage, values_callable=lambda e: [m.value for m in e]),
         nullable=True,
     )
 
     learning_goal : Mapped[str | None] = mapped_column(
         String(255),
+        nullable=True,
+    )
+
+    # Onboarding "About you" / "Your plan" answers. Plain strings, checked
+    # against the choice lists in app/schemas/profile.py.
+    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    education: Mapped[str | None] = mapped_column(String(30), nullable=True)
+
+    device: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    goal_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
+
+    preferred_study_hours: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    learning_pace: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    weekend_study: Mapped[bool | None] = mapped_column(
+        Boolean,
         nullable=True,
     )

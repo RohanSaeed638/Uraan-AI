@@ -13,6 +13,8 @@ class TaskOutput(BaseModel):
 
     estimated_hours: int
 
+    week: int | None = None
+
 
 class PhaseOutput(BaseModel):
 
@@ -23,6 +25,8 @@ class PhaseOutput(BaseModel):
     order: int
 
     estimated_weeks: int
+
+    milestones: list[str] = []
 
     tasks: list[TaskOutput]
 
