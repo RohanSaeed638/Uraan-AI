@@ -48,11 +48,20 @@ class Settings(BaseSettings):
     WEB_URL: str = "http://localhost:3000"
     API_PUBLIC_URL: str = "http://localhost:8000"
 
+    # Who can open the admin portal on first sign-in, comma separated emails.
+    # They are made admins the first time they call an admin endpoint; after
+    # that, admins can promote others from the portal.
+    ADMIN_EMAILS: str = ""
+
     # Websites allowed to call the API from a browser, comma separated.
     CORS_ORIGINS_RAW: str = Field(
-        default="http://localhost:3000",
+        default="http://localhost:3000,https://uraan-r0encywgn-rohansaeed0411s-projects.vercel.app,https://uraan-ai-six.vercel.app",
         validation_alias="CORS_ORIGINS",
     )
+
+    @property
+    def admin_emails(self) -> set[str]:
+        return {e.strip().lower() for e in self.ADMIN_EMAILS.split(",") if e.strip()}
 
     @property
     def cors_origins(self) -> list[str]:
