@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "dashboard": "Mission Control",
+    "tasks": "Missions",
+    "projects": "Quests",
+    "learning": "Training"
+  },
+  "dashboard": {
+    "continue": "Mission jari rakhein",
+    "tasksCompleted": "Missions mukammal huein",
+    "streak": "Din ki streak",
+    "currentRoadmap": "Maujooda Quest Line"
+  },
+  "tasks": {
+    "title": "Missions",
+    "subtitle": "Aapke tamam roadmaps ke missions, aik jagah.",
+    "failed": "Mission update nahin ho saka. Barah-e-karam dobara koshish karein.",
+    "emptyTitle": "Abhi tak koi mission nahin",
+    "emptyText": "Jab aap roadmap banayenge to missions yahan nazar aayenge."
+  },
+  "projects": {
+    "title": "Quests",
+    "subtitle": "Asli duniya ke quests karein aur apni skills dikhayein.",
+    "emptyTitle": "Abhi tak koi quest nahin",
+    "completed": "Clear kar diya",
+    "notStarted": "Shuru nahin kiya"
+  },
+  "progress": {
+    "tasksCompleted": "Missions mukammal huein",
+    "lessonsCompleted": "Training mukammal hui",
+    "overall": "Kul missions"
+  },
+  "learning": {
+    "title": "Training",
+    "suggested": "Aaj ki training",
+    "start": "Shuru karein"
+  },
+  "viewer": {
+    "markContinue": "XP hasil karein & jari rakhein",
+    "markTask": "Mission ka XP hasil karein",
+    "taskCompleted": "Mission Clear! 🎉",
+    "allDone": "Tamam training mukammal! 🎉",
+    "taskDoneToast": "Mission clear ho gaya",
+    "allTasks": "Tamam missions dekhein"
+  },
+  "roadmaps": {
+    "tasks": {
+      "none": "Is phase ke liye koi mission dastiyab nahin."
+    },
+    "card": {
+      "tasks": "{done} / {total} Missions"
+    }
+  }
+}

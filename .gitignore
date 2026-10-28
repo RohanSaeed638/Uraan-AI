@@ -63,3 +63,8 @@ coverage
 *.log
 
 .vscode
+# TypeScript
+*.tsbuildinfo
+
+# Archives
+*.zip

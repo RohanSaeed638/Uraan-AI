@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "dashboard": "مشن کنٹرول",
+    "tasks": "مشنز",
+    "projects": "کوئسٹز",
+    "learning": "ٹریننگ"
+  },
+  "dashboard": {
+    "continue": "مشن جاری رکھیں",
+    "tasksCompleted": "مشنز مکمل ہوئے",
+    "streak": "مسلسل دن",
+    "currentRoadmap": "موجودہ کوئسٹ لائن"
+  },
+  "tasks": {
+    "title": "مشنز",
+    "subtitle": "آپ کے تمام روڈ میپس کے مشنز، ایک جگہ پر۔",
+    "failed": "مشن اپڈیٹ نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔",
+    "emptyTitle": "ابھی کوئی مشنز نہیں",
+    "emptyText": "مشنز یہاں ظاہر ہوں گے جب آپ نے روڈ میپ تیار کیا ہوگا۔"
+  },
+  "projects": {
+    "title": "کوئسٹز",
+    "subtitle": "حقیقی دنیا کے کوئسٹز کریں اور اپنی مہارت دکھائیں۔",
+    "emptyTitle": "ابھی کوئی کوئسٹز نہیں",
+    "completed": "مکمل",
+    "notStarted": "شروع نہیں کیا گیا"
+  },
+  "progress": {
+    "tasksCompleted": "مشنز مکمل ہوئے",
+    "lessonsCompleted": "ٹریننگ مکمل ہوئی",
+    "overall": "کل مشنز"
+  },
+  "learning": {
+    "title": "ٹریننگ",
+    "suggested": "آج کی ٹریننگ",
+    "start": "شروع کریں"
+  },
+  "viewer": {
+    "markContinue": "XP حاصل کریں اور جاری رکھیں",
+    "markTask": "مشن کا XP حاصل کریں",
+    "taskCompleted": "مشن مکمل! 🎉",
+    "allDone": "تمام ٹریننگ مکمل! 🎉",
+    "taskDoneToast": "مشن مکمل ہوا",
+    "allTasks": "تمام مشنز دیکھیں"
+  },
+  "roadmaps": {
+    "tasks": {
+      "none": "اس مرحلے کے لیے کوئی مشنز دستیاب نہیں۔"
+    },
+    "card": {
+      "tasks": "{done} / {total} مشنز"
+    }
+  }
+}
