@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,7 +31,7 @@ export default async function RoadmapDetailPage({
 
   async function getRoadmap(id: string): Promise<Roadmap | null> {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/roadmaps/${id}`,
+      `${API_BASE}/roadmaps/${id}`,
       {
         headers: await authHeader(),
         cache: "no-store",
@@ -50,8 +51,8 @@ export default async function RoadmapDetailPage({
   }
 
   return (
-    <main className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl">
       <RoadmapDetailClient key={contentKey(roadmap)} roadmap={roadmap} />
-    </main>
+    </div>
   );
 }

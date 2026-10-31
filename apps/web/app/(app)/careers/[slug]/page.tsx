@@ -26,7 +26,7 @@ export default async function CareerDetailPage({
   const salary = salaryRange(career.salary_min_pkr, career.salary_max_pkr);
 
   return (
-    <main className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl">
       <Link
         href="/careers"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -103,7 +103,7 @@ export default async function CareerDetailPage({
             key={skill.name}
             className="flex items-center gap-3 rounded-2xl border p-3 text-sm"
           >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-violet/15 text-xs font-semibold text-brand-violet">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-violet/15 text-xs font-semibold text-violet-700 dark:text-brand-violet-light">
               {i + 1}
             </span>
             <span className="min-w-0 break-words">{ct.skill(skill.name)}</span>
@@ -135,6 +135,6 @@ export default async function CareerDetailPage({
           </li>
         ))}
       </ul>
-    </main>
+    </div>
   );
 }

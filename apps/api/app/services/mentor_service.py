@@ -1,6 +1,7 @@
 from uuid import UUID
 from app.services.achievement_service import AchievementService
 
+from app.core.analytics import track
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -316,6 +317,8 @@ class MentorService:
                 "Please try again."
                 ),
             )
+
+        track(profile.id, "mentor_message_sent")
 
         try:
             user_message = await (

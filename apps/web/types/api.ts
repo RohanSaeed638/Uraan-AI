@@ -325,6 +325,7 @@ export interface MentorSendResult {
 
 export interface ProfileData {
   id: string;
+  role?: "user" | "admin";
   full_name: string;
   language: string;
   country: string | null;
@@ -358,7 +359,7 @@ export interface ProfileData {
 export type ProfileChanges = Partial<
   Omit<
     ProfileData,
-    "id" | "onboarding_completed" | "streak_days" | "xp" | "created_at"
+    "id" | "role" | "onboarding_completed" | "streak_days" | "xp" | "created_at"
   >
 >;
 

@@ -1,0 +1,45 @@
+# Runs the whole app locally in containers:  docker compose up --build
+# Reads apps/api/.env for the API; the web app's NEXT_PUBLIC_* values come from
+# the shell or a root .env file (see apps/web/.env.example). The database and
+# sign-in stay on Supabase.
+services:
+  api:
+    build: ./apps/api
+    env_file: apps/api/.env
+    environment:
+      RUN_MIGRATIONS: "1"
+      CORS_ORIGINS: http://localhost:3000
+      WEB_URL: http://localhost:3000
+      API_PUBLIC_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health/ready', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    environment:
+      # Server-side calls from the web container reach the API by its service name.
+      INTERNAL_API_URL: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # Daily reminders every 15 minutes (the same job a hosting cron would run).
+  reminders:
+    build: ./apps/api
+    env_file: apps/api/.env
+    command: ["sh", "-c", "while true; do python -m app.workers.send_reminders; sleep 900; done"]
+    depends_on:
+      - api

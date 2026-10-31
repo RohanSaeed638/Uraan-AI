@@ -95,6 +95,24 @@ class RoadmapTaskRepository:
             "completed": completed or 0,
         }
 
+    async def get_progress_for_roadmaps(self, roadmap_ids: list[UUID]) -> dict[UUID, dict]:
+        """Task totals for many roadmaps in one query (the list page used to ask once per roadmap)."""
+        if not roadmap_ids:
+            return {}
+
+        rows = await self.db.execute(
+            select(
+                RoadmapPhase.roadmap_id,
+                func.count(RoadmapTask.id),
+                func.sum(RoadmapTask.completed.cast(Integer)),
+            )
+            .join(RoadmapPhase, RoadmapPhase.id == RoadmapTask.phase_id)
+            .where(RoadmapPhase.roadmap_id.in_(roadmap_ids))
+            .group_by(RoadmapPhase.roadmap_id)
+        )
+
+        return {rid: {"total": total or 0, "completed": done or 0} for rid, total, done in rows.all()}
+
     async def get_task_for_user(
         self,
         task_id: UUID,

@@ -16,6 +16,7 @@ import {
 
 import { api } from "@/lib/api/client";
 import { setUnitCompleted } from "@/lib/api/units";
+import { usePendingLessons } from "@/lib/use-pending-lessons";
 import { formatMinutes, getUnitMeta, isSearchLink, unitLabel } from "@/lib/units";
 import { ExerciseDetails, ProjectDetails, RoadmapTask } from "@/types/roadmap";
 
@@ -71,6 +72,10 @@ export default function UnitViewer({
   const [showComplete, setShowComplete] = useState(false);
 
   const unit = units[index];
+  const ready = (unit.status ?? "ready") === "ready";
+
+  // Lessons are written behind the plan: this page refreshes as they finish.
+  usePendingLessons(task.id, units);
   const meta = getUnitMeta(unit.type);
   const Icon = meta.icon;
   const isLast = index === units.length - 1;
@@ -276,6 +281,22 @@ export default function UnitViewer({
         </div>
       )}
 
+      {!ready ? (
+        <Card className="mt-6 items-center gap-3 p-10 text-center" role="status">
+          {unit.status === "failed" ? (
+            <>
+              <p className="font-heading text-lg font-semibold">{t("writeFailedTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("writeFailedText")}</p>
+            </>
+          ) : (
+            <>
+              <Loader2 className="h-6 w-6 animate-spin text-brand-gold" />
+              <p className="font-heading text-lg font-semibold">{t("writingTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("writingText")}</p>
+            </>
+          )}
+        </Card>
+      ) : (
       <div className="mt-6 space-y-6">
         {searchLink && unit.resource_url && (
           <a
@@ -347,6 +368,7 @@ export default function UnitViewer({
           </p>
         )}
       </div>
+      )}
 
       <div className="mt-10 flex items-center justify-between gap-3 border-t border-border pt-6">
         <Button
@@ -368,7 +390,7 @@ export default function UnitViewer({
               {t("skip")}
             </Button>
           )}
-          <Button onClick={completeAndContinue} disabled={saving} className="gap-1.5">
+          <Button onClick={completeAndContinue} disabled={saving || !ready} className="gap-1.5">
             {saving ? (
               <Loader2 size={15} className="animate-spin" />
             ) : done.has(unit.id) && !isLast ? (

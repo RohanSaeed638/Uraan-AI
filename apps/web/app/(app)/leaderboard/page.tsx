@@ -97,7 +97,7 @@ export default async function LeaderboardPage({
                 <p className="truncate font-medium">
                   {entry.display_name}
                   {entry.is_me && (
-                    <span className="ms-2 text-xs font-normal text-brand-violet">
+                    <span className="ms-2 text-xs font-normal text-violet-700 dark:text-brand-violet-light">
                       {t("you")}
                     </span>
                   )}

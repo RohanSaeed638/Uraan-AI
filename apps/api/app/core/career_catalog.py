@@ -25,7 +25,13 @@ def catalog_slugs() -> set[str]:
 CODING_CATEGORIES = {"Software", "Data and AI", "Security and Infrastructure"}
 
 
+def is_coding_category(category: str | None) -> bool:
+    return category in CODING_CATEGORIES
+
+
 def is_coding_career(slug: str | None) -> bool:
+    """From the catalogue file; careers added in the admin portal are checked
+    against the database by `career_is_coding` instead."""
     for career in load_catalog():
         if career["slug"] == slug:
             return career.get("category") in CODING_CATEGORIES

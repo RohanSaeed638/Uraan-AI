@@ -20,6 +20,14 @@ class Profile(BaseModel):
 
     full_name: Mapped[str] = mapped_column(String(255))
 
+    # "user" or "admin": who can open the admin portal.
+    role: Mapped[str] = mapped_column(
+        String(20),
+        default="user",
+        server_default="user",
+        nullable=False,
+    )
+
     language: Mapped[str] = mapped_column(
         String(10),
         default="en",

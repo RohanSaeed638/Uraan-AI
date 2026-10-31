@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import MotivationCard from "@/components/dashboard/MotivationCard";
@@ -6,7 +7,12 @@ import { ArrowRight, Clock, Flame, ListChecks, Sparkles, Zap } from "lucide-reac
 
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
-import { getDashboardSummary, getGamification } from "@/lib/server/data";
+import {
+  getAchievementsServer,
+  getDashboardSummary,
+  getGamification,
+} from "@/lib/server/data";
+import Highlights from "@/components/dashboard/Highlights";
 import { RoadmapSummary } from "@/types/roadmap";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -21,7 +27,7 @@ async function getRoadmaps(): Promise<RoadmapSummary[]> {
   } = await supabase.auth.getSession();
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/roadmaps`,
+    `${API_BASE}/roadmaps`,
     {
       headers: { Authorization: `Bearer ${session?.access_token}` },
       cache: "no-store",
@@ -38,10 +44,11 @@ export default async function DashboardPage() {
   const tStatus = await getTranslations("status");
   const locale = await getLocale();
 
-  const [roadmaps, summary, gamification] = await Promise.all([
+  const [roadmaps, summary, gamification, achievements] = await Promise.all([
     getRoadmaps(),
     getDashboardSummary(),
     getGamification(),
+    getAchievementsServer(),
   ]);
 
   const active = roadmaps.filter((r) => r.status === "active");
@@ -225,6 +232,8 @@ export default async function DashboardPage() {
           ))}
         </div>
       </div>
+
+      <Highlights achievements={achievements} />
     </div>
   );
 }

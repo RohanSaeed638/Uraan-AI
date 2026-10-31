@@ -16,7 +16,7 @@ function getGreeting() {
   return "evening";
 }
 
-export default function Navbar({ user }: { user: User }) {
+export default function Navbar({ user, isAdmin = false }: { user: User; isAdmin?: boolean }) {
   const t = useTranslations("topbar");
   const tNav = useTranslations("nav");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function Navbar({ user }: { user: User }) {
       >
         <Menu size={20} />
       </button>
-      <MobileSidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileSidebar open={menuOpen} onClose={() => setMenuOpen(false)} isAdmin={isAdmin} />
 
       <div className="min-w-0 flex-1 md:flex-none">
         <h2 className="truncate font-heading text-sm font-semibold sm:text-base">

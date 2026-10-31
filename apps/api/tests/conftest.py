@@ -14,3 +14,11 @@ def awards(monkeypatch):
 
     monkeypatch.setattr(GamificationService, "award", fake_award)
     return given
+
+
+# The limits are exercised in tests/test_rate_limit.py with their own switch;
+# everywhere else a test must not depend on how many requests came before it.
+from app.core.config import settings as _settings  # noqa: E402
+
+_settings.RATE_LIMIT_ENABLED = False
+_settings.AUTH_CACHE_SECONDS = 0

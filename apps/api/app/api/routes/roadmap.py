@@ -3,6 +3,7 @@ from app.services.profile_service import ProfileService
 from app.dependencies.services import get_roadmap_service, get_task_learning_unit_service
 from app.dependencies.services import get_profile_service
 from app.services.task_learning_unit_service import TaskLearningUnitService
+from app.core.rate_limit import daily_limit
 from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import get_db
@@ -38,6 +39,7 @@ def _status_of(roadmap) -> dict:
 @router.post(
     "/generate",
     response_model=RoadmapStatusResponse,
+    dependencies=[Depends(daily_limit("roadmap-generation", "RATE_LIMIT_ROADMAP_GENERATION"))],
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def generate_roadmap(
@@ -59,6 +61,7 @@ async def generate_roadmap(
 @router.post(
     "/{roadmap_id}/regenerate",
     response_model=RoadmapStatusResponse,
+    dependencies=[Depends(daily_limit("roadmap-generation", "RATE_LIMIT_ROADMAP_GENERATION"))],
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def regenerate_roadmap(
@@ -79,6 +82,7 @@ async def regenerate_roadmap(
 @router.post(
     "/{roadmap_id}/adapt",
     response_model=RoadmapStatusResponse,
+    dependencies=[Depends(daily_limit("roadmap-generation", "RATE_LIMIT_ROADMAP_GENERATION"))],
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def adapt_roadmap(

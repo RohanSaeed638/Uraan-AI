@@ -86,7 +86,7 @@ export default function AchievementsClient({
   const data = query.data;
 
   return (
-    <main className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8">
       <div>
         <PageHeader title={t("title")} subtitle={t("subtitle")} />
       </div>
@@ -163,6 +163,6 @@ export default function AchievementsClient({
           })}
         </>
       )}
-    </main>
+    </div>
   );
 }

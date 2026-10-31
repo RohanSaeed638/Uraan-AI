@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Code2,
@@ -12,6 +13,8 @@ import {
   ChevronRight,
   Clock,
   ExternalLink,
+  Loader2,
+  TriangleAlert,
   FolderKanban,
   PlayCircle,
   Target,
@@ -19,6 +22,8 @@ import {
 
 import { RoadmapTask } from "@/types/roadmap";
 
+import { retryLessons } from "@/lib/api/units";
+import { usePendingLessons } from "@/lib/use-pending-lessons";
 import { isSearchLink, unitAction, unitColor, unitLabel } from "@/lib/units";
 
 import RecommendedResources from "@/components/resources/RecommendedResources";
@@ -41,6 +46,18 @@ export default function TaskLearningPage({
     () => task.learning_units ?? [],
     [task.learning_units]
   );
+
+  const router = useRouter();
+  const writing = usePendingLessons(task.id, learningUnits);
+  const isReady = (unit: { status?: string }) => (unit.status ?? "ready") === "ready";
+
+  async function retry() {
+    try {
+      await retryLessons(task.id);
+    } finally {
+      router.refresh();
+    }
+  }
 
   /*
    * Get all available days.
@@ -112,7 +129,7 @@ export default function TaskLearningPage({
    */
   const nextUnit = useMemo(() => {
     return learningUnits.find(
-      (unit) => !unit.completed
+      (unit) => !unit.completed && isReady(unit)
     );
   }, [learningUnits]);
 
@@ -313,6 +330,34 @@ export default function TaskLearningPage({
         </div>
 
       </section>
+
+      {writing.waiting > 0 && (
+        <section
+          role="status"
+          className="flex items-center gap-3 rounded-xl border border-brand-gold/40 bg-brand-gold/10 p-4 text-sm"
+        >
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-gold" />
+          <span>{t("writing", { ready: writing.ready, total: writing.total })}</span>
+        </section>
+      )}
+
+      {writing.failed > 0 && (
+        <section
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm"
+        >
+          <span className="flex items-center gap-2 font-medium text-destructive">
+            <TriangleAlert className="h-4 w-4" /> {t("writingFailed", { count: writing.failed })}
+          </span>
+          <button
+            type="button"
+            onClick={retry}
+            className="rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            {t("retryWriting")}
+          </button>
+        </section>
+      )}
 
       {/* -------------------------------------------------- */}
       {/* Continue Learning */}
@@ -538,7 +583,7 @@ export default function TaskLearningPage({
         {/* Current Day */}
         {/* ------------------------------------------------ */}
 
-        <main className="min-w-0 space-y-5">
+        <div className="min-w-0 space-y-5">
 
           {/* Day header */}
 
@@ -731,6 +776,7 @@ export default function TaskLearningPage({
 
                         <div className="mt-5 flex flex-wrap items-center gap-3">
 
+                          {isReady(unit) ? (
                           <Link
                             href={`/roadmaps/${roadmapId}/task/${task.id}/learn/${unit.id}`}
                             className="
@@ -752,6 +798,16 @@ export default function TaskLearningPage({
 
                             <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                           </Link>
+                          ) : (
+                            <span className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm text-muted-foreground">
+                              {unit.status === "failed" ? (
+                                <TriangleAlert className="h-4 w-4 text-destructive" />
+                              ) : (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              )}
+                              {unit.status === "failed" ? t("lessonFailed") : t("lessonWriting")}
+                            </span>
+                          )}
 
                           {unit.resource_url && (
                             <a
@@ -853,7 +909,7 @@ export default function TaskLearningPage({
               </section>
             )}
 
-        </main>
+        </div>
 
       </div>
 

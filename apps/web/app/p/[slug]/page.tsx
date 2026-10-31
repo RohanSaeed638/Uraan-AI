@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "lucide-react";
@@ -10,7 +11,7 @@ import { Card } from "@/components/ui/card";
 async function getPublicPortfolio(slug: string): Promise<PublicPortfolio | null> {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/portfolio/public/${encodeURIComponent(slug)}`,
+      `${API_BASE}/portfolio/public/${encodeURIComponent(slug)}`,
       { cache: "no-store" }
     );
     return res.ok ? ((await res.json()) as PublicPortfolio) : null;
@@ -49,7 +50,7 @@ export default async function PublicPortfolioPage({
   const t = await getTranslations("public");
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main id="main" className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-heading text-4xl font-bold">{portfolio.name}</h1>
       {portfolio.headline && (
         <p className="mt-2 text-lg text-muted-foreground">

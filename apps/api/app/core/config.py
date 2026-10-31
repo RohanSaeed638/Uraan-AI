@@ -28,7 +28,8 @@ class Settings(BaseSettings):
     SUPABASE_JWT_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    REDIS_URL: str
+    # Not used yet (rate limits use RATE_LIMIT_STORAGE_URI); kept so existing .env files still load.
+    REDIS_URL: str = ""
 
     # Web push (generate with `vapid --gen`). Push is disabled when unset;
     # in-app notifications still work.
@@ -47,6 +48,33 @@ class Settings(BaseSettings):
     # links inside emails (open the app, unsubscribe).
     WEB_URL: str = "http://localhost:3000"
     API_PUBLIC_URL: str = "http://localhost:8000"
+
+    # Logs: "json" for log services (the default when APP_ENV is production),
+    # "text" for reading in a terminal. SQL_ECHO prints every database statement.
+    LOG_FORMAT: str = ""
+    SQL_ECHO: bool = False
+    # A request slower than this is logged as a warning.
+    SLOW_REQUEST_MS: int = 1000
+
+    # Rate limits ("count/hour" or "count/day"). Counters live in memory unless
+    # RATE_LIMIT_STORAGE_URI points at Redis (redis://...), which several API
+    # processes need to share them.
+    # How long a verified sign-in token is trusted without asking Supabase again (0 = always ask).
+    AUTH_CACHE_SECONDS: int = 60
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_STORAGE_URI: str = "memory://"
+    RATE_LIMIT_ANONYMOUS: str = "50/hour"
+    RATE_LIMIT_AUTHENTICATED: str = "500/hour"
+    RATE_LIMIT_ADDRESS: str = "3000/hour"
+    RATE_LIMIT_AI_CHAT: str = "100/day"
+    RATE_LIMIT_ROADMAP_GENERATION: str = "10/day"
+
+    # Error tracking (Sentry) and product analytics (PostHog). Both do nothing
+    # until a key is set. Sentry sends a share of requests as performance traces.
+    SENTRY_DSN: str = ""
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
+    POSTHOG_API_KEY: str = ""
+    POSTHOG_HOST: str = "https://eu.i.posthog.com"
 
     # Who can open the admin portal on first sign-in, comma separated emails.
     # They are made admins the first time they call an admin endpoint; after

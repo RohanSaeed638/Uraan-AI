@@ -901,7 +901,9 @@
     "openMenu": "Menu kholain",
     "closeMenu": "Menu band karein",
     "upgradeTitle": "Pro mein upgrade karein",
-    "upgradeText": "Advanced roadmaps aur AI features unlock karein."
+    "upgradeText": "Advanced roadmaps aur AI features unlock karein.",
+    "admin": "Admin",
+    "quick": "Jaldi navigation"
   },
   "topbar": {
     "morning": "Subha bakhair, {name}! 👋",
@@ -961,7 +963,13 @@
     "xpToNext": "Agla level ke liye {current}/{total} XP",
     "yourRoadmaps": "Aapke Roadmaps",
     "viewAll": "Sab dekhein",
-    "updated": "Update hua {date}"
+    "updated": "Update hua {date}",
+    "seeDetails": "Details dekhein",
+    "upcomingProject": "Aane wala project",
+    "projectDone": "Ho gaya. Zabardast khela!",
+    "projectDaysLeft": "{count, plural, one {# din baqi} other {# din baqi}} is mahine, {xp} bonus XP",
+    "openProject": "Project kholen",
+    "recentAchievements": "Haali ki kamyabiyan"
   },
   "roadmaps": {
     "title": "Mere Roadmaps",
@@ -1101,7 +1109,12 @@
     "dayDone": "Din {day} mukammal hua",
     "dayDoneText": "Shandar kaam. Aap agle hissa par jaane ke liye tayar hain.",
     "toDay": "Din {day} par jari rakhein",
-    "furtherReading": "Mazeed mutala'a"
+    "furtherReading": "Mazeed mutala'a",
+    "writing": "Aap ka plan tayar hai. Hum sabaq likh rahe hain abhi: {ready} mein se {total} tayar hain, aur aur bhi aate rahenge jaise jaise complete honge.",
+    "writingFailed": "{count, plural, one {# sabaq nahi likha ja saka.} other {# sabaq nahi likhe ja sake.}}",
+    "retryWriting": "Dobara koshish karein",
+    "lessonWriting": "Ye sabaq likha ja raha hai…",
+    "lessonFailed": "Nahi likha ja saka"
   },
   "learning": {
     "title": "Learning",
@@ -1161,7 +1174,11 @@
     "skip": "Chhor dein",
     "next": "Agla",
     "finish": "Khatam karein",
-    "markContinue": "Complete mark karein & jari rakhein"
+    "markContinue": "Complete mark karein & jari rakhein",
+    "writingTitle": "Ye sabaq likha ja raha hai",
+    "writingText": "Ye thodi dair mein yahan nazar aayega. Aapko refresh karne ki zarurat nahi.",
+    "writeFailedTitle": "Ye sabaq nahi likha ja saka",
+    "writeFailedText": "Task par wapas ja kar \"Dobara koshish karein\" chunein taake phir se likha ja sake."
   },
   "filters": {
     "status": "Halat",
@@ -1412,7 +1429,39 @@
     "f3": "Apni taraqqi track karein",
     "f4": "Asli skills banayein",
     "start": "Shuru karein",
-    "haveAccount": "Pehle se account hai? <link>Sign in karein</link>"
+    "haveAccount": "Pehle se account hai? <link>Sign in karein</link>",
+    "signInShort": "Sign in karein",
+    "f1Text": "Aapke career ka poora plan chand seconds mein, free courses se bana hua.",
+    "f2Text": "Sabaq jo aapke level, device aur waqt ke mutabiq hain.",
+    "f3Text": "XP, streaks, kamyabiyan aur job-readiness score.",
+    "f4Text": "Projects aur portfolio jo aap employers ko dikha sakte hain.",
+    "careersTitle": "Apni pasand ka career chunein",
+    "careersText": "Pakistan ke liye chaudah careers, salary ranges, zaroori skills aur unko seekhnay ke free tareeqay.",
+    "c1": "Web Developer",
+    "c2": "Data Analyst",
+    "c3": "Mobile App Developer",
+    "c4": "AI / ML Engineer",
+    "c5": "UI/UX Designer",
+    "c6": "Digital Marketer",
+    "featuresTitle": "Woh sab jo aapko wahan pohanchane ke liye chahiye",
+    "howTitle": "Yeh kaise kaam karta hai",
+    "s1": "Apne baare mein batayein",
+    "s1Text": "Aapka goal, aapka level aur kitne ghante roz padh sakte hain.",
+    "s2": "Apna roadmap hasil karein",
+    "s2Text": "Ek marhala band plan jisme haftawari milestones, sabaq aur projects hain.",
+    "s3": "Seekhein aur level up karein",
+    "s3Text": "Sabaq mukammal karein, apni streak banayein aur dekhein kitne job-ready hain.",
+    "faqTitle": "Sawalat",
+    "q1": "Kya yeh waqai free hai?",
+    "q1a": "Ji haan. Beta ke dauran sab kuch free hai.",
+    "q2": "Kya mujhe koi tajurba chahiye?",
+    "q2a": "Nahin. Shuru karte waqt apna level chunein aur plan uske mutabiq hoga.",
+    "q3": "Kaun si zubaanain support hoti hain?",
+    "q3a": "English, Urdu aur Roman Urdu, AI ke likhe hue sabaq samait.",
+    "q4": "Kya main apne phone par use kar sakta hoon?",
+    "q4a": "Ji haan. Yeh kisi bhi phone, tablet ya laptop par kaam karta hai.",
+    "ctaTitle": "Udaan bharne ke liye tayar?",
+    "ctaText": "Apna pehla roadmap paanch minute se kam mein banayein."
   },
   "public": {
     "projects": "Projects",
@@ -1490,7 +1539,20 @@
     "unable_to_load_user_settings": "User settings load karne mein masla hai",
     "learning_unit_not_found": "Learning unit nahin mili",
     "could_not_prepare_the_lessons_right_now_please_try_again": "Abhi sabaq tayar nahin kar sakte. Barah-e-karam dobara koshish karein.",
-    "this_is_taking_longer_than_expected_check_my_roadmaps_in_a_minute": "Yeh expected se zyada waqt le raha hai. Ek minute mein My Roadmaps check karein."
+    "this_is_taking_longer_than_expected_check_my_roadmaps_in_a_minute": "Yeh expected se zyada waqt le raha hai. Ek minute mein My Roadmaps check karein.",
+    "this_unsubscribe_link_is_not_valid": "Yeh unsubscribe link valid nahin hai.",
+    "you_do_not_have_access_to_the_admin_portal": "Aap ke paas admin portal ka access nahin hai.",
+    "user_not_found": "User nahin mila",
+    "a_career_with_this_address_already_exists": "Is address par pehle se career mojood hai.",
+    "a_resource_with_this_link_already_exists": "Is link par pehle se resource mojood hai.",
+    "the_end_time_must_be_in_the_future": "End time mustaqbil mein hona chahiye.",
+    "announcement_not_found": "Announcement nahin mila",
+    "you_cannot_remove_your_own_admin_access": "Aap apna admin access nahin hata sakte.",
+    "there_must_be_at_least_one_admin": "Kam az kam ek admin hona zaroori hai.",
+    "unknown_career_path": "Pata nahin chalne wala career path",
+    "you_have_reached_today_s_limit_for_this_please_try_again_tomorrow": "Aap ne aaj ke liye is ka limit poora kar liya hai. Barah-e-karam kal dobara koshish karein.",
+    "this_lesson_is_still_being_written_try_again_in_a_moment": "Ye sabaq abhi likha ja raha hai. Thodi dair baad dobara koshish karein.",
+    "you_do_not_have_a_roadmap_yet": "Aap ke paas abhi tak roadmap nahi hai."
   },
   "catalog": {
     "careers": {
@@ -1681,5 +1743,57 @@
     "invalidTitle": "Yeh link valid nahin hai",
     "invalidText": "Ho sakta hai yeh adhoora ya purana ho. Sign in karein aur Settings mein email notifications badlein.",
     "signIn": "Sign in karein"
+  },
+  "announcements": {
+    "dismiss": "Band karein",
+    "label": "Announcements"
+  },
+  "a11y": {
+    "skip": "Seedha main content par jayein",
+    "progress": "Taraqqi"
+  },
+  "errorPages": {
+    "notFoundTitle": "Lagta hai aap roadmap se bahar hain",
+    "notFoundText": "Hum us page ko nahin dhoondh sakein. Shayad woh move ho gaya hai, ya link galat hai.",
+    "home": "Shuruat par wapas jao",
+    "errorTitle": "Hamari taraf se kuch galat ho gaya",
+    "errorText": "Humein iska pata chal gaya hai. Barah-e-karam thodi dair baad dobara koshish karein.",
+    "retry": "Dobara koshish karein",
+    "offlineTitle": "Aap offline hain",
+    "offlineText": "Apni internet connection check karein, phir dobara koshish karein. Aapki progress save hai."
+  },
+  "activity": {
+    "title": "Aapki activity",
+    "summary": "{count, plural, =0 {Aakhri chaar mahino mein koi active din nahin} one {Aakhri chaar mahino mein # active din} other {Aakhri chaar mahino mein # active din}}",
+    "day": "{date}: {count, plural, =0 {koi activity nahin} one {# action} other {# actions}}",
+    "weekly": "Har hafta kamaya gaya XP",
+    "xp": "XP"
+  },
+  "site": {
+    "navLabel": "Main",
+    "footerLabel": "Footer",
+    "about": "Baare mein",
+    "pricing": "Pricing",
+    "signIn": "Sign in",
+    "start": "Shuru karein",
+    "copyright": "(c) {year} Uraan AI. Beta ke dauran free hai.",
+    "aboutTitle": "Career guidance jo aapke saath chalti hai",
+    "aboutIntro": "Uraan AI Pakistan ke students aur career changers ko career chun-ne, plan banane aur usay mukammal karne mein madad karta hai.",
+    "about1Title": "Aap ke liye banaya gaya plan",
+    "about1Text": "Humein apna goal, level aur free time batayein. Hum asli, free resources se week-by-week roadmap banate hain, aur zindagi ke masail par dobara likhte hain.",
+    "about2Title": "Aisi learning jo practical hai",
+    "about2Text": "Har task chhote sabaq, exercises aur projects mein toot-ta hai, taake aap sirf videos dekhne ke bajaye cheezein banayein.",
+    "about3Title": "Aisa mentor jo kabhi nahin sota",
+    "about3Text": "AI mentor se kuch bhi poochein, apna code review karwayein, interview ki practice karein aur apne projects ko portfolio mein badlein.",
+    "pricingTitle": "Beta ke dauran free hai",
+    "pricingIntro": "Beta ke dauran har learner ke liye sab kuch open hai. Card ki zarurat nahin.",
+    "betaPlan": "Beta plan",
+    "free": "Free",
+    "p1": "14 careers ke liye personalised roadmaps",
+    "p2": "Sabaq, exercises aur projects",
+    "p3": "AI mentor, code review aur mock interviews",
+    "p4": "Planner, reminders aur progress tracking",
+    "p5": "Resume aur public portfolio",
+    "pricingNote": "Agar paid plans baad mein aayein, to hum aapko pehle se bata denge."
   }
 }

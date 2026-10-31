@@ -3,7 +3,9 @@ import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/shared/PageHeader";
 import { BookOpen, CheckSquare, Clock, TrendingUp } from "lucide-react";
 
-import { getProgressOverview } from "@/lib/server/data";
+import { getActivity, getProgressOverview } from "@/lib/server/data";
+import ActivityChart from "@/components/shared/ActivityChart";
+import ActivityHeatmap from "@/components/shared/ActivityHeatmap";
 import { formatMinutes } from "@/lib/units";
 
 import { Card } from "@/components/ui/card";
@@ -17,7 +19,25 @@ const pct = (done: number, total: number) =>
 export default async function ProgressPage() {
   const t = await getTranslations("progress");
   const tUnit = await getTranslations("unit");
-  const overview = await getProgressOverview();
+  const tAct = await getTranslations("activity");
+  const [overview, activity] = await Promise.all([getProgressOverview(), getActivity()]);
+  const activityDays = activity?.days ?? [];
+  const activeDays = activityDays.length;
+
+  // XP per week for the last 12 weeks, oldest first, labelled by the week's Monday.
+  const now = new Date();
+  const weekly = Array.from({ length: 12 }, (_, i) => {
+    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (11 - i) * 7));
+    const begin = new Date(end);
+    begin.setUTCDate(end.getUTCDate() - 6);
+    const from = begin.toISOString().slice(0, 10);
+    const to = end.toISOString().slice(0, 10);
+
+    return {
+      week: `${begin.getUTCDate()}/${begin.getUTCMonth() + 1}`,
+      xp: activityDays.filter((d) => d.date >= from && d.date <= to).reduce((a, d) => a + d.xp, 0),
+    };
+  });
 
   const rows = overview?.roadmap_progress ?? [];
 
@@ -78,6 +98,22 @@ export default async function ProgressPage() {
             </Card>
           ))}
         </div>
+      </div>
+
+      <h2 className="font-heading mt-10 text-lg font-semibold">{tAct("title")}</h2>
+      <div className="mt-3 grid gap-4 lg:grid-cols-2">
+        <Card className="gap-3 p-5">
+          <p className="text-sm text-muted-foreground">{tAct("summary", { count: activeDays })}</p>
+          <ActivityHeatmap
+            days={activityDays}
+            label={tAct("summary", { count: activeDays })}
+            dayLabel={(date, count) => tAct("day", { date, count })}
+          />
+        </Card>
+        <Card className="gap-3 p-5">
+          <p className="text-sm text-muted-foreground">{tAct("weekly")}</p>
+          <ActivityChart data={weekly} label={tAct("xp")} />
+        </Card>
       </div>
 
       <h2 className="font-heading mt-10 text-lg font-semibold">{t("byRoadmap")}</h2>

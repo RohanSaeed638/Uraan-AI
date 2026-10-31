@@ -2,6 +2,8 @@
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
 
+import { useTranslations } from "next-intl"
+
 import { cn } from "@/lib/utils"
 
 function Progress({
@@ -10,9 +12,12 @@ function Progress({
   value,
   ...props
 }: ProgressPrimitive.Root.Props) {
+  const t = useTranslations("a11y")
+
   return (
     <ProgressPrimitive.Root
       value={value}
+      aria-label={t("progress")}
       data-slot="progress"
       className={cn("flex flex-wrap gap-3", className)}
       {...props}

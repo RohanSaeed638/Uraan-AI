@@ -167,7 +167,7 @@ export default function MentorClient() {
       </Card>
 
       <Card className="flex flex-col overflow-hidden p-0">
-        <div className="flex-1 space-y-4 overflow-y-auto p-6">
+        <div role="region" aria-label={t("title")} tabIndex={0} className="flex-1 space-y-4 overflow-y-auto p-6 focus-visible:outline-2 focus-visible:outline-ring">
           {messages.length === 0 && !send.isPending && (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/10">

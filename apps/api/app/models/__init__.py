@@ -32,3 +32,5 @@ from .library import LibraryResource, ResourceBookmark, ResourceRating
 from .ai_request import AiRequest
 from .daily_motivation import DailyMotivation
 from .planner import ScheduleOverride, SchedulePreference, ScheduleSnapshot
+from .admin import AuditLog, Announcement
+from . import indexes  # noqa: F401  (registers the composite indexes)

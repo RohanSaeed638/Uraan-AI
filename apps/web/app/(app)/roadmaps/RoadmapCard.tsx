@@ -22,7 +22,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-500",
-  completed: "bg-brand-violet/15 text-brand-violet",
+  completed: "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light",
   paused: "bg-amber-500/15 text-amber-500",
   generating: "bg-sky-500/15 text-sky-500",
   failed: "bg-destructive/15 text-destructive",

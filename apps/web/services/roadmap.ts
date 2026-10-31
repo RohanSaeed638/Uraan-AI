@@ -1,9 +1,10 @@
+import { API_BASE } from "@/lib/api-base";
 import { translateApiMessage } from "@/lib/api-errors";
 import axios from "axios";
 import { createClient } from "@/lib/supabase/client";
 import { RoadmapJobStatus } from "@/types/roadmap";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const API = API_BASE;
 const supabase = createClient();
 
 async function authHeader() {

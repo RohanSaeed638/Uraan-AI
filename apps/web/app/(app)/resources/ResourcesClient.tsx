@@ -82,7 +82,7 @@ export default function ResourcesClient() {
     !!(q || filters.career || filters.type || filters.difficulty || filters.free_only || filters.bookmarked);
 
   return (
-    <main className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="mt-6 gap-5 p-5">
@@ -195,6 +195,6 @@ export default function ResourcesClient() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

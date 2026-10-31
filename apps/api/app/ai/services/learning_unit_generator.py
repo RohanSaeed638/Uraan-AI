@@ -217,9 +217,13 @@ class LearningUnitGenerator:
 
         raise ValueError(f"Exercise '{unit.title}' could not be written: {last}")
 
-    async def generate(self, roadmap, task, profile=None) -> list[dict]:
-        """Validated lessons as dicts ready for `TaskLearningUnit(**d)`."""
-        coding = is_coding_career(roadmap.career_slug)
+    async def outline_units(self, roadmap, task, profile=None) -> list[PlanUnit]:
+        """The validated day-by-day plan: titles, types and what each lesson covers."""
+        coding = getattr(roadmap, "coding_career", None)
+
+        if coding is None:
+            coding = is_coding_career(roadmap.career_slug)
+
         prompt = build_outline_prompt(roadmap, task, profile, coding)
         last_error: Exception | None = None
 
@@ -228,58 +232,90 @@ class LearningUnitGenerator:
                 plan = await self._outline(prompt)
                 trim_exercises(plan)
                 validate_plan(plan, roadmap.learning_style, coding)
-                break
+
+                return normalize_order(plan)
             except (ValueError, ValidationError, json.JSONDecodeError) as exc:
                 last_error = exc
                 logger.warning("Outline attempt %s rejected: %s", attempt, exc)
-        else:
-            raise ValueError(f"No usable lesson plan: {last_error}")
 
-        units = normalize_order(plan)
+        raise ValueError(f"No usable lesson plan: {last_error}")
 
+    async def write_unit(self, unit: PlanUnit, units: list[PlanUnit], roadmap, task):
+        """(lesson text, type-specific details) for one lesson."""
+        if unit.type == "video":
+            return (unit.notes or "").strip() or None, None
+
+        if unit.type == "exercise":
+            exercise = await self._write_exercise(unit, roadmap, task)
+
+            return exercise.problem, exercise.as_details()
+
+        text = await self._write(unit, units, roadmap, task)
+
+        return text, project_details(unit) if unit.type == "project" else None
+
+    @staticmethod
+    def _row(unit: PlanUnit, content, details, url, status: str) -> dict:
+        return {
+            "day": unit.day,
+            "order": unit.order,
+            "type": unit.type,
+            "title": unit.title[:255],
+            "description": unit.description or None,
+            "content": content,
+            "details": details,
+            "prompt_version": prompt_version("lessons"),
+            "resource_url": url,
+            "estimated_minutes": unit.estimated_minutes,
+            "status": status,
+        }
+
+    async def generate_outline(self, roadmap, task, profile=None) -> list[dict]:
+        """The plan, fast: every lesson is saved with its title, day and length,
+        videos are finished (a link and notes), and each reading, project and
+        exercise is marked `pending` with its outline kept in `details["_plan"]`
+        for `write_unit` to fill in afterwards."""
+        units = await self.outline_units(roadmap, task, profile)
+        videos = [u for u in units if u.type == "video"]
+        urls = await resolve_many(
+            [(u.video_urls, u.search_query, f"{task.title} {u.title}") for u in videos]
+        )
+        resolved = {id(u): url for u, url in zip(videos, urls)}
+        rows = []
+
+        for u in units:
+            if u.type == "video":
+                rows.append(self._row(u, (u.notes or "").strip() or None, None, resolved.get(id(u)), "ready"))
+            else:
+                rows.append(self._row(u, None, {"_plan": u.model_dump()}, None, "pending"))
+
+        return rows
+
+    async def generate(self, roadmap, task, profile=None) -> list[dict]:
+        """Validated lessons as dicts ready for `TaskLearningUnit(**d)`, every
+        body written before it returns (see `generate_outline` for the quick path)."""
+        units = await self.outline_units(roadmap, task, profile)
         gate = asyncio.Semaphore(PARALLEL_WRITERS)
 
         async def body(unit: PlanUnit):
-            """(lesson text, type-specific details)."""
             if unit.type == "video":
-                return (unit.notes or "").strip() or None, None
+                return await self.write_unit(unit, units, roadmap, task)
 
             async with gate:
-                if unit.type == "exercise":
-                    exercise = await self._write_exercise(unit, roadmap, task)
-
-                    return exercise.problem, exercise.as_details()
-
-                text = await self._write(unit, units, roadmap, task)
-
-            return text, project_details(unit) if unit.type == "project" else None
+                return await self.write_unit(unit, units, roadmap, task)
 
         videos = [u for u in units if u.type == "video"]
 
         bodies, urls = await asyncio.gather(
             asyncio.gather(*(body(u) for u in units)),
             resolve_many(
-                [
-                    (u.video_urls, u.search_query, f"{task.title} {u.title}")
-                    for u in videos
-                ]
+                [(u.video_urls, u.search_query, f"{task.title} {u.title}") for u in videos]
             ),
         )
 
         resolved = {id(u): url for u, url in zip(videos, urls)}
 
         return [
-            {
-                "day": u.day,
-                "order": u.order,
-                "type": u.type,
-                "title": u.title[:255],
-                "description": u.description or None,
-                "content": content,
-                "details": details,
-                "prompt_version": prompt_version("lessons"),
-                "resource_url": resolved.get(id(u)),
-                "estimated_minutes": u.estimated_minutes,
-            }
+            self._row(u, content, details, resolved.get(id(u)), "ready")
             for u, (content, details) in zip(units, bodies)
         ]

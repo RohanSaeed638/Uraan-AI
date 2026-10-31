@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (tests, migrations)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: uraan
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      APP_NAME: Uraan AI
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/uraan
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: test
+      SUPABASE_JWT_SECRET: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/requirements.txt
+      - run: pip install -r requirements.txt pytest-cov
+
+      # Supabase provides the auth schema; a plain Postgres needs a stand-in with the
+      # columns the app and its tests use, and the roles Supabase creates.
+      - name: Prepare the database like Supabase
+        run: |
+          psql "postgresql://postgres:postgres@localhost:5432/uraan" <<'SQL'
+          create schema if not exists auth;
+          create table if not exists auth.users (
+            id uuid primary key default gen_random_uuid(),
+            email text,
+            email_confirmed_at timestamptz
+          );
+          do $$ begin
+            if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
+            if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
+          end $$;
+          SQL
+
+      - name: Migrate, and check models and migrations agree
+        run: |
+          alembic upgrade head
+          alembic check
+
+      - name: OpenAPI file is up to date
+        run: |
+          python scripts/dump_openapi.py
+          git diff --exit-code openapi.json
+
+      - name: Tests
+        run: pytest tests -q --cov=app --cov-report=term --cov-fail-under=75
+
+  web:
+    name: Web (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint --workspace apps/web
+      - name: Types
+        run: npx tsc --noEmit -p apps/web
+      - name: API types are up to date
+        run: |
+          npm run gen:api --workspace apps/web
+          git diff --exit-code apps/web/types/api.generated.ts
+      - name: Unit tests
+        run: npm test --workspace apps/web
+      - name: Build
+        run: npm run build --workspace apps/web

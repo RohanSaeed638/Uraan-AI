@@ -67,7 +67,7 @@ export default function WeekView({ schedule, weekStart, onMove, onDropLesson, on
                   className="group flex items-baseline justify-between gap-2 rounded-xl text-start outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                   aria-label={t("openDay", { day: `${weekdays[i]} ${date.getDate()}` })}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground group-hover:text-foreground">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-foreground/70 group-hover:text-foreground">
                     {weekdays[i]}
                   </span>
                   <span

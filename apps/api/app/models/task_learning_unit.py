@@ -75,6 +75,16 @@ class TaskLearningUnit(BaseModel):
         nullable=True,
     )
 
+    # ready, or while the body is still being written: pending (waiting),
+    # writing (being written now), failed (can be retried). The outline is saved
+    # first so a learner sees their plan in seconds; the lessons fill in behind it.
+    status: Mapped[str] = mapped_column(
+        String(12),
+        default="ready",
+        server_default="ready",
+        nullable=False,
+    )
+
     completed: Mapped[bool] = mapped_column(
         Boolean,
         default=False,

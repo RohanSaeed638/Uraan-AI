@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import Literal
 from uuid import UUID
@@ -6,12 +7,12 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.ai.prompts.language import SUPPORTED
-from app.core.career_catalog import catalog_slugs
 from app.models.enums import CareerStage, SkillLevel
 from app.models.enums import LearningStyle
 
-# The slugs of data/careers.json, so validation cannot drift from the catalogue.
-CAREER_SLUGS = catalog_slugs()
+# A career address: words joined by hyphens. Whether it exists is checked against
+# the database (admins can add careers), in ProfileService.
+CAREER_SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 LANGUAGES = set(SUPPORTED)
 
@@ -82,6 +83,14 @@ class UpdateProfileRequest(BaseModel):
 
     onboarding_completed: bool
 
+    @field_validator("career_slug")
+    @classmethod
+    def career_format(cls, value):
+        if not CAREER_SLUG.match(value):
+            raise ValueError("Unknown career path")
+
+        return value
+
     @field_validator(
         "learning_style", "skill_level", "career_stage", *_NEW_CHOICES,
         mode="before",
@@ -139,7 +148,7 @@ class PatchProfileRequest(BaseModel):
     @field_validator("career_slug")
     @classmethod
     def known_career(cls, value):
-        if value is not None and value not in CAREER_SLUGS:
+        if value is not None and not CAREER_SLUG.match(value):
             raise ValueError("Unknown career path")
 
         return value
@@ -181,6 +190,8 @@ REQUIRED_PROFILE_FIELDS = {
 class ProfileResponse(BaseModel):
 
     id: UUID
+
+    role: str = "user"
 
     full_name: str
 

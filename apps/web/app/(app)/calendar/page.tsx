@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import { getCalendarSchedule, getCalendarToken } from "@/lib/server/data";
 
 import PlannerClient from "@/components/planner/PlannerClient";
@@ -12,7 +13,7 @@ export default async function CalendarPage() {
     <PlannerClient
       initial={schedule}
       initialToken={subscription?.token ?? null}
-      apiUrl={process.env.NEXT_PUBLIC_API_URL ?? ""}
+      apiUrl={API_BASE}
     />
   );
 }

@@ -1,4 +1,7 @@
+import type { AchievementsResult } from "@/lib/api/achievements";
+import { API_BASE } from "@/lib/api-base";
 import { createClient } from "@/lib/supabase/server";
+import type { AdminStats } from "@/lib/api/admin";
 import { Roadmap, RoadmapSummary } from "@/types/roadmap";
 import {
   CalendarSchedule,
@@ -24,7 +27,7 @@ async function authedFetch(path: string) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  return fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+  return fetch(`${API_BASE}${path}`, {
     headers: { Authorization: `Bearer ${session?.access_token}` },
     cache: "no-store",
   });
@@ -65,6 +68,24 @@ async function getJson<T>(path: string): Promise<T | null> {
   }
 }
 
+/** Signed in as an admin (the API answers 403 to everyone else). */
+export async function getAdminMe(): Promise<
+  { id: string; name: string; email: string | null } | "forbidden" | "error"
+> {
+  try {
+    const res = await authedFetch("/admin/me");
+
+    if (res.ok) return await res.json();
+
+    // Only a clear "no" means not an admin; anything else is a problem to show, not a 404.
+    return res.status === 401 || res.status === 403 ? "forbidden" : "error";
+  } catch {
+    return "error";
+  }
+}
+
+export const getAdminStats = () => getJson<AdminStats>("/admin/stats");
+
 export const getDashboardSummary = () =>
   getJson<DashboardSummary>("/dashboard/summary");
 
@@ -93,6 +114,11 @@ export const getLeaderboard = (period: LeaderboardPeriod) =>
 
 export const getProgressOverview = () =>
   getJson<ProgressOverview>("/progress/overview");
+
+export const getAchievementsServer = () => getJson<AchievementsResult>("/achievements");
+
+export const getActivity = () =>
+  getJson<{ days: { date: string; count: number; xp: number }[] }>("/progress/activity?days=120");
 
 export const getProjects = () => getJson<ProjectList>("/projects");
 
@@ -124,7 +150,7 @@ export async function compareCareersServer(
       data: { session },
     } = await supabase.auth.getSession();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/careers/compare`, {
+    const res = await fetch(`${API_BASE}/careers/compare`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

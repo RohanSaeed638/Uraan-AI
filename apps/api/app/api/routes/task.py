@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_user
@@ -9,6 +9,7 @@ from app.dependencies.services import (
     get_roadmap_task_service,
     get_task_learning_unit_service,
 )
+from app.services.lesson_writer import needs_writer, write_pending_lessons
 from app.services.task_learning_unit_service import (
     TaskLearningUnitService,
 )
@@ -51,17 +52,44 @@ async def get_task(
 )
 async def create_learning_plan(
     task_id: UUID,
+    background_tasks: BackgroundTasks,
     current_user=Depends(get_current_user),
     service: TaskLearningUnitService = Depends(
         get_task_learning_unit_service
     ),
 ):
-    """Writes the task's lessons if it has none, then returns the task.
-    Calling it again returns the saved lessons without regenerating."""
-    return await service.ensure_plan(
+    """Plans the task's lessons if it has none (a few seconds), then returns
+    the task. The lesson text is written in the background, first day first:
+    each lesson's `status` says whether it is ready. Calling this again returns
+    what is saved and restarts any writing that was interrupted."""
+    task = await service.ensure_plan(
         task_id=task_id,
         auth_user_id=current_user.id,
     )
+
+    if needs_writer(task.learning_units):
+        background_tasks.add_task(write_pending_lessons, task.id)
+
+    return task
+
+
+@router.post(
+    "/{task_id}/learning-plan/retry",
+    response_model=RoadmapTaskResponse,
+)
+async def retry_lessons(
+    task_id: UUID,
+    background_tasks: BackgroundTasks,
+    current_user=Depends(get_current_user),
+    service: TaskLearningUnitService = Depends(
+        get_task_learning_unit_service
+    ),
+):
+    """Writes the lessons that failed again."""
+    task = await service.requeue_failed(task_id=task_id, auth_user_id=current_user.id)
+    background_tasks.add_task(write_pending_lessons, task.id)
+
+    return task
 
 
 @router.patch(

@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import { getTranslations } from "next-intl/server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -23,7 +24,7 @@ export default async function RoadmapPage({
   } = await supabase.auth.getSession();
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/roadmaps`,
+    `${API_BASE}/roadmaps`,
     {
       headers: { Authorization: `Bearer ${session?.access_token}` },
       cache: "no-store",
@@ -33,7 +34,7 @@ export default async function RoadmapPage({
   const roadmaps: RoadmapSummary[] = Array.isArray(data) ? data : [];
 
   return (
-    <main className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
       <PageHeader
         className="mb-6"
         title={t("title")}
@@ -46,6 +47,6 @@ export default async function RoadmapPage({
       ) : (
         <RoadmapList roadmaps={roadmaps} />
       )}
-    </main>
+    </div>
   );
 }

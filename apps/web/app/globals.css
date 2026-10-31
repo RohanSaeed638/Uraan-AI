@@ -72,8 +72,8 @@
   --card-foreground: #1a1530;
   --popover: #ffffff;
   --popover-foreground: #1a1530;
-  --primary: #f5a83c;
-  --primary-foreground: #241a05;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
   --secondary: #ece7fb;
   --secondary-foreground: #4c1d95;
   --muted: #f1eef9;
@@ -83,7 +83,7 @@
   --destructive: #dc2626;
   --border: #e4dff5;
   --input: #e4dff5;
-  --ring: #d98a0b;
+  --ring: #7c3aed;
   --chart-1: #7c3aed;
   --chart-2: #f5a83c;
   --chart-3: #22d3ee;
@@ -92,12 +92,12 @@
   --radius: 1rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #1a1530;
-  --sidebar-primary: #f5a83c;
-  --sidebar-primary-foreground: #241a05;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f1eef9;
   --sidebar-accent-foreground: #4c1d95;
   --sidebar-border: #e4dff5;
-  --sidebar-ring: #f5a83c;
+  --sidebar-ring: #7c3aed;
 }
 
 .dark {
@@ -107,8 +107,8 @@
   --card-foreground: #f3f1fa;
   --popover: #17133a;
   --popover-foreground: #f3f1fa;
-  --primary: #f5a83c;
-  --primary-foreground: #241a05;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
   --secondary: #241f47;
   --secondary-foreground: #d8cdfa;
   --muted: #1d1a3d;
@@ -118,7 +118,7 @@
   --destructive: #f87171;
   --border: color-mix(in oklch, white 8%, transparent);
   --input: #211d43;
-  --ring: #f5a83c;
+  --ring: #a78bfa;
   --chart-1: #a78bfa;
   --chart-2: #f5a83c;
   --chart-3: #22d3ee;
@@ -126,12 +126,12 @@
   --chart-5: #34d399;
   --sidebar: #100c24;
   --sidebar-foreground: #f3f1fa;
-  --sidebar-primary: #f5a83c;
-  --sidebar-primary-foreground: #241a05;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1d1840;
   --sidebar-accent-foreground: #f3f1fa;
   --sidebar-border: color-mix(in oklch, white 6%, transparent);
-  --sidebar-ring: #f5a83c;
+  --sidebar-ring: #7c3aed;
 }
 
 /* Urdu script: its own face, and a taller line so the marks above and below
@@ -201,4 +201,19 @@ html[lang="ur"] body {
 /* Native checkboxes and radios in the brand gold. */
 @utility accent-gold {
   accent-color: var(--color-brand-gold);
+}
+
+
+/* People who ask their system for less motion get none: animations and
+   transitions are cut to nothing. Spinners keep turning, because they are how
+   a person knows something is loading. */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *:not(.animate-spin)::before,
+  *:not(.animate-spin)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

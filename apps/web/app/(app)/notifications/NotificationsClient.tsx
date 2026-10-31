@@ -12,6 +12,7 @@ import {
   CheckCheck,
   Flame,
   LucideIcon,
+  Megaphone,
   Trophy,
 } from "lucide-react";
 
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   boss_defeated: Trophy,
   streak: Flame,
   schedule_updated: CalendarClock,
+  announcement: Megaphone,
 };
 
 type Filter = "all" | "unread";

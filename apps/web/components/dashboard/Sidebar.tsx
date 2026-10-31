@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   Mic,
   Settings,
+  ShieldCheck,
   Sparkles,
   Target,
   TrendingUp,
@@ -49,7 +50,9 @@ const items = [
   { key: "settings", href: "/settings", icon: Settings },
 ];
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+const adminItem = { key: "admin", href: "/admin", icon: ShieldCheck } as const;
+
+function SidebarContent({ onNavigate, isAdmin }: { onNavigate?: () => void; isAdmin?: boolean }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
 
@@ -61,7 +64,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Scrolls on short screens so the upgrade card never overlaps it. */}
       <nav className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-        {items.map((item) => {
+        {(isAdmin ? [...items, adminItem] : items).map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(item.href + "/");
 
@@ -94,10 +97,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 /** Fixed sidebar on large screens. */
-export default function Sidebar() {
+export default function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-e border-sidebar-border bg-sidebar p-5 lg:flex print:hidden">
-      <SidebarContent />
+      <SidebarContent isAdmin={isAdmin} />
     </aside>
   );
 }
@@ -106,9 +109,11 @@ export default function Sidebar() {
 export function MobileSidebar({
   open,
   onClose,
+  isAdmin = false,
 }: {
   open: boolean;
   onClose: () => void;
+  isAdmin?: boolean;
 }) {
   const t = useTranslations("nav");
 
@@ -147,7 +152,7 @@ export function MobileSidebar({
         >
           <X size={18} />
         </button>
-        <SidebarContent onNavigate={onClose} />
+        <SidebarContent onNavigate={onClose} isAdmin={isAdmin} />
       </aside>
     </div>
   );

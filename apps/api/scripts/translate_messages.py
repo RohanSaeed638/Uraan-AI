@@ -29,6 +29,7 @@ from app.ai.llm import AIUnavailableError, complete_text  # noqa: E402
 
 MESSAGES = ROOT.parent / "web" / "messages"
 BATCH = 40
+SKIP_PREFIXES = ("admin.",)
 
 GLOSSARY = """
 Keep these exactly as written, in Latin letters, in every language: Uraan AI, XP, AI, GitHub, YouTube,
@@ -216,7 +217,8 @@ async def main():
     for language in [args.only] if args.only else list(LANGUAGES):
         for source_path, target_pattern in jobs:
             target = Path(str(target_pattern).format(lang=language))
-            source = dict(flatten(load(source_path)))
+            # The admin portal is for staff and stays in English.
+            source = {k: v for k, v in flatten(load(source_path)) if not k.startswith(SKIP_PREFIXES)}
             existing = dict(flatten(load(target)))
 
             print(f"{target.relative_to(MESSAGES.parent)}: {len(source)} strings")
