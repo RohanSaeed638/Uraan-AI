@@ -19,6 +19,7 @@ import { authService } from "@/services/auth/auth";
 import { authErrorKey } from "@/lib/auth-errors";
 
 import AuthCard from "./AuthCard";
+import ResendConfirmation from "./ResendConfirmation";
 import AuthHeader from "./AuthHeader";
 import OAuthButtons from "./OAuthButtons";
 import PasswordInput from "@/components/shared/PasswordInput";
@@ -34,6 +35,8 @@ export default function LoginForm() {
   const tErrors = useTranslations("auth.errors");
 
   const [loading, setLoading] = useState(false);
+  // The address that tried to sign in before confirming its email.
+  const [unconfirmed, setUnconfirmed] = useState<string | null>(null);
 
   const {
     register,
@@ -56,9 +59,12 @@ export default function LoginForm() {
       if (error) {
         const key = authErrorKey(error.message);
 
+        setUnconfirmed(key === "emailNotConfirmed" ? data.email : null);
         toast.error(key ? tErrors(key) : error.message);
         return;
       }
+
+      setUnconfirmed(null);
 
       if (!result.session) {
         toast.error(tErrors("loginFailed"));
@@ -149,6 +155,15 @@ export default function LoginForm() {
           {t("signIn")}
         </LoadingButton>
       </form>
+
+      {unconfirmed && (
+        <div role="alert" className="mt-4 rounded-2xl border border-border bg-muted/50 p-4">
+          <p className="text-sm text-muted-foreground">{t("unconfirmedText")}</p>
+          <div className="mt-3">
+            <ResendConfirmation email={unconfirmed} />
+          </div>
+        </div>
+      )}
 
       <div className="my-6 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />

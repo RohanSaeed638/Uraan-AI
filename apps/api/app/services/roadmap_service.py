@@ -510,6 +510,13 @@ class RoadmapService:
                     detail="Roadmap not found",
                 )
 
+            # A running job would write into rows that no longer exist.
+            if roadmap.status == RoadmapStatus.GENERATING and not is_stale(roadmap):
+                raise HTTPException(
+                    status_code=409,
+                    detail="Wait for the roadmap to finish updating first.",
+                )
+
             # ORM/database cascades must cover dependent records.
             await self.roadmap_repository.delete_roadmap(
                 roadmap

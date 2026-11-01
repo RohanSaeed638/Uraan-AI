@@ -409,3 +409,23 @@ def test_the_list_shows_progress_as_whole_percentages():
     rows = run(service.get_all(uuid4()))
 
     assert [(r["title"], r["progress"], r["total_tasks"]) for r in rows] == [("A", 33, 3), ("B", 100, 4), ("C", 0, 0)]
+
+
+# ---- deleting while a job runs --------------------------------------------------------------------------------------------------
+
+
+def test_a_roadmap_that_is_being_built_cannot_be_deleted():
+    building = roadmap(S.GENERATING, status_before_job="active")
+    service = make(building)
+
+    refused(service.delete_roadmap(building.id, uuid4()), 409)
+
+    assert service.roadmap_repository.deleted is None and service.db.rollbacks == 1
+
+
+def test_a_roadmap_whose_job_was_lost_can_still_be_deleted():
+    lost = roadmap(S.GENERATING, status_before_job=None, updated_at=datetime.now(timezone.utc) - timedelta(hours=2))
+    service = make(lost)
+    run(service.delete_roadmap(lost.id, uuid4()))
+
+    assert service.roadmap_repository.deleted is lost

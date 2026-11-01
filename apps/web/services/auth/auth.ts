@@ -98,6 +98,15 @@ export class AuthService {
     });
   }
 
+  /** Sends the sign-up confirmation email again. */
+  async resendConfirmation(email: string) {
+    return await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+  }
+
   async loginWithOAuth(provider: "google" | "github") {
     return await supabase.auth.signInWithOAuth({
       provider,

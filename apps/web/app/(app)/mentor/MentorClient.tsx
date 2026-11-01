@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 const LIST_KEY = ["mentor", "conversations"] as const;
 const detailKey = (id: string) => ["mentor", "conversation", id] as const;
 
-export default function MentorClient() {
+export default function MentorClient({ initialConversationId = null }: { initialConversationId?: string | null }) {
   const t = useTranslations("mentorChat");
   const queryClient = useQueryClient();
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function MentorClient() {
     }
   }
 
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(initialConversationId);
   const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 

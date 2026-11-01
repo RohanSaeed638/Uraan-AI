@@ -30,7 +30,7 @@ import {
 import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
-const items = [
+export const NAV_ITEMS = [
   { key: "dashboard", href: "/dashboard", icon: LayoutGrid },
   { key: "careers", href: "/careers", icon: Compass },
   { key: "roadmaps", href: "/roadmaps", icon: Target },
@@ -64,7 +64,7 @@ function SidebarContent({ onNavigate, isAdmin }: { onNavigate?: () => void; isAd
 
       {/* Scrolls on short screens so the upgrade card never overlaps it. */}
       <nav className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-        {(isAdmin ? [...items, adminItem] : items).map((item) => {
+        {(isAdmin ? [...NAV_ITEMS, adminItem] : NAV_ITEMS).map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(item.href + "/");
 
@@ -87,11 +87,15 @@ function SidebarContent({ onNavigate, isAdmin }: { onNavigate?: () => void; isAd
         })}
       </nav>
 
-      <div className="mt-4 shrink-0 rounded-2xl bg-gradient-to-br from-brand-violet to-indigo-900 p-4 text-white">
-        <Sparkles size={18} className="text-brand-gold-light" />
+      <Link
+        href="/pricing"
+        onClick={onNavigate}
+        className="mt-4 block shrink-0 rounded-2xl bg-gradient-to-br from-brand-violet to-indigo-900 p-4 text-white transition hover:opacity-95"
+      >
+        <Sparkles size={18} className="text-brand-gold-light" aria-hidden />
         <p className="mt-2 text-sm font-semibold">{t("upgradeTitle")}</p>
-        <p className="mt-1 text-xs text-white/70">{t("upgradeText")}</p>
-      </div>
+        <p className="mt-1 text-xs text-white/80">{t("upgradeText")}</p>
+      </Link>
     </>
   );
 }

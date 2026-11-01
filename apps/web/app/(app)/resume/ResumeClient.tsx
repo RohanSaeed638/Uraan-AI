@@ -29,13 +29,15 @@ const KINDS: DocumentKind[] = ["resume", "cover_letter", "linkedin_summary"];
 
 export default function ResumeClient({
   initialDocuments,
+  openId = null,
 }: {
   initialDocuments: CareerDocument[];
+  openId?: string | null;
 }) {
   const t = useTranslations("resume");
   const [documents, setDocuments] = useState(initialDocuments);
   const [activeId, setActiveId] = useState<string | null>(
-    initialDocuments[0]?.id ?? null
+    initialDocuments.find((d) => d.id === openId)?.id ?? initialDocuments[0]?.id ?? null
   );
 
   const [kind, setKind] = useState<DocumentKind>("resume");

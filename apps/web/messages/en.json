@@ -381,6 +381,16 @@
       "loadFailed": "We could not load the versions.",
       "restoreFailed": "We could not restore that version.",
       "note": "Restoring brings back the tasks and which of them were done. Lesson progress is not restored."
+    },
+    "delete": {
+      "open": "Delete",
+      "title": "Delete this roadmap?",
+      "description": "“{title}” will be removed for good.",
+      "warning": "Its tasks, lessons and quiz results are deleted and cannot be brought back. The XP and achievements you already earned stay with you.",
+      "confirm": "Delete roadmap",
+      "cancel": "Keep it",
+      "done": "Roadmap deleted.",
+      "failed": "We could not delete the roadmap. Please try again."
     }
   },
   "resources": {
@@ -900,8 +910,8 @@
     "menu": "Navigation",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "upgradeTitle": "Upgrade to Pro",
-    "upgradeText": "Unlock advanced roadmaps and AI features.",
+    "upgradeTitle": "Free during beta",
+    "upgradeText": "Everything is unlocked while we test. See what is included.",
     "admin": "Admin",
     "quick": "Quick navigation"
   },
@@ -1232,7 +1242,8 @@
       "invalidCredentials": "Wrong email or password.",
       "emailNotConfirmed": "Please confirm your email first. Check your inbox.",
       "alreadyRegistered": "An account with this email already exists.",
-      "rateLimited": "Too many attempts. Please wait a little and try again."
+      "rateLimited": "Too many attempts. Please wait a little and try again.",
+      "mustAgree": "Please accept the Terms of Service and Privacy Policy to continue."
     },
     "email": "Email address",
     "emailPlaceholder": "you@example.com",
@@ -1280,7 +1291,17 @@
     "brandText": "Personalized roadmaps. Practical learning. Real career progress.",
     "feature1": "Personalized learning roadmaps",
     "feature2": "AI-powered content & guidance",
-    "feature3": "Track your progress"
+    "feature3": "Track your progress",
+    "consent": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
+    "oauthConsent": "By continuing you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>.",
+    "checkEmailTitle": "Check your email",
+    "checkEmailText": "We sent a confirmation link to {email}. Open it to activate your account.",
+    "checkEmailHint": "Nothing there? Look in your spam folder, or send it again.",
+    "resend": "Resend confirmation email",
+    "resendWait": "Resend in {seconds}s",
+    "resent": "We sent it again. Check your inbox and spam folder.",
+    "resendFailed": "We could not send the email. Please try again.",
+    "unconfirmedText": "This account is not confirmed yet. Open the link in the email we sent, or ask for a new one."
   },
   "portfolio": {
     "title": "Portfolio",
@@ -1973,6 +1994,42 @@
     "p3": "AI mentor, code review and mock interviews",
     "p4": "Planner, reminders and progress tracking",
     "p5": "Resume and public portfolio",
-    "pricingNote": "If paid plans arrive later, we will tell you well before anything changes."
+    "pricingNote": "If paid plans arrive later, we will tell you well before anything changes.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "contact": "Contact"
+  },
+  "search": {
+    "label": "Search the app",
+    "placeholder": "Search roadmaps, lessons, careers...",
+    "open": "Open search",
+    "close": "Close search",
+    "clear": "Clear search",
+    "results": "Search results",
+    "pages": "Pages",
+    "searching": "Searching...",
+    "none": "No results for “{query}”",
+    "failed": "Search is not available right now. Please try again.",
+    "groups": {
+      "roadmap": "Roadmaps",
+      "task": "Tasks",
+      "lesson": "Lessons",
+      "career": "Careers",
+      "resource": "Resources",
+      "document": "Documents",
+      "conversation": "Mentor chats"
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "intro": "Questions, problems or ideas? We read every message.",
+    "emailUs": "Email us",
+    "notConfigured": "The contact address has not been set up yet.",
+    "helpWith": "We can help with:",
+    "t1": "Something that is not working",
+    "t2": "Your account or sign-in",
+    "t3": "A request to see, correct or delete your data",
+    "t4": "Ideas for making Uraan AI better",
+    "include": "Please include the email you signed up with and, for a problem, what you were doing and what you saw."
   }
 }

@@ -156,6 +156,31 @@ Each phase was done in turn, verified, and reported before the next one started.
 - Dockerfiles for both apps, a compose file, `.env.example` files, a deployment guide, and a typed API description (`openapi.json` to generated TypeScript types).
 - Vitest component and helper tests, and a Playwright browser journey.
 
+### After the plan: launch readiness (1 November 2026)
+
+Found by a final review of the finished app, and fixed:
+
+- **Top-bar search** was only an empty input. It is now a real global search: one database query across the learner's
+  roadmaps, tasks, lessons, documents and mentor chats plus the careers and resource library, with the app's own pages
+  offered by name. Results are grouped, highlighted, and open on click or arrow keys and Enter; it works on phones through
+  an icon; the three pages it links into (resources, mentor, resume) now open the chosen item.
+- **Roadmaps could not be deleted** from the interface. There is now a confirmed Delete (and the server refuses to
+  delete one that is still being built).
+- **Legal and contact pages:** Terms of Service, Privacy Policy and Contact, linked from the footer, with a required
+  consent checkbox at sign-up (and a consent note on Google and GitHub sign-in). The texts describe what the app really
+  does today and **must be reviewed by the owner or a lawyer before launch**.
+- **Resend confirmation email:** shown after sign-up and when signing in with an unconfirmed address, with a 60-second wait.
+- **Account deletion on request:** the Privacy Policy promises it, and deleting a user in Supabase does *not* remove their
+  data (the tables are not linked). `scripts/delete_account.py` (dry run by default) carries it out; tested against the
+  real database.
+- **Share image** (`/opengraph-image`) for link previews, an honest "Free during beta" sidebar card that links to Pricing,
+  and a fix that makes clock times print the same on server and browser.
+
+New tests: 9 backend search tests, 4 account-deletion tests, 2 roadmap-delete tests, 20 web tests (search, resend, consent,
+time format). Web: 60 unit tests. Verified in a real browser: search by mouse, keyboard and on a phone; the delete flow;
+the legal pages and share image; sign-up consent; the check-your-email panel and resend button (with Supabase's replies
+simulated, because its built-in mailer refused real sign-ups, see below).
+
 ---
 
 ## 5. How each piece was worked: from code to verification
@@ -226,7 +251,11 @@ Deviations from the original documents, kept on purpose:
 **Written but never run:** the Docker images and compose file (no Docker on the development machine), and both GitHub workflows. Expect to fix small things on their first run (the CI database stand-in for Supabase's auth table is the likeliest).
 
 **Known open items**
-- One calendar hydration warning (React error 418) appeared once and did not recur; its cause was not found.
+- One React hydration warning (error 418) is logged on the Calendar page in the production build for accounts that have
+  lessons. The server and browser text were compared and match, it does not appear in development mode, and the page
+  works normally (React just re-renders it in the browser), so it is a console warning only. The cause was not found.
+- **Supabase's built-in email sender refuses most sign-ups** (HTTP 429, a very low hourly limit). Real users cannot
+  register until custom SMTP (Resend) is set in Supabase > Authentication.
 - The language selector on the landing page still highlights the active language in gold.
 - Parts still lightly tested: the repositories (covered only through real-database tests), the lesson generator's own functions, and the old `auth` routes (which may be dead code, because the web app signs in through Supabase directly).
 - Only the first lesson-outline step is slightly slower than its 15 s target.

@@ -381,6 +381,16 @@
       "loadFailed": "Versions load nahin ho sake.",
       "restoreFailed": "Wo version restore nahin ho saka.",
       "note": "Restore karne se tasks aur jo complete thay wo wapas aate hain. Sabaq ki progress restore nahin hoti."
+    },
+    "delete": {
+      "open": "Delete",
+      "title": "Kya aap is roadmap ko delete karna chahte hain?",
+      "description": "“{title}” hamesha ke liye hata diya jayega.",
+      "warning": "Iske tasks, sabaq aur quiz ke results delete ho jayenge aur wapas nahin laa sakte. Jo XP aur kamyabi aap ne hasil ki hain, wo aap ke paas rahengi.",
+      "confirm": "Roadmap delete karein",
+      "cancel": "Isay rakhein",
+      "done": "Roadmap delete ho gaya.",
+      "failed": "Roadmap delete nahin ho saka. Barah-e-karam dobara koshish karein."
     }
   },
   "resources": {
@@ -900,8 +910,8 @@
     "menu": "Navigation",
     "openMenu": "Menu kholain",
     "closeMenu": "Menu band karein",
-    "upgradeTitle": "Pro mein upgrade karein",
-    "upgradeText": "Advanced roadmaps aur AI features unlock karein.",
+    "upgradeTitle": "Beta ke dauran free",
+    "upgradeText": "Jab tak hum test kar rahe hain sab kuch unlocked hai. Dekhein kya shamil hai.",
     "admin": "Admin",
     "quick": "Jaldi navigation"
   },
@@ -1232,7 +1242,8 @@
       "invalidCredentials": "Email ya password ghalat hai.",
       "emailNotConfirmed": "Pehle apna email confirm karein. Inbox check karein.",
       "alreadyRegistered": "Is email se pehle se account maujood hai.",
-      "rateLimited": "Bohat zyada koshish ki gayi. Thodi dair baad dobara koshish karein."
+      "rateLimited": "Bohat zyada koshish ki gayi. Thodi dair baad dobara koshish karein.",
+      "mustAgree": "Barah-e-karam Terms of Service aur Privacy Policy ko qabool karein taake aage barh saken."
     },
     "email": "Email address",
     "emailPlaceholder": "aap@example.com",
@@ -1280,7 +1291,17 @@
     "brandText": "Personalized roadmaps. Practical learning. Real career progress.",
     "feature1": "Personalized learning roadmaps",
     "feature2": "AI-powered content & guidance",
-    "feature3": "Apni progress track karein"
+    "feature3": "Apni progress track karein",
+    "consent": "Main <terms>Terms of Service</terms> aur <privacy>Privacy Policy</privacy> se mutafiq hoon.",
+    "oauthConsent": "Aage barhne se aap hamare <terms>Terms</terms> aur <privacy>Privacy Policy</privacy> se mutafiq ho jaate hain.",
+    "checkEmailTitle": "Apna email check karein",
+    "checkEmailText": "Humne {email} par confirmation link bheja hai. Use khol kar apna account activate karein.",
+    "checkEmailHint": "Kuch nahin mila? Apne spam folder mein dekhein, ya dobara bhejein.",
+    "resend": "Confirmation email dobara bhejein",
+    "resendWait": "{seconds}s baad dobara bhejein",
+    "resent": "Humne dobara bhej diya hai. Apna inbox aur spam folder check karein.",
+    "resendFailed": "Email bhejna mumkin nahin hua. Barah-e-karam dobara koshish karein.",
+    "unconfirmedText": "Ye account abhi tak confirm nahin hua. Email mein jo link bheja hai use kholen, ya naya link maangain."
   },
   "portfolio": {
     "title": "Portfolio",
@@ -1794,6 +1815,42 @@
     "p3": "AI mentor, code review aur mock interviews",
     "p4": "Planner, reminders aur progress tracking",
     "p5": "Resume aur public portfolio",
-    "pricingNote": "Agar paid plans baad mein aayein, to hum aapko pehle se bata denge."
+    "pricingNote": "Agar paid plans baad mein aayein, to hum aapko pehle se bata denge.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "contact": "Rabita"
+  },
+  "search": {
+    "label": "App mein dhoondein",
+    "placeholder": "Roadmaps, sabaq, careers dhoondein...",
+    "open": "Search kholen",
+    "close": "Search band karein",
+    "clear": "Search saaf karein",
+    "results": "Search ke natije",
+    "pages": "Pages",
+    "searching": "Dhoondh rahe hain...",
+    "none": "“{query}” ke liye koi natija nahin mila",
+    "failed": "Search abhi available nahin hai. Barah-e-karam dobara koshish karein.",
+    "groups": {
+      "roadmap": "Roadmaps",
+      "task": "Tasks",
+      "lesson": "Sabaq",
+      "career": "Careers",
+      "resource": "Resources",
+      "document": "Documents",
+      "conversation": "Mentor chats"
+    }
+  },
+  "contact": {
+    "title": "Hum se rabta karein",
+    "intro": "Sawalat, masail ya ideas? Hum har paigham par nazar daalte hain.",
+    "emailUs": "Humein email karein",
+    "notConfigured": "Rabita ka address abhi set nahin hua.",
+    "helpWith": "Hum madad kar sakte hain:",
+    "t1": "Kuch jo kaam nahin kar raha",
+    "t2": "Aapka account ya sign-in",
+    "t3": "Aapke data ko dekhne, durust karne ya delete karne ki darkhwast",
+    "t4": "Uraan AI ko behtar banane ke ideas",
+    "include": "Barah-e-karam wo email shamil karein jis se aapne sign up kiya aur agar masla hai to batayein ke aap kya kar rahe thay aur kya dekha."
   }
 }

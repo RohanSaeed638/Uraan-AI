@@ -35,15 +35,15 @@ const EMPTY: ResourceFilters = {
   sort: "recommended",
 };
 
-export default function ResourcesClient() {
+export default function ResourcesClient({ initialQuery = "" }: { initialQuery?: string }) {
   const t = useTranslations("resources");
   const queryClient = useQueryClient();
   const { options: careers } = useCareerOptions();
 
-  const [filters, setFilters] = useState<ResourceFilters>(EMPTY);
+  const [filters, setFilters] = useState<ResourceFilters>({ ...EMPTY, q: initialQuery });
 
   // Search as the person types, but only ask the API once they pause.
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(initialQuery);
 
   useEffect(() => {
     const timer = setTimeout(() => setQ(filters.q ?? ""), 250);

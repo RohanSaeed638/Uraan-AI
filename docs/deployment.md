@@ -37,9 +37,22 @@ and the **web app** (Vercel). Do them in this order, because each needs the addr
 
 - Import the repository; **Root Directory** `apps/web`. The framework is detected as Next.js.
 - **Environment variables** (Production): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `NEXT_PUBLIC_API_URL` (the API's public address, no `/api/v1`), and optionally `NEXT_PUBLIC_SITE_URL`
-  and `NEXT_PUBLIC_SENTRY_DSN`. They are fixed at build time: change one, redeploy.
+  `NEXT_PUBLIC_API_URL` (the API's public address, no `/api/v1`), `NEXT_PUBLIC_CONTACT_EMAIL` (the address learners and data requests go to), and optionally
+  `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_SENTRY_DSN`. They are fixed at build time: change one, redeploy.
 - Back on the API, add the Vercel address to `CORS_ORIGINS`.
+
+## Before you open to the public
+
+- **Read the Terms (`/terms`) and Privacy Policy (`/privacy`) and have them checked** by someone who can advise on
+  Pakistani law (for example the governing-law clause, the age limit, and the 30-day deletion promise). They describe
+  what the app really does today; if you add a provider or a feature that handles new data, update the text and the
+  date in `apps/web/lib/site.ts`.
+- Set `NEXT_PUBLIC_CONTACT_EMAIL`. Without it the Contact page says the address is not set up.
+- **Deleting an account** is done on request (there is no button; the Privacy Policy promises it within 30 days).
+  Deleting the user in Supabase is **not enough**: the learner's data is not linked to it. Use
+  `python scripts/delete_account.py --email someone@example.com` in `apps/api` (with the production `DATABASE_URL`).
+  Without `--yes` it only shows what would be deleted. Check you are dealing with the account's owner first, and take a
+  backup if in doubt (see the backup runbook).
 
 ## 4. After the first deploy
 

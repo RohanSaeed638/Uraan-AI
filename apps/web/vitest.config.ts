@@ -4,7 +4,17 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { "@": path.resolve(__dirname) } },
+  resolve: {
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname) },
+      // The workspace has two copies of React (here and at the repository root). Libraries
+      // load the root one, so the app's code must too, or hooks fail with "dispatcher is null".
+      { find: /^react$/, replacement: path.resolve(__dirname, "../../node_modules/react") },
+      { find: /^react\/(.*)$/, replacement: path.resolve(__dirname, "../../node_modules/react") + "/$1" },
+      { find: /^react-dom$/, replacement: path.resolve(__dirname, "../../node_modules/react-dom") },
+      { find: /^react-dom\/(.*)$/, replacement: path.resolve(__dirname, "../../node_modules/react-dom") + "/$1" },
+    ],
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
