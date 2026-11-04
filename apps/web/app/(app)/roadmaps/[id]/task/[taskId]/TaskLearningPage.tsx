@@ -334,9 +334,9 @@ export default function TaskLearningPage({
       {writing.waiting > 0 && (
         <section
           role="status"
-          className="flex items-center gap-3 rounded-xl border border-brand-gold/40 bg-brand-gold/10 p-4 text-sm"
+          className="flex items-center gap-3 rounded-xl border border-brand-violet/40 bg-brand-violet/10 p-4 text-sm"
         >
-          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-gold" />
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-violet-600 dark:text-brand-violet-light" />
           <span>{t("writing", { ready: writing.ready, total: writing.total })}</span>
         </section>
       )}

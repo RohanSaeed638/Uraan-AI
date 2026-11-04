@@ -60,12 +60,12 @@ export default function AnnouncementBanner() {
               "flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm",
               warning
                 ? "border-amber-500/40 bg-amber-500/10"
-                : "border-brand-gold/40 bg-brand-gold/10"
+                : "border-brand-violet/40 bg-brand-violet/10"
             )}
           >
             <Icon
               size={16}
-              className={cn("mt-0.5 shrink-0", warning ? "text-amber-500" : "text-brand-gold")}
+              className={cn("mt-0.5 shrink-0", warning ? "text-amber-500" : "text-violet-600 dark:text-brand-violet-light")}
             />
             <p className="min-w-0 flex-1 break-words">
               <span className="font-semibold">{a.title}</span>

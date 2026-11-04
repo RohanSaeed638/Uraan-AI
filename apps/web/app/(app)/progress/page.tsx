@@ -90,10 +90,10 @@ export default async function ProgressPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {stats.map(({ icon: Icon, label, value }) => (
             <Card key={label} className="justify-center gap-2 p-5">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
                 <Icon size={17} />
               </span>
-              <p className="text-2xl font-bold leading-none">{value}</p>
+              <p className="num text-2xl font-bold leading-none">{value}</p>
               <p className="text-xs text-muted-foreground">{label}</p>
             </Card>
           ))}
@@ -123,7 +123,7 @@ export default async function ProgressPage() {
             <div className="flex items-center justify-between gap-4">
               <Link
                 href={`/roadmaps/${r.roadmap_id}`}
-                className="font-semibold hover:text-brand-gold-deep dark:hover:text-brand-gold"
+                className="font-semibold hover:text-violet-700 dark:hover:text-brand-violet-light"
               >
                 {r.title}
               </Link>

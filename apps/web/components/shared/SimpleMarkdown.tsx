@@ -32,7 +32,7 @@ function inline(text: string): ReactNode[] {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+          className="font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
         >
           {label}
         </a>

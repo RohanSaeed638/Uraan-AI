@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display), var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -138,6 +138,7 @@
    a line do not collide. */
 html[lang="ur"] {
   --font-sans: var(--font-urdu), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-urdu), ui-sans-serif, system-ui, sans-serif;
 }
 
 html[lang="ur"] body {
@@ -166,13 +167,13 @@ html[lang="ur"] body {
 
 @layer base {
   ::selection {
-    background: color-mix(in oklch, var(--color-brand-gold) 35%, transparent);
+    background: color-mix(in oklch, var(--color-brand-violet) 35%, transparent);
   }
 
   /* Slim scrollbars that match the theme. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in oklch, var(--color-brand-gold) 35%, transparent) transparent;
+    scrollbar-color: color-mix(in oklch, var(--color-brand-violet) 40%, transparent) transparent;
   }
 }
 
@@ -185,8 +186,8 @@ html[lang="ur"] body {
 
   &:hover {
     transform: translateY(-2px);
-    border-color: color-mix(in oklch, var(--color-brand-gold) 55%, transparent);
-    box-shadow: 0 10px 30px -12px color-mix(in oklch, var(--color-brand-gold) 35%, transparent);
+    border-color: color-mix(in oklch, var(--color-brand-violet) 55%, transparent);
+    box-shadow: 0 14px 34px -14px color-mix(in oklch, var(--color-brand-violet) 45%, transparent);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -216,4 +217,52 @@ html[lang="ur"] body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+
+/* Landing page: slow drift for the background glows. People who ask for less motion get none
+   (see the reduced-motion rule above). */
+@keyframes hero-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 22px, 0); }
+}
+
+.hero-float { animation: hero-drift 16s ease-in-out infinite; }
+.hero-float-slow { animation: hero-drift 24s ease-in-out infinite reverse; }
+
+
+/* ---- typography ---------------------------------------------------------- */
+
+/* Large type sits a little tighter. Urdu script is left alone: its letters join, and tracking breaks them. */
+.font-heading {
+  letter-spacing: -0.018em;
+}
+
+html[lang="ur"] .font-heading {
+  letter-spacing: 0;
+}
+
+/* Figures that read like instruments: a monospaced face with equal-width digits, so numbers that
+   change (XP, streaks, scores) do not jiggle, and columns of them line up. */
+@utility num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ---- depth --------------------------------------------------------------- */
+
+/* Cards look lit from above: in the dark theme a hairline highlight along the top edge and a
+   faint wash of light; in the light theme two soft shadows (a tight one and a wide, diffuse one). */
+[data-slot="card"] {
+  box-shadow:
+    0 1px 2px rgb(26 21 48 / 0.05),
+    0 12px 28px -14px rgb(26 21 48 / 0.18);
+}
+
+.dark [data-slot="card"] {
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.035), transparent 45%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 18px 40px -22px rgb(0 0 0 / 0.7);
 }

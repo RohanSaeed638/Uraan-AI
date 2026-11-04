@@ -57,7 +57,7 @@ export default function WeekView({ schedule, weekStart, onMove, onDropLesson, on
               <Card
                 className={cn(
                   "h-full min-h-56 gap-3 p-3",
-                  isToday && "border-brand-gold/70 bg-brand-gold/5",
+                  isToday && "border-brand-violet/70 bg-brand-violet/5",
                   past && !planned && "opacity-60"
                 )}
               >
@@ -73,7 +73,7 @@ export default function WeekView({ schedule, weekStart, onMove, onDropLesson, on
                   <span
                     className={cn(
                       "flex size-7 items-center justify-center rounded-full text-sm font-bold",
-                      isToday ? "bg-brand-gold text-[#241a05]" : "group-hover:bg-muted"
+                      isToday ? "bg-primary text-primary-foreground" : "group-hover:bg-muted"
                     )}
                   >
                     {date.getDate()}

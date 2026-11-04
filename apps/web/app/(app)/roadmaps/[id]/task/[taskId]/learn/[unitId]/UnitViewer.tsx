@@ -220,7 +220,7 @@ export default function UnitViewer({
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-brand-gold-deep dark:text-brand-gold">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-violet-700 dark:text-brand-violet-light">
           <Icon size={14} /> {unitLabel(unit.type, tUnit)}
         </span>
         {unit.estimated_minutes != null && (
@@ -290,7 +290,7 @@ export default function UnitViewer({
             </>
           ) : (
             <>
-              <Loader2 className="h-6 w-6 animate-spin text-brand-gold" />
+              <Loader2 className="h-6 w-6 animate-spin text-violet-600 dark:text-brand-violet-light" />
               <p className="font-heading text-lg font-semibold">{t("writingTitle")}</p>
               <p className="text-sm text-muted-foreground">{t("writingText")}</p>
             </>
@@ -355,7 +355,7 @@ export default function UnitViewer({
             rel="noopener noreferrer"
             className="flex items-center justify-between rounded-2xl border border-border p-4 transition hover:bg-muted"
           >
-            <span className="font-medium text-brand-gold-deep dark:text-brand-gold">
+            <span className="font-medium text-violet-700 dark:text-brand-violet-light">
               {unit.type === "project" ? t("openProject") : t("openResource")}
             </span>
             <ExternalLink size={16} className="text-muted-foreground" />

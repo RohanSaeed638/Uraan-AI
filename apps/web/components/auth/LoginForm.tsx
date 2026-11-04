@@ -94,7 +94,7 @@ export default function LoginForm() {
         subtitle={t("signInSubtitle")}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("email")}</Label>
 
@@ -117,7 +117,7 @@ export default function LoginForm() {
             <Label htmlFor="password">{t("password")}</Label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+              className="text-xs font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
             >
               {t("forgot")}
             </Link>
@@ -180,7 +180,7 @@ export default function LoginForm() {
           link: (chunks) => (
             <Link
               href="/register"
-              className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+              className="font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
             >
               {chunks}
             </Link>

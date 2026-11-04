@@ -36,7 +36,7 @@
       "weekend": "Weekends",
       "yes": "Yes",
       "no": "No",
-      "title": "Your profile is ready 🎉",
+      "title": "Your profile is ready",
       "subtitle": "Let's create your personalized roadmap.",
       "name": "Name",
       "language": "Language",
@@ -47,7 +47,7 @@
       "target": "Goal",
       "hrs": "{count} hrs",
       "months": "{count, plural, one {# month} other {# months}}",
-      "generate": "Generate My Roadmap 🚀"
+      "generate": "Generate My Roadmap"
     },
     "career": {
       "title": "Choose your dream career",
@@ -71,7 +71,7 @@
     },
     "failed": "We couldn't create your roadmap. Please try again.",
     "welcome": {
-      "title": "Welcome to Uraan AI 🚀",
+      "title": "Welcome to Uraan AI",
       "subtitle": "Let's create your personalized career roadmap.",
       "f1": "Personalized Roadmap",
       "f1t": "Tailored for your goals.",
@@ -90,11 +90,11 @@
     "skill": {
       "title": "What's your current skill level?",
       "subtitle": "This helps us generate the right roadmap.",
-      "beginner": "🌱 Beginner",
+      "beginner": "Beginner",
       "beginnerText": "I'm completely new to this career.",
-      "intermediate": "🔥 Intermediate",
+      "intermediate": "Intermediate",
       "intermediateText": "I know the basics and have built a few projects.",
-      "advanced": "🚀 Advanced",
+      "advanced": "Advanced",
       "advancedText": "I have experience and want to level up."
     },
     "style": {
@@ -124,11 +124,11 @@
       "title": "Creating your AI roadmap",
       "text": "We're analyzing your goals, experience, learning style and available study time.",
       "wait": "This can take up to a minute. Please keep this page open",
-      "s1": "✅ Selecting roadmap...",
-      "s2": "✅ Preparing milestones...",
-      "s3": "⏳ Finding projects...",
-      "s4": "⏳ Preparing interview plan...",
-      "s5": "⏳ Building personalized dashboard..."
+      "s1": "Selecting roadmap...",
+      "s2": "Preparing milestones...",
+      "s3": "Finding projects...",
+      "s4": "Preparing interview plan...",
+      "s5": "Building personalized dashboard..."
     },
     "loading": {
       "title": "Creating your roadmap...",
@@ -916,14 +916,17 @@
     "quick": "Quick navigation"
   },
   "topbar": {
-    "morning": "Good morning, {name}! 👋",
-    "afternoon": "Good afternoon, {name}! 👋",
-    "evening": "Good evening, {name}! 👋",
+    "morning": "Good morning, {name}!",
+    "afternoon": "Good afternoon, {name}!",
+    "evening": "Good evening, {name}!",
     "there": "there",
     "encourage": "Keep going! You're making great progress.",
     "search": "Search anything...",
     "student": "Student",
-    "logout": "Log out"
+    "logout": "Log out",
+    "streak": "{count}-day streak",
+    "level": "Level {level}",
+    "stats": "Your streak and level"
   },
   "notifications": {
     "title": "Notifications",
@@ -979,7 +982,18 @@
     "projectDone": "Done. Well played!",
     "projectDaysLeft": "{count, plural, one {# day left} other {# days left}} this month, {xp} bonus XP",
     "openProject": "Open project",
-    "recentAchievements": "Recent achievements"
+    "recentAchievements": "Recent achievements",
+    "heroEyebrow": "Continue learning",
+    "heroNoNext": "Pick up where you left off",
+    "minutes": "{count} min",
+    "openRoadmap": "Open roadmap",
+    "tasksOf": "{done} of {total} tasks done",
+    "thisWeek": "This week",
+    "activeDays": "{count} of 7 days active",
+    "weekXp": "{xp} XP this week",
+    "today": "today",
+    "dayDone": "learned",
+    "dayMissed": "no learning"
   },
   "roadmaps": {
     "title": "My Roadmaps",
@@ -1133,7 +1147,7 @@
     "emptyTitle": "No lessons yet",
     "emptyText": "Lessons appear here once you have a roadmap with learning units.",
     "goRoadmaps": "Go to My Roadmaps",
-    "caughtUp": "You're all caught up 🎉",
+    "caughtUp": "You're all caught up",
     "caughtUpText": "Every lesson across your roadmaps is complete.",
     "suggested": "Suggested for today",
     "planned": "{planned} planned · target {target}/day",
@@ -1158,8 +1172,8 @@
     "someUnfinished": "Some earlier lessons in this task are still unfinished.",
     "taskDoneToast": "Task marked as complete",
     "taskFailed": "Couldn't update the task. Please try again.",
-    "taskCompleted": "Task Completed! 🎉",
-    "allDone": "All lessons done! 🎉",
+    "taskCompleted": "Task Completed!",
+    "allDone": "All lessons done!",
     "finishedIn": "You've finished every lesson in <b>{task}</b>.",
     "lessons": "Lessons",
     "time": "Time",
@@ -1482,7 +1496,8 @@
     "q4": "Can I use it on my phone?",
     "q4a": "Yes. It works on any phone, tablet or laptop.",
     "ctaTitle": "Ready to take off?",
-    "ctaText": "Build your first roadmap in under five minutes."
+    "ctaText": "Build your first roadmap in under five minutes.",
+    "badge": "Free while we are in beta"
   },
   "public": {
     "projects": "Projects",

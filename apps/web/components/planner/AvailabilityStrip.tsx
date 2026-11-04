@@ -35,7 +35,7 @@ export default function AvailabilityStrip({
     <Card className="gap-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold">
-          <Clock size={16} className="text-brand-gold" /> {t("yourTime")}
+          <Clock size={16} className="text-violet-600 dark:text-brand-violet-light" /> {t("yourTime")}
           <span className="font-normal text-muted-foreground">
             · {t("startsAt", { time: formatTime(start, locale) })}
           </span>
@@ -53,7 +53,7 @@ export default function AvailabilityStrip({
               <div
                 className={cn(
                   "w-full max-w-8 rounded-t-lg",
-                  minutes > 0 ? "bg-brand-gold" : "bg-muted"
+                  minutes > 0 ? "bg-brand-violet" : "bg-muted"
                 )}
                 style={{ height: `${Math.max((minutes / max) * 100, 8)}%` }}
                 aria-hidden
@@ -79,7 +79,7 @@ export default function AvailabilityStrip({
       )}
 
       {active && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-brand-gold/10 px-4 py-3 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-brand-violet/10 px-4 py-3 text-sm">
           <p className="min-w-0 break-words">
             <span className="font-medium">{t("youTold")}</span> {note}
           </p>

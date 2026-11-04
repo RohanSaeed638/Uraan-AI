@@ -88,7 +88,7 @@ export default function OptimiseDialog({
                   key={key}
                   type="button"
                   onClick={() => setText(t(`examples.${key}`))}
-                  className="rounded-full border border-border px-3 py-1 text-xs transition hover:border-brand-gold/60 hover:bg-brand-gold/10"
+                  className="rounded-full border border-border px-3 py-1 text-xs transition hover:border-brand-violet/60 hover:bg-brand-violet/10"
                 >
                   {t(`examples.${key}`)}
                 </button>

@@ -95,8 +95,8 @@ export default function RoadmapDetailClient({
           </div>
 
           <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-brand-gold/15">
-              <Clock size={18} className="text-brand-gold" />
+            <span className="flex size-10 items-center justify-center rounded-xl bg-brand-violet/15">
+              <Clock size={18} className="text-violet-600 dark:text-brand-violet-light" />
             </span>
             <div>
               <p className="text-lg font-bold leading-none">{totalHours}h</p>

@@ -192,7 +192,7 @@ export default function ResumeClient({
                   className={cn(
                     "group flex items-center gap-1 rounded-xl pe-1",
                     d.id === activeId
-                      ? "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                      ? "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                       : "hover:bg-muted"
                   )}
                 >

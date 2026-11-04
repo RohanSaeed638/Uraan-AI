@@ -36,7 +36,7 @@
       "weekend": "Weekend",
       "yes": "Haan",
       "no": "Nahin",
-      "title": "Aap ka profile tayar hai 🎉",
+      "title": "Aap ka profile tayar hai",
       "subtitle": "Chaliye aap ka personalized roadmap banate hain.",
       "name": "Naam",
       "language": "Zuban",
@@ -47,7 +47,7 @@
       "target": "Goal",
       "hrs": "{count} hrs",
       "months": "{count, plural, one {# month} other {# months}}",
-      "generate": "Meri Roadmap Generate Karein 🚀"
+      "generate": "Meri Roadmap Generate Karein"
     },
     "career": {
       "title": "Apna dream career choose karein",
@@ -71,7 +71,7 @@
     },
     "failed": "Hum aapka roadmap create nahin kar paye. Barah-e-karam dobara koshish karein.",
     "welcome": {
-      "title": "Uraan AI mein khush aamdeed 🚀",
+      "title": "Uraan AI mein khush aamdeed",
       "subtitle": "Chaliye aapka personalized career roadmap banate hain.",
       "f1": "Personalized Roadmap",
       "f1t": "Aapke goals ke mutabiq.",
@@ -90,11 +90,11 @@
     "skill": {
       "title": "Aapka current skill level kya hai?",
       "subtitle": "Is se humein sahi roadmap banane mein madad milegi.",
-      "beginner": "🌱 Beginner",
+      "beginner": "Beginner",
       "beginnerText": "Main is career mein bilkul naya hoon.",
-      "intermediate": "🔥 Intermediate",
+      "intermediate": "Intermediate",
       "intermediateText": "Mujhe basics pata hain aur kuch projects banaye hain.",
-      "advanced": "🚀 Advanced",
+      "advanced": "Advanced",
       "advancedText": "Mujhe tajurba hai aur main level up karna chahta hoon."
     },
     "style": {
@@ -124,11 +124,11 @@
       "title": "Aapka AI roadmap bana rahe hain",
       "text": "Hum aapke goals, tajurba, learning style aur available study time analyze kar rahe hain.",
       "wait": "Ismein ek minute tak lag sakta hai. Bara-e-meherbani is page ko khula rakhein",
-      "s1": "✅ Roadmap select kar rahe hain...",
-      "s2": "✅ Milestones tayar kar rahe hain...",
-      "s3": "⏳ Projects dhoondh rahe hain...",
-      "s4": "⏳ Interview plan tayar kar rahe hain...",
-      "s5": "⏳ Personalized dashboard bana rahe hain..."
+      "s1": "Roadmap select kar rahe hain...",
+      "s2": "Milestones tayar kar rahe hain...",
+      "s3": "Projects dhoondh rahe hain...",
+      "s4": "Interview plan tayar kar rahe hain...",
+      "s5": "Personalized dashboard bana rahe hain..."
     },
     "loading": {
       "title": "Aapka roadmap bana rahe hain...",
@@ -916,14 +916,17 @@
     "quick": "Jaldi navigation"
   },
   "topbar": {
-    "morning": "Subha bakhair, {name}! 👋",
-    "afternoon": "Dopehar bakhair, {name}! 👋",
-    "evening": "Shaam bakhair, {name}! 👋",
+    "morning": "Subha bakhair, {name}!",
+    "afternoon": "Dopehar bakhair, {name}!",
+    "evening": "Shaam bakhair, {name}!",
     "there": "wahan",
     "encourage": "Aise hi chalte rahiye! Aap achi taraqqi kar rahe hain.",
     "search": "Kuch bhi search karein...",
     "student": "Student",
-    "logout": "Log out"
+    "logout": "Log out",
+    "streak": "{count}-din streak",
+    "level": "Level {level}",
+    "stats": "Aapka streak aur level"
   },
   "notifications": {
     "title": "Notifications",
@@ -979,7 +982,18 @@
     "projectDone": "Ho gaya. Zabardast khela!",
     "projectDaysLeft": "{count, plural, one {# din baqi} other {# din baqi}} is mahine, {xp} bonus XP",
     "openProject": "Project kholen",
-    "recentAchievements": "Haali ki kamyabiyan"
+    "recentAchievements": "Haali ki kamyabiyan",
+    "heroEyebrow": "Seekhna jari rakhein",
+    "heroNoNext": "Jahan chhoda tha wahan se shuru karein",
+    "minutes": "{count} min",
+    "openRoadmap": "Roadmap kholen",
+    "tasksOf": "{done} mein se {total} tasks mukammal",
+    "thisWeek": "Is haftay",
+    "activeDays": "{count} mein se 7 din active",
+    "weekXp": "Is haftay {xp} XP",
+    "today": "aaj",
+    "dayDone": "seekha",
+    "dayMissed": "seekhne ka waqt nahin"
   },
   "roadmaps": {
     "title": "Mere Roadmaps",
@@ -1133,7 +1147,7 @@
     "emptyTitle": "Abhi tak koi sabaq nahin",
     "emptyText": "Sabaq yahan nazar aayenge jab aap ke paas roadmap aur learning units hon.",
     "goRoadmaps": "My Roadmaps par jayein",
-    "caughtUp": "Aap sab kuch pakar chuke hain 🎉",
+    "caughtUp": "Aap sab kuch pakar chuke hain",
     "caughtUpText": "Aap ke tamam roadmaps ke sabaq mukammal hain.",
     "suggested": "Aaj ke liye suggest kiya gaya",
     "planned": "{planned} plan kiya gaya · target {target}/din",
@@ -1158,8 +1172,8 @@
     "someUnfinished": "Is task ke kuch pehle ke sabaq abhi tak mukammal nahin hue.",
     "taskDoneToast": "Task complete mark kar diya gaya hai",
     "taskFailed": "Task update nahin ho saka. Barah-e-karam dobara koshish karein.",
-    "taskCompleted": "Task Complete! 🎉",
-    "allDone": "Saare sabaq mukammal! 🎉",
+    "taskCompleted": "Task Complete!",
+    "allDone": "Saare sabaq mukammal!",
     "finishedIn": "Aap ne <b>{task}</b> ke tamam sabaq mukammal kar liye hain.",
     "lessons": "Sabaq",
     "time": "Waqt",
@@ -1482,7 +1496,8 @@
     "q4": "Kya main apne phone par use kar sakta hoon?",
     "q4a": "Ji haan. Yeh kisi bhi phone, tablet ya laptop par kaam karta hai.",
     "ctaTitle": "Udaan bharne ke liye tayar?",
-    "ctaText": "Apna pehla roadmap paanch minute se kam mein banayein."
+    "ctaText": "Apna pehla roadmap paanch minute se kam mein banayein.",
+    "badge": "Beta mein free hai"
   },
   "public": {
     "projects": "Projects",

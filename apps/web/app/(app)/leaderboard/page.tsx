@@ -57,7 +57,7 @@ export default async function LeaderboardPage({
                 link: (chunks) => (
                   <Link
                     href="/settings"
-                    className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+                    className="font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
                   >
                     {chunks}
                   </Link>

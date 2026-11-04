@@ -29,9 +29,9 @@ export default function StageIndicator({ stages, activeStage }: Props) {
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors",
                   isActive &&
-                    "border-brand-gold bg-brand-gold text-[#241a05] ring-4 ring-brand-gold/25",
+                    "border-brand-violet bg-primary text-primary-foreground ring-4 ring-brand-violet/25",
                   isComplete &&
-                    "border-brand-gold bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold",
+                    "border-brand-violet bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light",
                   !isActive &&
                     !isComplete &&
                     "border-border bg-card text-muted-foreground"
@@ -42,7 +42,7 @@ export default function StageIndicator({ stages, activeStage }: Props) {
               <span
                 className={cn(
                   "whitespace-nowrap text-xs font-medium",
-                  isActive ? "text-brand-gold-deep dark:text-brand-gold" : "text-muted-foreground"
+                  isActive ? "text-violet-700 dark:text-brand-violet-light" : "text-muted-foreground"
                 )}
               >
                 {t(`stages.${stage.label}`)}

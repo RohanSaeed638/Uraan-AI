@@ -293,7 +293,7 @@ export default function PortfolioClient({
                 href={publicUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-sm font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+                className="flex items-center gap-1 text-sm font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
               >
                 {t("view")} <ExternalLink size={13} />
               </a>

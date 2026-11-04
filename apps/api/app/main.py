@@ -85,7 +85,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to Uraan AI 🚀"}
+    return {"message": "Welcome to Uraan AI"}
 
 
 @app.get("/health")

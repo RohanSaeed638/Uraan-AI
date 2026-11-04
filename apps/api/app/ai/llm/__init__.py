@@ -48,9 +48,15 @@ def get_router() -> LLMRouter:
 LOCALISED_PURPOSES = {"roadmap", "roadmap_adapt", "lessons", "quiz", "career", "review"}
 
 
+# For every request, whatever the feature or tone: the product reads as calm and professional.
+STYLE_RULE = "Style rule: never use emoji or emoticons in any text you write."
+
+
 async def complete(request: LLMRequest) -> LLMResult:
     if request.profile_id is None:
         request.profile_id = current_profile()
+
+    request.messages = [*request.messages, {"role": "system", "content": STYLE_RULE}]
 
     rule = generation_rule(current_language()) if request.purpose in LOCALISED_PURPOSES else ""
 

@@ -129,7 +129,7 @@ def test_a_streak_milestone_is_celebrated_once():
 
         return await streak_notes(db, me)
 
-    assert with_db(check) == ["7-day streak! 🔥"]
+    assert with_db(check) == ["7-day streak!"]
 
 
 def test_no_celebration_between_milestones():
@@ -151,4 +151,4 @@ def test_the_celebration_is_in_the_learners_language():
 
         return await streak_notes(db, me)
 
-    assert with_db(check, language="ur-Latn") == ["14 din ki streak! 🔥"]
+    assert with_db(check, language="ur-Latn") == ["14 din ki streak!"]

@@ -56,7 +56,7 @@ export default function UnsubscribeClient({ token }: { token: string }) {
 
         {state === "ready" && (
           <>
-            <span className="flex size-14 items-center justify-center rounded-full bg-brand-gold/15 text-brand-gold">
+            <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/15 text-violet-600 dark:text-brand-violet-light">
               <MailX size={26} />
             </span>
             <h1 className="font-heading text-xl font-bold">{t("title")}</h1>

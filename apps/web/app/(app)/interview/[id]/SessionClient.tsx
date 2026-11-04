@@ -29,7 +29,7 @@ function Scores({ turn }: { turn: InterviewTurn }) {
       {items.map(([label, value]) => (
         <span
           key={label}
-          className="rounded-full bg-brand-violet/10 px-3 py-1 text-xs font-medium text-brand-gold-deep dark:text-brand-gold"
+          className="rounded-full bg-brand-violet/10 px-3 py-1 text-xs font-medium text-violet-700 dark:text-brand-violet-light"
         >
           {t("score", { label: t(label), value: value ?? "–" })}
         </span>

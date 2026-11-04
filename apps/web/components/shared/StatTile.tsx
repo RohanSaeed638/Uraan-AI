@@ -35,7 +35,7 @@ export default function StatTile({
         <Icon size={18} />
       </span>
       <div className="min-w-0">
-        <p className="font-heading text-xl font-bold leading-none">{value}</p>
+        <p className="num text-xl font-bold leading-none">{value}</p>
         <p className="mt-1 truncate text-xs text-muted-foreground">{label}</p>
       </div>
     </Card>

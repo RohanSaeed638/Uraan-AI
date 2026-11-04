@@ -2,6 +2,7 @@ import { ArrowRight, Compass, Sparkles, Target, TrendingUp, Wrench } from "lucid
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import HeroBackground from "@/components/site/HeroBackground";
 import LandingRedirect from "@/components/site/LandingRedirect";
 import SiteFooter from "@/components/site/SiteFooter";
 import SiteHeader from "@/components/site/SiteHeader";
@@ -28,16 +29,38 @@ export default async function HomePage() {
       <SiteHeader />
 
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
-        <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-24">
-          <h1 className="font-heading text-4xl font-bold leading-tight sm:text-5xl">{t("title")}</h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">{t("subtitle")}</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/register" className={buttonVariants({ size: "lg" })}>
-              {t("start")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
-            </Link>
-            <Link href="/login" className={buttonVariants({ size: "lg", variant: "outline" })}>
-              {t("signInShort")}
-            </Link>
+        <section className="relative isolate">
+          <HeroBackground />
+          <div className="mx-auto max-w-4xl px-4 pb-24 pt-16 text-center sm:px-6 sm:pb-32 sm:pt-24">
+            <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet-300/60 bg-white/60 px-4 py-1.5 text-sm font-medium text-violet-800 shadow-sm backdrop-blur dark:border-violet-400/30 dark:bg-white/5 dark:text-violet-200">
+              <Sparkles className="size-4 text-amber-500" aria-hidden />
+              {t("badge")}
+            </p>
+            <h1 className="font-heading mt-6 bg-gradient-to-br from-violet-950 via-violet-700 to-indigo-600 bg-clip-text text-4xl font-bold leading-tight text-transparent sm:text-6xl dark:from-white dark:via-violet-200 dark:to-violet-400">
+              {t("title")}
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">{t("subtitle")}</p>
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/register"
+                className={buttonVariants({
+                  size: "lg",
+                  className: "h-12 px-7 text-base shadow-lg shadow-violet-500/30 transition hover:-translate-y-0.5",
+                })}
+              >
+                {t("start")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
+              </Link>
+              <Link
+                href="/login"
+                className={buttonVariants({
+                  size: "lg",
+                  variant: "outline",
+                  className: "h-12 bg-white/60 px-7 text-base backdrop-blur dark:bg-white/5",
+                })}
+              >
+                {t("signInShort")}
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -49,7 +72,7 @@ export default async function HomePage() {
               <Link
                 key={k}
                 href="/register"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-brand-violet"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm transition hover:-translate-y-0.5 hover:border-brand-violet hover:shadow-md"
               >
                 <Compass className="size-4 text-violet-700 dark:text-brand-violet-light" aria-hidden />
                 {t(k)}
@@ -58,12 +81,13 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section aria-labelledby="features-h" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <section aria-labelledby="features-h" className="bg-gradient-to-b from-transparent via-violet-500/[0.06] to-transparent">
+         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <h2 id="features-h" className="font-heading text-2xl font-bold">{t("featuresTitle")}</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, key }) => (
-              <Card key={key} className="gap-3 p-6">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
+              <Card key={key} className="card-lift gap-3 p-6">
+                <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-md shadow-violet-500/30">
                   <Icon className="size-5" aria-hidden />
                 </span>
                 <h3 className="font-semibold">{t(key)}</h3>
@@ -71,6 +95,7 @@ export default async function HomePage() {
               </Card>
             ))}
           </div>
+         </div>
         </section>
 
         <section aria-labelledby="how-h" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -79,7 +104,7 @@ export default async function HomePage() {
             {steps.map((k, i) => (
               <li key={k}>
                 <Card className="h-full gap-2 p-6">
-                  <span className="font-mono text-3xl font-bold text-violet-700 dark:text-brand-violet-light">{i + 1}</span>
+                  <span className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 font-mono text-lg font-bold text-white shadow-md shadow-violet-500/30">{i + 1}</span>
                   <h3 className="font-semibold">{t(k)}</h3>
                   <p className="text-sm text-muted-foreground">{t(`${k}Text`)}</p>
                 </Card>
@@ -100,12 +125,23 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-          <h2 className="font-heading text-3xl font-bold">{t("ctaTitle")}</h2>
-          <p className="mt-3 text-muted-foreground">{t("ctaText")}</p>
-          <Link href="/register" className={buttonVariants({ size: "lg", className: "mt-7" })}>
-            {t("start")}
-          </Link>
+        <section className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:px-6">
+          <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-violet-700 via-violet-600 to-indigo-800 px-6 py-14 text-center text-white shadow-2xl shadow-violet-900/20 sm:px-12">
+            <div aria-hidden className="absolute inset-0 -z-10 [background-image:radial-gradient(circle,rgba(255,255,255,0.22)_1px,transparent_1.6px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
+            <div aria-hidden className="absolute -end-16 -top-16 -z-10 size-64 rounded-full bg-amber-300/40 blur-3xl" />
+            <div aria-hidden className="absolute -bottom-20 -start-16 -z-10 size-64 rounded-full bg-fuchsia-400/30 blur-3xl" />
+            <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t("ctaTitle")}</h2>
+            <p className="mx-auto mt-3 max-w-xl text-violet-100">{t("ctaText")}</p>
+            <Link
+              href="/register"
+              className={buttonVariants({
+                size: "lg",
+                className: "mt-8 h-12 bg-white px-8 text-base text-violet-800 shadow-lg hover:bg-violet-50",
+              })}
+            >
+              {t("start")} <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
+            </Link>
+          </div>
         </section>
       </main>
 

@@ -75,7 +75,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
           <Link key={p.id} href={p.href}>
             <Card className="card-lift h-full gap-3 px-6">
               <div className="flex items-start justify-between gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
                   <FolderKanban size={18} />
                 </span>
                 <span

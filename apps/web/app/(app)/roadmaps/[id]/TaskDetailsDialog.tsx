@@ -63,8 +63,8 @@ export default function TaskDetailsDialog({
 
           {task.estimated_hours != null && (
             <div className="flex items-center gap-3 rounded-2xl bg-muted/60 p-4">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gold/15">
-                <Clock className="h-4 w-4 text-brand-gold" />
+              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-violet/15">
+                <Clock className="h-4 w-4 text-violet-600 dark:text-brand-violet-light" />
               </span>
               <div>
                 <p className="text-sm font-medium">{t("estimated")}</p>

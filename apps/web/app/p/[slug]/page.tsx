@@ -79,7 +79,7 @@ export default async function PublicPortfolioPage({
                   {p.tech.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-brand-gold-deep dark:text-brand-gold"
+                      className="rounded-full bg-brand-violet/10 px-2.5 py-0.5 text-xs font-medium text-violet-700 dark:text-brand-violet-light"
                     >
                       {tech}
                     </span>
@@ -92,7 +92,7 @@ export default async function PublicPortfolioPage({
                     href={p.repo_url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="flex items-center gap-1 text-brand-gold-deep dark:text-brand-gold hover:underline"
+                    className="flex items-center gap-1 text-violet-700 dark:text-brand-violet-light hover:underline"
                   >
                     {t("code")} <ExternalLink size={13} />
                   </a>
@@ -102,7 +102,7 @@ export default async function PublicPortfolioPage({
                     href={p.live_url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="flex items-center gap-1 text-brand-gold-deep dark:text-brand-gold hover:underline"
+                    className="flex items-center gap-1 text-violet-700 dark:text-brand-violet-light hover:underline"
                   >
                     {t("demo")} <ExternalLink size={13} />
                   </a>

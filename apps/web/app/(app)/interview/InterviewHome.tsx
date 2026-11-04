@@ -107,7 +107,7 @@ export default function InterviewHome({
               className="flex items-center gap-3 border-b px-5 py-3.5 last:border-b-0"
             >
               <Link href={`/interview/${s.id}`} className="min-w-0 flex-1">
-                <p className="truncate font-medium hover:text-brand-gold-deep dark:hover:text-brand-gold">
+                <p className="truncate font-medium hover:text-violet-700 dark:hover:text-brand-violet-light">
                   {s.role}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -124,7 +124,7 @@ export default function InterviewHome({
                   "rounded-full px-2.5 py-0.5 text-xs font-medium",
                   s.status === "completed"
                     ? "bg-emerald-500/10 text-emerald-600"
-                    : "bg-brand-gold/15 text-brand-gold"
+                    : "bg-brand-violet/15 text-violet-600 dark:text-brand-violet-light"
                 )}
               >
                 {s.status === "completed"

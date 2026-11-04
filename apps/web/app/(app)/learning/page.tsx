@@ -24,7 +24,7 @@ function UnitRow({ c, cta, tUnit }: { c: UnitContext; cta: string; tUnit: Transl
 
   return (
     <div className="flex items-center gap-4 border-b border-border px-5 py-4 last:border-b-0">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
         <Icon size={18} />
       </span>
       <div className="min-w-0 flex-1">

@@ -38,8 +38,8 @@
   "viewer": {
     "markContinue": "Claim XP & continue",
     "markTask": "Claim mission XP",
-    "taskCompleted": "Mission Cleared! 🎉",
-    "allDone": "All training done! 🎉",
+    "taskCompleted": "Mission Cleared!",
+    "allDone": "All training done!",
     "taskDoneToast": "Mission cleared",
     "allTasks": "View all missions"
   },

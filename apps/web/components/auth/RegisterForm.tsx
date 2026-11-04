@@ -112,7 +112,7 @@ export default function RegisterForm() {
         subtitle={t("createSubtitle")}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="fullName">{t("fullName")}</Label>
 
@@ -240,7 +240,7 @@ export default function RegisterForm() {
           link: (chunks) => (
             <Link
               href="/login"
-              className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+              className="font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
             >
               {chunks}
             </Link>

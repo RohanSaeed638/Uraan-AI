@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Menu, Search, X } from "lucide-react";
 
 import GlobalSearch from "./GlobalSearch";
+import TopbarStats from "./TopbarStats";
 import { MobileSidebar } from "./Sidebar";
 import NotificationBell from "./NotificationBell";
 import UserDropdown from "./UserDropdown";
@@ -44,9 +45,6 @@ export default function Navbar({ user, isAdmin = false }: { user: User; isAdmin?
         <h2 className="truncate font-heading text-sm font-semibold sm:text-base">
           {t(getGreeting(), { name: `\u2068${firstName}\u2069` })}
         </h2>
-        <p className="hidden text-xs text-muted-foreground sm:block">
-          {t("encourage")}
-        </p>
       </div>
 
       <div className="hidden max-w-sm flex-1 items-center md:flex">
@@ -54,6 +52,7 @@ export default function Navbar({ user, isAdmin = false }: { user: User; isAdmin?
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+        <TopbarStats />
         <button
           type="button"
           aria-label={tSearch("open")}

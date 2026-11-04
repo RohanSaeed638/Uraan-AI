@@ -144,7 +144,7 @@ export default function MentorClient({ initialConversationId = null }: { initial
               className={cn(
                 "group flex items-center gap-1 rounded-xl pe-1 transition",
                 c.id === activeId
-                  ? "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                  ? "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                   : "hover:bg-muted"
               )}
             >

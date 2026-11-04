@@ -65,7 +65,7 @@ export default function MonthView({ schedule, month, onMove, onDropLesson, onOpe
                 className={cn(
                   "flex min-h-24 flex-col gap-1 rounded-2xl border p-1.5 transition sm:min-h-28 sm:p-2",
                   inMonth ? "bg-card" : "bg-muted/30 opacity-50",
-                  isToday ? "border-brand-gold/80 bg-brand-gold/5" : "border-border",
+                  isToday ? "border-brand-violet/80 bg-brand-violet/5" : "border-border",
                   key < schedule.today && !planned && "opacity-60"
                 )}
               >
@@ -78,7 +78,7 @@ export default function MonthView({ schedule, month, onMove, onDropLesson, onOpe
                   <span
                     className={cn(
                       "flex size-6 items-center justify-center rounded-full text-xs font-semibold",
-                      isToday && "bg-brand-gold text-[#241a05]"
+                      isToday && "bg-primary text-primary-foreground"
                     )}
                   >
                     {date.getDate()}
@@ -93,7 +93,7 @@ export default function MonthView({ schedule, month, onMove, onDropLesson, onOpe
                 {planned && (
                   <>
                     <div className="h-1 overflow-hidden rounded-full bg-muted">
-                      <div className="h-full rounded-full bg-brand-gold" style={{ width: `${fill}%` }} />
+                      <div className="h-full rounded-full bg-brand-violet" style={{ width: `${fill}%` }} />
                     </div>
 
                     <div className="hidden space-y-1 sm:block">
@@ -109,7 +109,7 @@ export default function MonthView({ schedule, month, onMove, onDropLesson, onOpe
                         <button
                           type="button"
                           onClick={() => onOpenDay(date)}
-                          className="px-1 text-[11px] font-medium text-brand-gold-deep hover:underline dark:text-brand-gold"
+                          className="px-1 text-[11px] font-medium text-violet-700 hover:underline dark:text-violet-600 dark:text-brand-violet-light"
                         >
                           {t("more", { count: planned.units.length - MAX_SHOWN })}
                         </button>

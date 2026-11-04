@@ -26,8 +26,8 @@ export default function ToggleChip({
         "inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition",
         "outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
         checked
-          ? "border-brand-gold bg-brand-gold/15 text-foreground"
-          : "border-border bg-card text-muted-foreground hover:border-brand-gold/60 hover:bg-brand-gold/10 hover:text-foreground",
+          ? "border-brand-violet bg-brand-violet/15 text-foreground"
+          : "border-border bg-card text-muted-foreground hover:border-brand-violet/60 hover:bg-brand-violet/10 hover:text-foreground",
         className
       )}
     >
@@ -36,7 +36,7 @@ export default function ToggleChip({
         className={cn(
           "flex size-4 items-center justify-center rounded-full border transition",
           checked
-            ? "border-brand-gold bg-brand-gold text-[#241a05]"
+            ? "border-brand-violet bg-primary text-primary-foreground"
             : "border-muted-foreground/50"
         )}
       >

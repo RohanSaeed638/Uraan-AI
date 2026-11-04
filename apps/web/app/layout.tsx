@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Geist, Geist_Mono, Inter, Noto_Naskh_Arabic } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Noto_Naskh_Arabic, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,9 @@ import ErrorTranslator from "@/components/shared/ErrorTranslator";
 import { isRtl } from "@/i18n/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+// Headings: a rounder, more distinctive face than the body text, which stays in Inter.
+const display = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 // Urdu script; loaded for every page but only used when the language is Urdu.
 const urdu = Noto_Naskh_Arabic({
@@ -67,6 +70,7 @@ export default async function RootLayout({
         geistSans.variable,
         geistMono.variable,
         urdu.variable,
+        display.variable,
         "font-sans",
         inter.variable
       )}

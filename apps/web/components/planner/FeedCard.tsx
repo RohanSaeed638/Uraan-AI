@@ -55,7 +55,7 @@ export default function FeedCard({
   return (
     <Card className="gap-3 p-5">
       <p className="flex items-center gap-2 text-sm font-semibold">
-        <CalendarPlus size={16} className="text-brand-gold" /> {t("title")}
+        <CalendarPlus size={16} className="text-violet-600 dark:text-brand-violet-light" /> {t("title")}
       </p>
       <p className="text-sm text-muted-foreground">{t("text")}</p>
 

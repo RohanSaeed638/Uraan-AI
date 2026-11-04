@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { CircleCheck, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import WelcomeBirdIllustration from "@/components/illustrations/WelcomeBirdIllustration";
 
@@ -29,12 +29,18 @@ export default function GeneratingStep() {
           <div className="h-full w-3/4 animate-pulse rounded-full bg-brand-gradient" />
         </div>
 
+        {/* The first steps are shown as done, the rest as still going. */}
         <ul className="space-y-3 text-start text-sm text-muted-foreground">
-          <li>{t("s1")}</li>
-          <li>{t("s2")}</li>
-          <li>{t("s3")}</li>
-          <li>{t("s4")}</li>
-          <li>{t("s5")}</li>
+          {(["s1", "s2", "s3", "s4", "s5"] as const).map((key, index) => (
+            <li key={key} className="flex items-center gap-3">
+              {index < 2 ? (
+                <CircleCheck size={16} className="shrink-0 text-emerald-500" aria-hidden />
+              ) : (
+                <Loader2 size={16} className="shrink-0 animate-spin text-brand-violet/70" aria-hidden />
+              )}
+              {t(key)}
+            </li>
+          ))}
         </ul>
       </div>
     </div>

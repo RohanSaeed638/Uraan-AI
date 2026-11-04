@@ -181,7 +181,7 @@ function Detail({
     <Card
       className={`flex-row items-start gap-4 p-5 ${wide ? "sm:col-span-2" : ""}`}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
         <Icon size={18} />
       </span>
       <div className="min-w-0">

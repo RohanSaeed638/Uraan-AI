@@ -95,7 +95,7 @@ export default function AchievementsClient({
         <Card className="gap-4 p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-600 dark:text-brand-violet-light">
                 {t("careerTitle")}
               </p>
               <p className="font-heading text-3xl font-bold">
