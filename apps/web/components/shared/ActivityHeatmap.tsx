@@ -48,7 +48,7 @@ export default function ActivityHeatmap({
   }
 
   return (
-    <div role="img" aria-label={label} className="overflow-x-auto">
+    <div role="img" aria-label={label} tabIndex={0} className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-ring">
       <div className="flex w-max gap-1">
         {columns.map((column, w) => (
           <div key={w} className="flex flex-col gap-1">
