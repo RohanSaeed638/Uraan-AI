@@ -913,7 +913,13 @@
     "upgradeTitle": "Beta ke dauran free",
     "upgradeText": "Jab tak hum test kar rahe hain sab kuch unlocked hai. Dekhein kya shamil hai.",
     "admin": "Admin",
-    "quick": "Jaldi navigation"
+    "quick": "Jaldi navigation",
+    "groups": {
+      "learn": "Seekhain",
+      "practise": "Mashq Karein",
+      "grow": "Barhein",
+      "account": "Account"
+    }
   },
   "topbar": {
     "morning": "Subha bakhair, {name}!",

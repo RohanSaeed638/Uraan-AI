@@ -7,6 +7,7 @@ import BottomNav from "@/components/dashboard/BottomNav";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import ThemeSync from "@/components/shared/ThemeSync";
 import ConfettiHost from "@/components/shared/ConfettiHost";
+import XpBurst from "@/components/shared/XpBurst";
 import AnnouncementBanner from "@/components/shared/AnnouncementBanner";
 import { getProfileServer } from "@/lib/server/data";
 import LocaleSync from "@/components/shared/LocaleSync";
@@ -34,6 +35,7 @@ export default async function DashboardLayout({
       <ThemeSync />
       <LocaleSync />
       <ConfettiHost />
+      <XpBurst />
       <div className="h-screen flex overflow-hidden bg-background print:block print:h-auto print:overflow-visible">
         <Sidebar isAdmin={isAdmin} />
 

@@ -25,32 +25,63 @@ import {
   Trophy,
   User,
   X,
+  type LucideIcon,
 } from "lucide-react";
 
 import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
-export const NAV_ITEMS = [
-  { key: "dashboard", href: "/dashboard", icon: LayoutGrid },
-  { key: "careers", href: "/careers", icon: Compass },
-  { key: "roadmaps", href: "/roadmaps", icon: Target },
-  { key: "resources", href: "/resources", icon: Library },
-  { key: "learning", href: "/learning", icon: BookOpen },
-  { key: "calendar", href: "/calendar", icon: CalendarDays },
-  { key: "tasks", href: "/tasks", icon: CheckSquare },
-  { key: "projects", href: "/projects", icon: FolderKanban },
-  { key: "progress", href: "/progress", icon: TrendingUp },
-  { key: "resume", href: "/resume", icon: FileText },
-  { key: "portfolio", href: "/portfolio", icon: Briefcase },
-  { key: "interview", href: "/interview", icon: Mic },
-  { key: "mentor", href: "/mentor", icon: Bot },
-  { key: "achievements", href: "/achievements", icon: Medal },
-  { key: "leaderboard", href: "/leaderboard", icon: Trophy },
-  { key: "profile", href: "/profile", icon: User },
-  { key: "settings", href: "/settings", icon: Settings },
+/** The app's pages, grouped so seventeen links are scannable. `group: null` has no heading. */
+interface NavItem {
+  key: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+export const NAV_GROUPS: { group: string | null; items: NavItem[] }[] = [
+  { group: null, items: [{ key: "dashboard", href: "/dashboard", icon: LayoutGrid }] },
+  {
+    group: "learn",
+    items: [
+      { key: "careers", href: "/careers", icon: Compass },
+      { key: "roadmaps", href: "/roadmaps", icon: Target },
+      { key: "learning", href: "/learning", icon: BookOpen },
+      { key: "resources", href: "/resources", icon: Library },
+      { key: "calendar", href: "/calendar", icon: CalendarDays },
+      { key: "tasks", href: "/tasks", icon: CheckSquare },
+      { key: "projects", href: "/projects", icon: FolderKanban },
+    ],
+  },
+  {
+    group: "practise",
+    items: [
+      { key: "mentor", href: "/mentor", icon: Bot },
+      { key: "interview", href: "/interview", icon: Mic },
+    ],
+  },
+  {
+    group: "grow",
+    items: [
+      { key: "progress", href: "/progress", icon: TrendingUp },
+      { key: "achievements", href: "/achievements", icon: Medal },
+      { key: "leaderboard", href: "/leaderboard", icon: Trophy },
+      { key: "resume", href: "/resume", icon: FileText },
+      { key: "portfolio", href: "/portfolio", icon: Briefcase },
+    ],
+  },
+  {
+    group: "account",
+    items: [
+      { key: "profile", href: "/profile", icon: User },
+      { key: "settings", href: "/settings", icon: Settings },
+    ],
+  },
 ];
 
-const adminItem = { key: "admin", href: "/admin", icon: ShieldCheck } as const;
+/** All the pages in one list (the search offers them by name). */
+export const NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
+
+const adminItem: NavItem = { key: "admin", href: "/admin", icon: ShieldCheck };
 
 function SidebarContent({ onNavigate, isAdmin }: { onNavigate?: () => void; isAdmin?: boolean }) {
   const pathname = usePathname();
@@ -63,26 +94,40 @@ function SidebarContent({ onNavigate, isAdmin }: { onNavigate?: () => void; isAd
       </div>
 
       {/* Scrolls on short screens so the upgrade card never overlaps it. */}
-      <nav className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-        {(isAdmin ? [...NAV_ITEMS, adminItem] : NAV_ITEMS).map((item) => {
-          const active =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+      <nav aria-label={t("menu")} className="mt-5 flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pe-1">
+        {NAV_GROUPS.map((group) => {
+          const items = group.group === "account" && isAdmin ? [...group.items, adminItem] : group.items;
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition",
-                active
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            <div key={group.group ?? "top"} className="flex flex-col gap-1">
+              {group.group && (
+                <p className="px-3.5 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/45">
+                  {t(`groups.${group.group}`)}
+                </p>
               )}
-            >
-              <item.icon size={18} strokeWidth={2} className="shrink-0" />
-              {t(item.key)}
-            </Link>
+
+              {items.map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + "/");
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition",
+                      active
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-violet-500/30"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <item.icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />
+                    {t(item.key)}
+                  </Link>
+                );
+              })}
+            </div>
           );
         })}
       </nav>

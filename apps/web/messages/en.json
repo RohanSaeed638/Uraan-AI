@@ -913,7 +913,13 @@
     "upgradeTitle": "Free during beta",
     "upgradeText": "Everything is unlocked while we test. See what is included.",
     "admin": "Admin",
-    "quick": "Quick navigation"
+    "quick": "Quick navigation",
+    "groups": {
+      "learn": "Learn",
+      "practise": "Practise",
+      "grow": "Grow",
+      "account": "Account"
+    }
   },
   "topbar": {
     "morning": "Good morning, {name}!",
