@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { History, Pause, Play, RefreshCw, SlidersHorizontal } from "lucide-react";
+import { History, Pause, Play, RefreshCw, SlidersHorizontal, Trash2 } from "lucide-react";
 
 import {
   adaptRoadmap,
+  deleteRoadmap,
   pauseRoadmap,
   regenerateRoadmap,
   restoreRoadmapVersion,
@@ -43,6 +44,7 @@ export default function RoadmapActions({ roadmap, dailyHours }: Props) {
   const [adaptOpen, setAdaptOpen] = useState(false);
   const [rebuildOpen, setRebuildOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const building = roadmap.status === "generating";
   const canChange = !building && roadmap.status !== "failed";
@@ -75,6 +77,20 @@ export default function RoadmapActions({ roadmap, dailyHours }: Props) {
     setRebuildOpen(false);
     await run(() => regenerateRoadmap(roadmap.id), t("rebuild.failed"));
   };
+
+  async function remove() {
+    setBusy(true);
+
+    try {
+      await deleteRoadmap(roadmap.id);
+      toast.success(t("delete.done"));
+      router.push("/roadmaps");
+      router.refresh();
+    } catch (err) {
+      toast.error(apiErrorMessage(err, t("delete.failed")));
+      setBusy(false);
+    }
+  }
 
   return (
     <>
@@ -124,6 +140,19 @@ export default function RoadmapActions({ roadmap, dailyHours }: Props) {
             {t("versions.open")}
           </Button>
         )}
+
+        {!building && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 text-destructive hover:text-destructive"
+            disabled={busy}
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 size={14} />
+            {t("delete.open")}
+          </Button>
+        )}
       </div>
 
       <JobBanner
@@ -153,6 +182,26 @@ export default function RoadmapActions({ roadmap, dailyHours }: Props) {
           router.refresh();
         }}
       />
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("delete.title")}</DialogTitle>
+            <DialogDescription>{t("delete.description", { title: roadmap.title })}</DialogDescription>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">{t("delete.warning")}</p>
+
+          <div className="flex flex-wrap gap-2">
+            <Button variant="destructive" disabled={busy} onClick={remove}>
+              {t("delete.confirm")}
+            </Button>
+            <Button variant="ghost" disabled={busy} onClick={() => setDeleteOpen(false)}>
+              {t("delete.cancel")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={rebuildOpen} onOpenChange={setRebuildOpen}>
         <DialogContent className="sm:max-w-md">

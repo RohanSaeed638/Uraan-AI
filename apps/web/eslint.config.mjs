@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Test builds, and a file generated from the API description.
+    ".next-test/**",
+    ".next-dev/**",
+    "types/api.generated.ts",
   ]),
 ]);
 

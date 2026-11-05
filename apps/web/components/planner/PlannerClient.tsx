@@ -202,10 +202,10 @@ export default function PlannerClient({ initial, initialToken, apiUrl }: Props) 
           {summary && (
             <div
               role="status"
-              className="flex items-start justify-between gap-3 rounded-2xl border border-brand-gold/40 bg-brand-gold/10 px-4 py-3 text-sm"
+              className="flex items-start justify-between gap-3 rounded-2xl border border-brand-violet/40 bg-brand-violet/10 px-4 py-3 text-sm"
             >
               <p className="flex min-w-0 gap-2">
-                <Sparkles size={16} className="mt-0.5 shrink-0 text-brand-gold" />
+                <Sparkles size={16} className="mt-0.5 shrink-0 text-violet-600 dark:text-brand-violet-light" />
                 <span className="break-words">{summary}</span>
               </p>
               <button

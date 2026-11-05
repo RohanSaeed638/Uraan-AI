@@ -1,0 +1,7 @@
+node_modules
+.next
+.next-test
+.turbo
+.git
+**/.env
+**/.env.local

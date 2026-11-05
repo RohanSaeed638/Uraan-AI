@@ -10,6 +10,7 @@ export const loginSchema = z.object({
 export const registerSchema = loginSchema.extend({
   fullName: z.string().min(2, "nameRequired"),
   confirmPassword: z.string(),
+  agree: z.boolean().refine((value) => value, { message: "mustAgree" }),
 }).refine((data) => data.password === data.confirmPassword, {
   path: ["confirmPassword"],
   message: "mismatch",

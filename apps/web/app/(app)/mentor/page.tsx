@@ -8,7 +8,15 @@ import { buttonVariants } from "@/components/ui/button";
 
 import MentorClient from "./MentorClient";
 
-export default async function MentorPage() {
+const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export default async function MentorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ c?: string | string[] }>;
+}) {
+  const { c } = await searchParams;
+  const openId = typeof c === "string" && ID.test(c) ? c : null;
   const t = await getTranslations("mentorChat");
   const settings = await getUserSettings();
 
@@ -35,5 +43,5 @@ export default async function MentorPage() {
     );
   }
 
-  return <MentorClient />;
+  return <MentorClient initialConversationId={openId} />;
 }

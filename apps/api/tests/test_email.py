@@ -65,7 +65,7 @@ def test_the_email_has_the_text_the_link_and_a_one_click_unsubscribe():
     assert f"{settings.WEB_URL}/learning" in mail["html"]
     assert "/unsubscribe?token=" in mail["html"] and "/unsubscribe?token=" in mail["text"]
     assert mail["headers"]["List-Unsubscribe-Post"] == "List-Unsubscribe=One-Click"
-    assert mail["headers"]["List-Unsubscribe"].startswith(f"<{settings.API_PUBLIC_URL}/email/unsubscribe?token=")
+    assert mail["headers"]["List-Unsubscribe"].startswith(f"<{settings.API_PUBLIC_URL}/api/v1/email/unsubscribe?token=")
 
     token = mail["headers"]["List-Unsubscribe"].split("token=")[1].rstrip(">")
 

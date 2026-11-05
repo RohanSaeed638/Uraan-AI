@@ -107,7 +107,7 @@ export default function NotificationBell() {
       >
         <Bell size={17} />
         {unread > 0 && (
-          <span className="absolute end-1 top-1 flex min-w-4 items-center justify-center rounded-full bg-brand-gold px-1 text-[10px] font-semibold leading-4 text-black">
+          <span className="absolute end-1 top-1 flex min-w-4 items-center justify-center rounded-full bg-brand-violet px-1 text-[10px] font-semibold leading-4 text-black">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -126,7 +126,7 @@ export default function NotificationBell() {
               {unread > 0 && (
                 <button
                   onClick={() => readAll.mutate()}
-                  className="text-xs font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+                  className="text-xs font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
                 >
                   {t("markAll")}
                 </button>
@@ -165,7 +165,7 @@ export default function NotificationBell() {
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="block border-t px-4 py-2.5 text-center text-xs font-medium text-brand-gold-deep hover:bg-muted dark:text-brand-gold"
+              className="block border-t px-4 py-2.5 text-center text-xs font-medium text-violet-700 hover:bg-muted dark:text-violet-600 dark:text-brand-violet-light"
             >
               {t("viewAll")}
             </Link>

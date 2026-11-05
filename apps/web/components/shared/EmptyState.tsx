@@ -20,7 +20,7 @@ export default function EmptyState({
 }) {
   return (
     <Card className={cn("items-center gap-3 border-dashed p-10 text-center", className)}>
-      <span className="flex size-14 items-center justify-center rounded-full bg-brand-gold/15 text-brand-gold">
+      <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/15 text-violet-600 dark:text-brand-violet-light">
         <Icon size={26} />
       </span>
       <p className="font-heading text-lg font-semibold">{title}</p>

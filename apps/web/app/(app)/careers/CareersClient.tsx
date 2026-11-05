@@ -72,7 +72,7 @@ export default function CareersClient({ initial }: { initial: CareerList | null 
     setFilters((f) => ({ ...f, ...patch }));
 
   return (
-    <main className="mx-auto max-w-6xl pb-24">
+    <div className="mx-auto max-w-6xl pb-24">
       <PageHeader
         title={t("title")}
         subtitle={t("subtitle")}
@@ -209,6 +209,6 @@ export default function CareersClient({ initial }: { initial: CareerList | null 
       )}
 
       <RecommendDialog open={helpOpen} onOpenChange={setHelpOpen} />
-    </main>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Globe } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -13,7 +14,14 @@ import FilterChips from "@/components/shared/FilterChips";
 
 /** Picks the app's language. Saved on the account too when `signedIn`, so it
  * follows the learner to another device. */
-export default function LanguageSwitcher({ signedIn = true }: { signedIn?: boolean }) {
+export default function LanguageSwitcher({
+  signedIn = true,
+  compact = false,
+}: {
+  signedIn?: boolean;
+  /** A small drop-down instead of the row of buttons, for narrow screens. */
+  compact?: boolean;
+}) {
   const t = useTranslations("language");
   const router = useRouter();
   const current = useLocale();
@@ -38,6 +46,29 @@ export default function LanguageSwitcher({ signedIn = true }: { signedIn?: boole
     } finally {
       setBusy(false);
     }
+  }
+
+  if (compact) {
+    // On a phone it is just a globe button (the real drop-down sits invisibly on top of it, so a tap
+    // opens the language list); from the small breakpoint up it shows the current language.
+    return (
+      <label className="relative inline-flex items-center">
+        <Globe size={16} aria-hidden className="pointer-events-none absolute start-[0.6rem] text-muted-foreground sm:start-3" />
+        <select
+          aria-label={t("label")}
+          value={isLocale(current) ? current : "en"}
+          disabled={busy}
+          onChange={(event) => choose(event.target.value as Locale)}
+          className="h-9 w-9 cursor-pointer appearance-none rounded-full border border-border bg-background text-sm font-medium text-transparent outline-none focus-visible:ring-3 focus-visible:ring-ring/30 sm:w-auto sm:ps-9 sm:pe-3 sm:text-foreground"
+        >
+          {LOCALES.map((value) => (
+            <option key={value} value={value} className="bg-background text-foreground">
+              {LOCALE_LABELS[value]}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
   }
 
   return (

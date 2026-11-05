@@ -6,12 +6,13 @@ import axios from "axios";
 import { useTranslations } from "next-intl";
 import { MailCheck, MailX } from "lucide-react";
 
+import { API_BASE } from "@/lib/api-base";
 import Logo from "@/components/shared/Logo";
 import LoadingButton from "@/components/shared/LoadingButton";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const API = API_BASE;
 
 type State = "checking" | "ready" | "done" | "invalid";
 
@@ -47,7 +48,7 @@ export default function UnsubscribeClient({ token }: { token: string }) {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main id="main" className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md items-center gap-5 p-8 text-center">
         <Logo variant="full" size={26} />
 
@@ -55,7 +56,7 @@ export default function UnsubscribeClient({ token }: { token: string }) {
 
         {state === "ready" && (
           <>
-            <span className="flex size-14 items-center justify-center rounded-full bg-brand-gold/15 text-brand-gold">
+            <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/15 text-violet-600 dark:text-brand-violet-light">
               <MailX size={26} />
             </span>
             <h1 className="font-heading text-xl font-bold">{t("title")}</h1>

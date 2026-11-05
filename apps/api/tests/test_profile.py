@@ -69,7 +69,7 @@ def test_patch_cleans_text():
         {"target_duration": 0},
         {"target_duration": 37},
         {"language": "klingon"},
-        {"career_slug": "wizard"},
+        {"career_slug": "Not a career!"},
         {"timezone": "Mars/Olympus"},
         {"skill_level": "godlike"},
         {"learning_goal": "x" * 256},
@@ -92,6 +92,9 @@ class _Repo:
     async def update(self, profile):
         self.saved += 1
         return profile
+
+    async def career_exists(self, slug):
+        return slug in {"backend-engineer", "data-analyst"}
 
 
 def _profile():
@@ -161,3 +164,22 @@ def test_patching_a_missing_profile_is_404():
         asyncio.run(service.patch_profile(uuid4(), {"daily_hours": 3}))
 
     assert exc.value.status_code == 404
+
+
+def test_an_unknown_career_is_refused_by_the_service():
+    profile = _profile()
+    repo = _Repo(profile)
+
+    with pytest.raises(HTTPException) as exc:
+        asyncio.run(ProfileService(repo).patch_profile(uuid4(), {"career_slug": "wizard"}))
+
+    assert exc.value.status_code == 422 and exc.value.detail == "Unknown career path"
+    assert profile.career_slug == "backend-engineer" and repo.saved == 0
+
+
+def test_a_career_in_the_database_is_accepted():
+    profile = _profile()
+
+    asyncio.run(ProfileService(_Repo(profile)).patch_profile(uuid4(), {"career_slug": "data-analyst"}))
+
+    assert profile.career_slug == "data-analyst"

@@ -22,7 +22,7 @@ export default function PageHeader({
     >
       <div className="min-w-0">
         <div className="flex items-center gap-3">
-          <span aria-hidden className="h-8 w-1.5 shrink-0 rounded-full bg-brand-gold" />
+          <span aria-hidden className="h-8 w-1.5 shrink-0 rounded-full bg-brand-violet" />
           <h1 className="font-heading text-2xl font-bold sm:text-3xl">{title}</h1>
         </div>
         {subtitle && (

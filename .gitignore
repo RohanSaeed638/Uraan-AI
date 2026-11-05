@@ -23,6 +23,7 @@ coverage
 
 # Build Outputs
 .next/
+.next*
 out/
 build
 dist
@@ -68,3 +69,11 @@ coverage
 
 # Archives
 *.zip
+
+# Database dumps
+backups/
+!.env.example
+
+# Playwright
+test-results/
+playwright-report/

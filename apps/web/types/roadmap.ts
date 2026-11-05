@@ -130,6 +130,9 @@ export interface LearningUnit {
 
   estimated_minutes: number | null;
 
+  /** ready, or still being written (pending, writing) or failed (can be retried). */
+  status?: "ready" | "pending" | "writing" | "failed";
+
   completed: boolean;
 }
 

@@ -46,7 +46,7 @@ export default function ReadinessCard({ compact = false }: { compact?: boolean }
         </div>
 
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold">
+          <p className="text-xs font-semibold uppercase tracking-wide text-violet-600 dark:text-brand-violet-light">
             {t("title")}
           </p>
           <p className="font-heading text-xl font-bold">

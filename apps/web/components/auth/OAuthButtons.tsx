@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
@@ -41,6 +42,7 @@ function GitHubIcon() {
 
 export default function OAuthButtons() {
   const tErrors = useTranslations("auth.errors");
+  const tAuth = useTranslations("auth");
   const [loading, setLoading] = useState<"google" | "github" | null>(null);
 
   async function handleOAuth(provider: "google" | "github") {
@@ -59,6 +61,7 @@ export default function OAuthButtons() {
   }
 
   return (
+    <>
     <div className="grid grid-cols-2 gap-3">
       <Button
         type="button"
@@ -87,5 +90,20 @@ export default function OAuthButtons() {
         GitHub
       </Button>
     </div>
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        {tAuth.rich("oauthConsent", {
+          terms: (chunks) => (
+            <Link href="/terms" target="_blank" className="underline">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" target="_blank" className="underline">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
+    </>
   );
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { toast } from "sonner";
@@ -19,12 +19,14 @@ import { authService } from "@/services/auth/auth";
 import { authErrorKey } from "@/lib/auth-errors";
 
 import AuthCard from "./AuthCard";
+import ResendConfirmation from "./ResendConfirmation";
 import AuthHeader from "./AuthHeader";
 import OAuthButtons from "./OAuthButtons";
 
 import PasswordInput from "@/components/shared/PasswordInput";
 import LoadingButton from "@/components/shared/LoadingButton";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -34,14 +36,18 @@ export default function RegisterForm() {
   const tErrors = useTranslations("auth.errors");
 
   const [loading, setLoading] = useState(false);
+  // Set once the account exists and the confirmation email is on its way.
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: { agree: false },
   });
 
   async function onSubmit(data: RegisterFormValues) {
@@ -62,11 +68,17 @@ export default function RegisterForm() {
         return;
       }
 
-      toast.success(t("created"));
-
       reset();
 
-      router.push("/login");
+      // With email confirmation off, sign-up already signs the person in.
+      if (result.session) {
+        toast.success(t("welcomeToast"));
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
+      setSentTo(data.email);
     } catch (error) {
       console.error(error);
 
@@ -76,6 +88,23 @@ export default function RegisterForm() {
     }
   }
 
+  if (sentTo) {
+    return (
+      <AuthCard>
+        <AuthHeader title={t("checkEmailTitle")} subtitle={t("checkEmailText", { email: `⁨${sentTo}⁩` })} />
+
+        <p className="text-sm text-muted-foreground">{t("checkEmailHint")}</p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <ResendConfirmation email={sentTo} />
+          <Link href="/login" className="text-sm font-medium text-violet-700 hover:underline dark:text-brand-violet-light">
+            {t("backToSignIn")}
+          </Link>
+        </div>
+      </AuthCard>
+    );
+  }
+
   return (
     <AuthCard>
       <AuthHeader
@@ -83,7 +112,7 @@ export default function RegisterForm() {
         subtitle={t("createSubtitle")}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="fullName">{t("fullName")}</Label>
 
@@ -151,6 +180,41 @@ export default function RegisterForm() {
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <div className="flex items-start gap-3">
+            <Controller
+              control={control}
+              name="agree"
+              render={({ field }) => (
+                <Checkbox
+                  id="agree"
+                  className="mt-0.5"
+                  checked={field.value === true}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                />
+              )}
+            />
+            <Label htmlFor="agree" className="block text-sm font-normal leading-snug text-muted-foreground">
+              {t.rich("consent", {
+                terms: (chunks) => (
+                  <Link href="/terms" target="_blank" className="font-medium text-violet-700 underline dark:text-brand-violet-light">
+                    {chunks}
+                  </Link>
+                ),
+                privacy: (chunks) => (
+                  <Link href="/privacy" target="_blank" className="font-medium text-violet-700 underline dark:text-brand-violet-light">
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </Label>
+          </div>
+
+          {errors.agree && (
+            <p className="text-sm text-destructive">{tErrors("mustAgree")}</p>
+          )}
+        </div>
+
         <LoadingButton
           type="submit"
           loading={loading}
@@ -176,7 +240,7 @@ export default function RegisterForm() {
           link: (chunks) => (
             <Link
               href="/login"
-              className="font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+              className="font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
             >
               {chunks}
             </Link>

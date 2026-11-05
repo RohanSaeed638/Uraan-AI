@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 const LIST_KEY = ["mentor", "conversations"] as const;
 const detailKey = (id: string) => ["mentor", "conversation", id] as const;
 
-export default function MentorClient() {
+export default function MentorClient({ initialConversationId = null }: { initialConversationId?: string | null }) {
   const t = useTranslations("mentorChat");
   const queryClient = useQueryClient();
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function MentorClient() {
     }
   }
 
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(initialConversationId);
   const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -144,7 +144,7 @@ export default function MentorClient() {
               className={cn(
                 "group flex items-center gap-1 rounded-xl pe-1 transition",
                 c.id === activeId
-                  ? "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                  ? "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                   : "hover:bg-muted"
               )}
             >
@@ -167,7 +167,7 @@ export default function MentorClient() {
       </Card>
 
       <Card className="flex flex-col overflow-hidden p-0">
-        <div className="flex-1 space-y-4 overflow-y-auto p-6">
+        <div role="region" aria-label={t("title")} tabIndex={0} className="flex-1 space-y-4 overflow-y-auto p-6 focus-visible:outline-2 focus-visible:outline-ring">
           {messages.length === 0 && !send.isPending && (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/10">

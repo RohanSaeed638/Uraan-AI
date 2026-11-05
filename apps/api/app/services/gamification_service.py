@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.achievement_catalog import career_title
 from app.models.profile import Profile
+from app.core.analytics import track
 from app.models.xp_event import XPEvent
 
 XP_LESSON_COMPLETED = 10
@@ -91,6 +92,7 @@ class GamificationService:
             return False
 
         profile.xp = (profile.xp or 0) + amount
+        track(profile.id, "xp_earned", reason=reason, amount=amount)
 
         today = local_today(profile.timezone)
         profile.streak_days = next_streak(

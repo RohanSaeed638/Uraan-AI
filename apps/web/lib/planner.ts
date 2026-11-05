@@ -65,8 +65,12 @@ export function formatTime(value: string, locale: string): string {
     timeZone: "UTC",
   }).format(Date.UTC(2024, 0, 1, h, m));
 
+  // Newer Node versions put a narrow no-break space before AM/PM while browsers print a normal one;
+  // the server and the browser must write the same characters or the page fails to hydrate.
+  const plain = time.replace(/[\u202f\u00a0]/g, " ");
+
   // Inside right-to-left text the clock would read "AM 9:00": keep it as one left-to-right piece.
-  return locale === "ur" ? `\u2066${time}\u2069` : time;
+  return locale === "ur" ? `\u2066${plain}\u2069` : plain;
 }
 
 /** "Fri, 7 Nov" */

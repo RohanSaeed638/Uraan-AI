@@ -95,7 +95,7 @@ export default function DayView({ schedule, day, onMove, onDropLesson }: Props) 
                       "border-s-4 active:cursor-grabbing",
                       lesson.missed
                         ? "border-destructive/50 border-s-destructive bg-destructive/5"
-                        : "border-border border-s-brand-gold bg-card hover:border-brand-gold/60"
+                        : "border-border border-s-brand-violet bg-card hover:border-brand-violet/60"
                     )}
                   >
                     <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -113,7 +113,7 @@ export default function DayView({ schedule, day, onMove, onDropLesson }: Props) 
                           </p>
                         )}
                         {lesson.pinned && !lesson.missed && (
-                          <p className="mt-1 flex items-center gap-1 text-xs text-brand-gold-deep dark:text-brand-gold">
+                          <p className="mt-1 flex items-center gap-1 text-xs text-violet-700 dark:text-brand-violet-light">
                             <Pin size={12} /> {t("pinned")}
                           </p>
                         )}

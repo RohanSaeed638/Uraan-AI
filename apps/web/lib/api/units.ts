@@ -5,6 +5,11 @@ export async function setUnitCompleted(unitId: string, completed: boolean) {
   await api.patch(`/learning-units/${unitId}`, { completed });
 }
 
+/** Writes the lessons that failed again. */
+export async function retryLessons(taskId: string) {
+  await api.post(`/tasks/${taskId}/learning-plan/retry`, undefined, { timeout: 30_000 });
+}
+
 /**
  * Asks the server to write this task's lessons if it has none. Safe to call
  * more than once: a task that already has lessons is returned unchanged.

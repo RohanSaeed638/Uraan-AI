@@ -27,3 +27,6 @@ export const restoreRoadmapVersion = (id: string, versionId: string) =>
   api
     .post<Roadmap>(`/roadmaps/${id}/versions/${versionId}/restore`)
     .then((r) => r.data);
+
+/** Removes the roadmap with its tasks and lessons. XP already earned stays. */
+export const deleteRoadmap = (id: string) => api.delete(`/roadmaps/${id}`);

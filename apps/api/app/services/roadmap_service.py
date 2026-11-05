@@ -242,7 +242,11 @@ class RoadmapService:
 
         roadmap = await self.roadmap_repository.get_latest(
             profile.id
-        )    
+        )
+
+        if roadmap is None:
+            raise HTTPException(status_code=404, detail="You do not have a roadmap yet.")
+
         return roadmap
     
     async def get_by_id(
@@ -348,11 +352,14 @@ class RoadmapService:
 
         summaries = []
 
+        # One query for every roadmap's progress, not one each.
+        progress_by_roadmap = await self.roadmap_task_repository.get_progress_for_roadmaps(
+            [r.id for r in roadmaps]
+        )
+
         for roadmap in roadmaps:
 
-            progress = await self.roadmap_task_repository.get_roadmap_progress(
-                roadmap.id
-            )
+            progress = progress_by_roadmap.get(roadmap.id, {"total": 0, "completed": 0})
 
             percentage = 0
 
@@ -501,6 +508,13 @@ class RoadmapService:
                 raise HTTPException(
                     status_code=404,
                     detail="Roadmap not found",
+                )
+
+            # A running job would write into rows that no longer exist.
+            if roadmap.status == RoadmapStatus.GENERATING and not is_stale(roadmap):
+                raise HTTPException(
+                    status_code=409,
+                    detail="Wait for the roadmap to finish updating first.",
                 )
 
             # ORM/database cascades must cover dependent records.

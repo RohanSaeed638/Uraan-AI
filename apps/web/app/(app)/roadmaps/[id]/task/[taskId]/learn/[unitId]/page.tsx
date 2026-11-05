@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api-base";
 import { notFound } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -18,7 +19,7 @@ export default async function LearnUnitPage({ params }: PageProps) {
   if (!session) notFound();
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
+    `${API_BASE}/tasks/${taskId}`,
     {
       headers: { Authorization: `Bearer ${session.access_token}` },
       cache: "no-store",

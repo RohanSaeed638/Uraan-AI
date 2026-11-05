@@ -24,6 +24,15 @@ class ProfileRepository:
 
         return result.scalars().first()
 
+    async def career_exists(self, slug: str) -> bool:
+        from app.models.career import Career
+
+        found = await self.db.execute(
+            select(Career.id).where(Career.slug == slug, Career.is_active.is_(True))
+        )
+
+        return found.first() is not None
+
     async def create(
         self,
         profile: Profile,

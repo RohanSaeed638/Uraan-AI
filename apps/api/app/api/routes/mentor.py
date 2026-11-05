@@ -1,4 +1,5 @@
 from uuid import UUID
+from app.core.rate_limit import daily_limit
 from fastapi import (
     APIRouter,
     Depends,
@@ -58,6 +59,7 @@ async def daily_motivation(
 @router.post(
     "/review",
     response_model=ReviewResponse,
+    dependencies=[Depends(daily_limit("ai-chat", "RATE_LIMIT_AI_CHAT"))],
 )
 async def review_work(
     payload: ReviewRequest,
@@ -128,6 +130,7 @@ async def get_mentor_conversation(
 @router.post(
     "/conversations/{conversation_id}/messages",
     response_model=MentorMessageCreateResponse,
+    dependencies=[Depends(daily_limit("ai-chat", "RATE_LIMIT_AI_CHAT"))],
     status_code=201,
 )
 async def send_mentor_message(

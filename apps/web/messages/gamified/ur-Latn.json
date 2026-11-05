@@ -38,8 +38,8 @@
   "viewer": {
     "markContinue": "XP hasil karein & jari rakhein",
     "markTask": "Mission ka XP hasil karein",
-    "taskCompleted": "Mission Clear! 🎉",
-    "allDone": "Tamam training mukammal! 🎉",
+    "taskCompleted": "Mission Clear!",
+    "allDone": "Tamam training mukammal!",
     "taskDoneToast": "Mission clear ho gaya",
     "allTasks": "Tamam missions dekhein"
   },

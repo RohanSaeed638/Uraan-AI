@@ -72,7 +72,8 @@ def ask(monkeypatch, purpose, language):
 
     asyncio.run(scenario())
 
-    return provider.seen[0]
+    # Every request also carries the no-emoji style rule; these tests are about the language rule.
+    return [m for m in provider.seen[0] if not m.startswith("Style rule")]
 
 
 @pytest.mark.parametrize("purpose", ["roadmap", "roadmap_adapt", "lessons", "quiz", "career", "review"])
@@ -90,6 +91,19 @@ def test_other_calls_are_left_alone(monkeypatch, purpose):
 def test_english_learners_get_no_extra_message(monkeypatch):
     assert ask(monkeypatch, "roadmap", "en") == []
     assert ask(monkeypatch, "roadmap", None) == []
+
+
+@pytest.mark.parametrize("purpose", ["roadmap", "lessons", "mentor", "motivation", "planner", "document", "interview"])
+def test_every_request_tells_the_ai_not_to_use_emoji(monkeypatch, purpose):
+    provider = Capture()
+
+    async def recorder(row):
+        pass
+
+    monkeypatch.setattr(llm, "get_router", lambda: LLMRouter([provider], recorder=recorder))
+    asyncio.run(llm.complete_text([{"role": "user", "content": "hi"}], purpose=purpose))
+
+    assert any("never use emoji" in m for m in provider.seen[0])
 
 
 # ---- messages the server writes ------------------------------------------------------------------

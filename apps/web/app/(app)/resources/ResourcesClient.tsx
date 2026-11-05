@@ -35,15 +35,15 @@ const EMPTY: ResourceFilters = {
   sort: "recommended",
 };
 
-export default function ResourcesClient() {
+export default function ResourcesClient({ initialQuery = "" }: { initialQuery?: string }) {
   const t = useTranslations("resources");
   const queryClient = useQueryClient();
   const { options: careers } = useCareerOptions();
 
-  const [filters, setFilters] = useState<ResourceFilters>(EMPTY);
+  const [filters, setFilters] = useState<ResourceFilters>({ ...EMPTY, q: initialQuery });
 
   // Search as the person types, but only ask the API once they pause.
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(initialQuery);
 
   useEffect(() => {
     const timer = setTimeout(() => setQ(filters.q ?? ""), 250);
@@ -82,7 +82,7 @@ export default function ResourcesClient() {
     !!(q || filters.career || filters.type || filters.difficulty || filters.free_only || filters.bookmarked);
 
   return (
-    <main className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <Card className="mt-6 gap-5 p-5">
@@ -195,6 +195,6 @@ export default function ResourcesClient() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

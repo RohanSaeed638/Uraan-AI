@@ -1,4 +1,6 @@
 from uuid import UUID
+
+from app.core.analytics import track
 from app.services.achievement_service import AchievementService
 from app.ai.llm import use_profile
 from app.ai.versions import prompt_version
@@ -106,6 +108,7 @@ class DocumentService:
             await AchievementService(self.db).safe_evaluate(profile)
             await self.db.commit()
             await self.db.refresh(document)
+            track(profile.id, "document_generated", kind=str(payload.kind))
         except Exception:
             await self.db.rollback()
             raise

@@ -24,7 +24,7 @@ export default function DropZone({
 
   return (
     <div
-      className={cn(className, over && allowed && "ring-2 ring-brand-gold/70 ring-offset-0")}
+      className={cn(className, over && allowed && "ring-2 ring-brand-violet/70 ring-offset-0")}
       onDragOver={(e) => {
         if (!allowed) return;
 

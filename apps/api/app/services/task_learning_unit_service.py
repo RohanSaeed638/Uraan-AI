@@ -7,6 +7,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.services.learning_unit_generator import LearningUnitGenerator
+from app.core.career_catalog import is_coding_category
+from app.services.lesson_writer import requeue_failed
+from app.models.career import Career
 from app.models.roadmap import Roadmap
 from app.models.task_learning_unit import TaskLearningUnit
 from app.repositories.profile_repository import ProfileRepository
@@ -26,6 +29,19 @@ from app.services.gamification_service import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+async def career_is_coding(db, slug: str | None) -> bool | None:
+    """Whether this career's lessons get coding exercises, by its category in
+    the database. None when it cannot be told (the catalogue file decides)."""
+    try:
+        category = (
+            await db.execute(select(Career.category).where(Career.slug == slug))
+        ).scalar_one_or_none()
+    except Exception:
+        return None
+
+    return None if category is None else is_coding_category(category)
 
 
 class TaskLearningUnitService:
@@ -114,7 +130,9 @@ class TaskLearningUnitService:
 
             try:
                 use_profile(profile.id, profile.language)
-                units = await self.generator.generate(roadmap, task, profile)
+                roadmap.coding_career = await career_is_coding(self.db, roadmap.career_slug)
+                # Plan first (seconds); the lesson text is written behind it.
+                units = await self.generator.generate_outline(roadmap, task, profile)
             except Exception as exc:
                 logger.exception("Lesson generation failed for %s", task.id)
                 raise HTTPException(
@@ -143,6 +161,23 @@ class TaskLearningUnitService:
             profile_id=profile.id,
             fresh=True,
         )
+
+    async def requeue_failed(self, task_id: UUID, auth_user_id: UUID):
+        """Puts the task's failed lessons back in the queue and returns the task."""
+        profile = await self.profile_repository.get_by_auth_user_id(auth_user_id)
+
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+
+        task = await self.task_repository.get_task_for_user(task_id=task_id, profile_id=profile.id)
+
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        await requeue_failed(self.db, task.id)
+        await self.db.commit()
+
+        return await self.task_repository.get_task_for_user(task_id=task_id, profile_id=profile.id, fresh=True)
 
     async def get_by_task(
         self,
@@ -231,6 +266,12 @@ class TaskLearningUnitService:
                 raise HTTPException(
                     status_code=404,
                     detail="Learning unit not found",
+                )
+
+            if getattr(learning_unit, "status", "ready") != "ready":
+                raise HTTPException(
+                    status_code=409,
+                    detail="This lesson is still being written. Try again in a moment.",
                 )
 
             was_completed = learning_unit.completed

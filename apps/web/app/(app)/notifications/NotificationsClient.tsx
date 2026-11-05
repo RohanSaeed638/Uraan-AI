@@ -12,6 +12,7 @@ import {
   CheckCheck,
   Flame,
   LucideIcon,
+  Megaphone,
   Trophy,
 } from "lucide-react";
 
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   boss_defeated: Trophy,
   streak: Flame,
   schedule_updated: CalendarClock,
+  announcement: Megaphone,
 };
 
 type Filter = "all" | "unread";
@@ -131,7 +133,7 @@ export default function NotificationsClient() {
                   onClick={() => open(n)}
                   className={cn(
                     "flex w-full items-start gap-4 border-b px-5 py-4 text-start transition last:border-b-0 hover:bg-muted/60",
-                    !n.read && "bg-brand-gold/5"
+                    !n.read && "bg-brand-violet/5"
                   )}
                 >
                   <span
@@ -139,7 +141,7 @@ export default function NotificationsClient() {
                       "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl",
                       n.read
                         ? "bg-muted text-muted-foreground"
-                        : "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                        : "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                     )}
                   >
                     <Icon size={18} />
@@ -158,7 +160,7 @@ export default function NotificationsClient() {
                   </span>
 
                   {!n.read && (
-                    <span aria-label={t("unreadDot")} className="mt-2 size-2 shrink-0 rounded-full bg-brand-gold" />
+                    <span aria-label={t("unreadDot")} className="mt-2 size-2 shrink-0 rounded-full bg-brand-violet" />
                   )}
                 </button>
               );

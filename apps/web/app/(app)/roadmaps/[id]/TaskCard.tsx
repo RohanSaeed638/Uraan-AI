@@ -79,7 +79,7 @@ export function TaskCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => event.stopPropagation()}
-              className="inline-flex items-center gap-1 text-sm font-medium text-brand-gold-deep dark:text-brand-gold hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-violet-700 dark:text-brand-violet-light hover:underline"
             >
               {t("openResource")}
               <ExternalLink className="h-3 w-3" />

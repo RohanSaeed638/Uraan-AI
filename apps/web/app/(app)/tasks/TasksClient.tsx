@@ -112,6 +112,7 @@ export default function TasksClient({
               className="flex items-center gap-4 border-b border-border px-5 py-4 last:border-b-0"
             >
               <Checkbox
+                aria-label={task.title}
                 checked={task.completed}
                 disabled={pendingId === task.id}
                 onCheckedChange={(checked) => toggle(task.id, checked === true)}

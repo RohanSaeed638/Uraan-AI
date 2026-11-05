@@ -43,7 +43,7 @@ export default function LessonChip({
         draggable && "cursor-grab active:cursor-grabbing",
         lesson.missed
           ? "border-destructive/50 bg-destructive/10"
-          : "border-border bg-card hover:border-brand-gold/60 hover:bg-brand-gold/10"
+          : "border-border bg-card hover:border-brand-violet/60 hover:bg-brand-violet/10"
       )}
     >
       <Icon size={13} className={cn("shrink-0", unitColor(lesson.type))} aria-hidden />
@@ -63,14 +63,14 @@ export default function LessonChip({
         <TriangleAlert size={13} className="shrink-0 text-destructive" aria-label={t("missed")} />
       )}
       {lesson.pinned && !lesson.missed && (
-        <Pin size={12} className="shrink-0 text-brand-gold" aria-label={t("pinned")} />
+        <Pin size={12} className="shrink-0 text-violet-600 dark:text-brand-violet-light" aria-label={t("pinned")} />
       )}
 
       <button
         type="button"
         onClick={() => onMove(lesson)}
         aria-label={t("move", { title: lesson.title })}
-        className="shrink-0 rounded-full p-1 text-muted-foreground opacity-60 transition hover:bg-brand-gold/20 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 group-hover:opacity-100"
+        className="shrink-0 rounded-full p-1 text-muted-foreground opacity-60 transition hover:bg-brand-violet/20 hover:text-foreground hover:opacity-100 focus-visible:opacity-100 group-hover:opacity-100"
       >
         <CalendarClock size={13} />
       </button>

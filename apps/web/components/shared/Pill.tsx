@@ -18,7 +18,7 @@ export default function Pill({
           ? "border border-border text-foreground/80"
           : tone === "gold"
             ? "bg-brand-gold/20 text-brand-gold-deep dark:text-brand-gold-light"
-            : "bg-brand-violet/15 text-brand-violet",
+            : "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light",
         className
       )}
     >

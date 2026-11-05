@@ -38,8 +38,8 @@
   "viewer": {
     "markContinue": "XP حاصل کریں اور جاری رکھیں",
     "markTask": "مشن کا XP حاصل کریں",
-    "taskCompleted": "مشن مکمل! 🎉",
-    "allDone": "تمام ٹریننگ مکمل! 🎉",
+    "taskCompleted": "مشن مکمل!",
+    "allDone": "تمام ٹریننگ مکمل!",
     "taskDoneToast": "مشن مکمل ہوا",
     "allTasks": "تمام مشنز دیکھیں"
   },

@@ -27,7 +27,7 @@ export default function WelcomeStep({ next }: StepProps) {
       <div className="grid gap-5 sm:grid-cols-2">
         {features.map(({ icon: Icon, key }) => (
           <div key={key} className="flex items-center gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light">
               <Icon size={20} />
             </span>
             <div>

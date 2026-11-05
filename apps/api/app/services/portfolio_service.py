@@ -3,6 +3,7 @@ from app.services.achievement_service import AchievementService
 from app.ai.llm import use_profile
 import secrets
 from uuid import UUID
+from app.core.analytics import track
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
@@ -145,6 +146,7 @@ class PortfolioService:
             if changes["is_public"] and not portfolio.slug:
                 portfolio.slug = await self._free_slug(profile)
             portfolio.is_public = changes["is_public"]
+            track(profile.id, "portfolio_published" if portfolio.is_public else "portfolio_unpublished")
 
         await AchievementService(self.db).safe_evaluate(profile)
         await self._commit()

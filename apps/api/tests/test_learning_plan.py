@@ -397,7 +397,7 @@ class _Generator:
         self.calls = 0
         self.fail = fail
 
-    async def generate(self, roadmap, task, profile=None):
+    async def generate_outline(self, roadmap, task, profile=None):
         self.calls += 1
         if self.fail:
             raise ValueError("bad plan")

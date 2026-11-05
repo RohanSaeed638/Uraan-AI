@@ -59,8 +59,12 @@ def app():
 def test_responses_keep_detail_and_status_and_add_a_code():
     response = app().get("/missing")
 
+    body = response.json()
+
     assert response.status_code == 404
-    assert response.json() == {"detail": "Profile not found", "error_code": "profile_not_found"}
+    assert body["detail"] == body["message"] == "Profile not found"
+    assert body["error_code"] == "profile_not_found" and body["code"] == "NOT_FOUND_001"
+    assert "request_id" in body
 
 
 def test_headers_survive():

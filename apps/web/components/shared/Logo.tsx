@@ -40,7 +40,7 @@ export default function Logo({
           className="font-heading font-bold tracking-wide text-foreground"
           style={{ fontSize: size * 0.6 }}
         >
-          Uraan <span className="text-brand-gold">AI</span>
+          Uraan <span className="text-brand-gold-deep dark:text-brand-gold">AI</span>
         </span>
       </span>
     );

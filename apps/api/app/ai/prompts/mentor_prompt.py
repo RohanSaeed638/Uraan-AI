@@ -31,17 +31,15 @@ Guidelines:
 
 TONES = {
     "friendly": (
-        "Tone: warm and encouraging, in simple words. Celebrate effort. An "
-        "occasional emoji is fine."
+        "Tone: warm and encouraging, in simple words. Celebrate effort."
     ),
     "genz": (
         "Tone: casual and energetic, like a smart friend. Short sentences, a "
-        "little slang used sparingly (for example 'lowkey' or 'no cap'), a few "
-        "emojis. Never childish, and never at the cost of accuracy."
+        "little slang used sparingly (for example 'lowkey' or 'no cap'). Never "
+        "childish, and never at the cost of accuracy."
     ),
     "professional": (
-        "Tone: concise, formal and precise, like a senior colleague. No slang "
-        "and no emojis."
+        "Tone: concise, formal and precise, like a senior colleague. No slang."
     ),
 }
 

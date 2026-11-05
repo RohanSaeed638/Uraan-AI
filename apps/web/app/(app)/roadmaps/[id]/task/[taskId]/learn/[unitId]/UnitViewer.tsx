@@ -15,7 +15,12 @@ import {
 } from "lucide-react";
 
 import { api } from "@/lib/api/client";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+
+import { fireConfetti } from "@/components/shared/ConfettiHost";
+import { fireXp, XP_LESSON, XP_TASK } from "@/components/shared/XpBurst";
 import { setUnitCompleted } from "@/lib/api/units";
+import { usePendingLessons } from "@/lib/use-pending-lessons";
 import { formatMinutes, getUnitMeta, isSearchLink, unitLabel } from "@/lib/units";
 import { ExerciseDetails, ProjectDetails, RoadmapTask } from "@/types/roadmap";
 
@@ -69,8 +74,13 @@ export default function UnitViewer({
   const [taskDone, setTaskDone] = useState(task.completed);
   const [saving, setSaving] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const unit = units[index];
+  const ready = (unit.status ?? "ready") === "ready";
+
+  // Lessons are written behind the plan: this page refreshes as they finish.
+  usePendingLessons(task.id, units);
   const meta = getUnitMeta(unit.type);
   const Icon = meta.icon;
   const isLast = index === units.length - 1;
@@ -99,6 +109,7 @@ export default function UnitViewer({
     if (!done.has(unit.id)) {
       try {
         await setUnitCompleted(unit.id, true);
+        fireXp(XP_LESSON);
       } catch {
         toast.error(t("syncFailed"));
       }
@@ -110,6 +121,7 @@ export default function UnitViewer({
       goTo(index + 1);
     } else if (nextDone.size === units.length) {
       setShowComplete(true);
+      fireConfetti();
     } else {
       toast.info(t("someUnfinished"));
     }
@@ -122,6 +134,8 @@ export default function UnitViewer({
       await api.patch(`/roadmaps/tasks/${task.id}`, { completed: true });
       setTaskDone(true);
       toast.success(t("taskDoneToast"));
+      fireXp(XP_TASK);
+      fireConfetti();
     } catch {
       toast.error(t("taskFailed"));
     } finally {
@@ -131,20 +145,37 @@ export default function UnitViewer({
 
   /* ---------- Task complete screen ---------- */
   if (showComplete) {
+    // Each part eases in a moment after the one before it (skipped for people who prefer less motion).
+    const group: Variants = { hidden: {}, show: { transition: { staggerChildren: reduceMotion ? 0 : 0.09 } } };
+    const rise: Variants = {
+      hidden: reduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 },
+      show: { opacity: 1, y: 0, transition: { duration: reduceMotion ? 0 : 0.35, ease: "easeOut" } },
+    };
+
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center">
-        <WelcomeBirdIllustration size={110} />
-        <h1 className="font-heading mt-2 text-3xl font-bold">
+      <motion.div
+        variants={group}
+        initial="hidden"
+        animate="show"
+        className="mx-auto flex max-w-lg flex-col items-center py-10 text-center"
+      >
+        <motion.div
+          initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 220, damping: 14 }}
+        >
+          <WelcomeBirdIllustration size={110} />
+        </motion.div>
+
+        <motion.h1 variants={rise} className="font-heading mt-2 text-3xl font-bold">
           {taskDone ? t("taskCompleted") : t("allDone")}
-        </h1>
-        <p className="mt-2 text-muted-foreground">
+        </motion.h1>
+        <motion.p variants={rise} className="mt-2 text-muted-foreground">
           {t.rich("finishedIn", {
             task: task.title,
-            b: (chunks) => (
-              <span className="font-medium text-foreground">{chunks}</span>
-            ),
+            b: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
           })}
-        </p>
+        </motion.p>
 
         <div className="mt-8 grid w-full grid-cols-3 gap-3">
           {[
@@ -152,21 +183,19 @@ export default function UnitViewer({
             { label: t("time"), value: formatMinutes(totalMinutes, tUnit) },
             { label: t("status"), value: taskDone ? t("completed") : t("inReview") },
           ].map(({ label, value }) => (
-            <Card key={label} className="items-center gap-1 p-4">
-              <p className="text-lg font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </Card>
+            <motion.div key={label} variants={rise}>
+              <Card className="items-center gap-1 p-4">
+                <p className="num text-lg font-bold">{value}</p>
+                <p className="text-xs text-muted-foreground">{label}</p>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <motion.div variants={rise} className="mt-8 flex w-full flex-col gap-3">
           {!taskDone && (
             <Button size="lg" onClick={markTaskComplete} disabled={saving}>
-              {saving ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                t("markTask")
-              )}
+              {saving ? <Loader2 size={16} className="animate-spin" /> : t("markTask")}
             </Button>
           )}
           <Link
@@ -178,14 +207,11 @@ export default function UnitViewer({
           >
             {t("allTasks")}
           </Link>
-          <Link
-            href={`/roadmaps/${roadmapId}`}
-            className={buttonVariants({ variant: "ghost" })}
-          >
+          <Link href={`/roadmaps/${roadmapId}`} className={buttonVariants({ variant: "ghost" })}>
             {t("backRoadmap")}
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
@@ -215,7 +241,7 @@ export default function UnitViewer({
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-brand-gold-deep dark:text-brand-gold">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-violet/10 px-3 py-1 font-medium text-violet-700 dark:text-brand-violet-light">
           <Icon size={14} /> {unitLabel(unit.type, tUnit)}
         </span>
         {unit.estimated_minutes != null && (
@@ -276,6 +302,22 @@ export default function UnitViewer({
         </div>
       )}
 
+      {!ready ? (
+        <Card className="mt-6 items-center gap-3 p-10 text-center" role="status">
+          {unit.status === "failed" ? (
+            <>
+              <p className="font-heading text-lg font-semibold">{t("writeFailedTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("writeFailedText")}</p>
+            </>
+          ) : (
+            <>
+              <Loader2 className="h-6 w-6 animate-spin text-violet-600 dark:text-brand-violet-light" />
+              <p className="font-heading text-lg font-semibold">{t("writingTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("writingText")}</p>
+            </>
+          )}
+        </Card>
+      ) : (
       <div className="mt-6 space-y-6">
         {searchLink && unit.resource_url && (
           <a
@@ -334,7 +376,7 @@ export default function UnitViewer({
             rel="noopener noreferrer"
             className="flex items-center justify-between rounded-2xl border border-border p-4 transition hover:bg-muted"
           >
-            <span className="font-medium text-brand-gold-deep dark:text-brand-gold">
+            <span className="font-medium text-violet-700 dark:text-brand-violet-light">
               {unit.type === "project" ? t("openProject") : t("openResource")}
             </span>
             <ExternalLink size={16} className="text-muted-foreground" />
@@ -347,6 +389,7 @@ export default function UnitViewer({
           </p>
         )}
       </div>
+      )}
 
       <div className="mt-10 flex items-center justify-between gap-3 border-t border-border pt-6">
         <Button
@@ -368,7 +411,7 @@ export default function UnitViewer({
               {t("skip")}
             </Button>
           )}
-          <Button onClick={completeAndContinue} disabled={saving} className="gap-1.5">
+          <Button onClick={completeAndContinue} disabled={saving || !ready} className="gap-1.5">
             {saving ? (
               <Loader2 size={15} className="animate-spin" />
             ) : done.has(unit.id) && !isLast ? (

@@ -209,7 +209,7 @@ export default function AccountTab({ user }: { user: User }) {
           </div>
         </div>
 
-        <form onSubmit={saveName} className="mt-6 space-y-4">
+        <form method="post" onSubmit={saveName} className="mt-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="fullName">{t("fullName")}</Label>
             <Input
@@ -240,7 +240,7 @@ export default function AccountTab({ user }: { user: User }) {
         <p className="mt-1 break-all text-sm text-muted-foreground">{email}</p>
 
         {hasPassword ? (
-          <form onSubmit={changeEmail} className="mt-5 space-y-4">
+          <form method="post" onSubmit={changeEmail} className="mt-5 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="newEmail">{t("newEmail")}</Label>
               <Input
@@ -278,7 +278,7 @@ export default function AccountTab({ user }: { user: User }) {
         <h2 className="text-sm font-semibold">{t("security")}</h2>
 
         {hasPassword ? (
-          <form onSubmit={changePassword} className="mt-5 space-y-4">
+          <form method="post" onSubmit={changePassword} className="mt-5 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="currentPassword">{t("currentPassword")}</Label>
               <Input

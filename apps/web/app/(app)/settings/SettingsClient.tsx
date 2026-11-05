@@ -72,7 +72,7 @@ export default function SettingsClient({
               className={cn(
                 "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2.5 text-start text-sm font-medium transition sm:gap-2.5 sm:px-3.5",
                 active === key
-                  ? "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                  ? "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                   : "text-muted-foreground hover:bg-muted"
               )}
             >

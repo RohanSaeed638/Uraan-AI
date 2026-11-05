@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 from app.models.task_learning_unit import LearningUnitType
 
 class LearningUnitResponse(BaseModel):
@@ -25,12 +25,25 @@ class LearningUnitResponse(BaseModel):
 
     estimated_minutes: int | None = None
 
+    # ready, pending, writing or failed: the lesson text is filled in behind the plan.
+    status: str = "ready"
+
     completed: bool
 
     model_config = ConfigDict(
         from_attributes=True
     )
-    
+
+    @field_validator("details")
+    @classmethod
+    def hide_internal(cls, value):
+        """Keys starting with "_" (the saved outline of a lesson still being
+        written) are for the server, not the learner."""
+        if isinstance(value, dict):
+            return {k: v for k, v in value.items() if not k.startswith("_")} or None
+
+        return value
+
 class RoadmapTaskResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

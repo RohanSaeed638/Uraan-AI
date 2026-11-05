@@ -8,6 +8,7 @@ If a job fails, nothing the learner had is lost: content is only replaced after
 the AI call succeeded, and the roadmap returns to the status it had before.
 """
 import logging
+from app.core.analytics import track
 from app.ai.llm import use_profile
 from datetime import datetime, timedelta, timezone
 
@@ -171,6 +172,7 @@ async def run_job(
             roadmap.generation_error = None
             roadmap.status_before_job = None
             await db.commit()
+            track(roadmap.profile_id, "roadmap_ready", kind=kind, career=roadmap.career_slug)
 
         except Exception:
             logger.exception("Roadmap %s failed for %s", kind, roadmap_id)

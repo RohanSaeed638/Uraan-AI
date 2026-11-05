@@ -109,7 +109,7 @@ def unsubscribe_links(profile_id: UUID) -> tuple[str, str]:
 
     return (
         f"{settings.WEB_URL.rstrip('/')}/unsubscribe?token={token}",
-        f"{settings.API_PUBLIC_URL.rstrip('/')}/email/unsubscribe?token={token}",
+        f"{settings.API_PUBLIC_URL.rstrip('/')}/api/v1/email/unsubscribe?token={token}",
     )
 
 

@@ -57,10 +57,10 @@ export default function FilterChips<T extends string>({
           "outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
           size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm",
           active
-            ? "bg-brand-gold text-[#241a05] shadow-sm"
+            ? "bg-primary text-primary-foreground shadow-sm"
             : segmented
               ? "text-muted-foreground hover:text-foreground"
-              : "border border-border bg-card text-muted-foreground hover:border-brand-gold/60 hover:bg-brand-gold/10 hover:text-foreground"
+              : "border border-border bg-card text-muted-foreground hover:border-brand-violet/60 hover:bg-brand-violet/10 hover:text-foreground"
         );
         const content = (
           <>

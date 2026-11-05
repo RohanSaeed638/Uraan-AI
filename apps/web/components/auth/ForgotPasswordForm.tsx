@@ -99,7 +99,7 @@ export default function ForgotPasswordForm() {
         subtitle={t("forgotSubtitle")}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("email")}</Label>
 

@@ -11,7 +11,7 @@ from app.ai.services.career_recommender import catalogue_lines, pick_valid
 from app.core.career_catalog import catalog_slugs, load_catalog
 from app.models.career import Career
 from app.repositories.career_repository import CareerRepository
-from app.schemas.profile import CAREER_SLUGS
+from app.schemas.profile import CAREER_SLUG
 from app.services.career_seed import seed_careers
 from app.services.career_service import CareerService
 
@@ -27,8 +27,11 @@ def test_catalogue_has_the_fourteen_prd_careers():
     assert len(catalog_slugs()) == 14
 
 
-def test_profile_validation_uses_the_catalogue_slugs():
-    assert CAREER_SLUGS == catalog_slugs()
+def test_every_catalogue_slug_is_a_valid_career_address():
+    """Whether a career exists is checked against the database (admins can add
+    careers); the schema only checks the address is well formed."""
+    assert all(CAREER_SLUG.match(slug) for slug in catalog_slugs())
+    assert not CAREER_SLUG.match("Not a slug!")
 
 
 @pytest.mark.parametrize("career", load_catalog(), ids=lambda c: c["slug"])

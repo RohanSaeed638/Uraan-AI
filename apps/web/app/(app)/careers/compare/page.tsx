@@ -24,14 +24,14 @@ export default async function ComparePage({
 
   if (!careers) {
     return (
-      <main className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl">
         <Card className="items-center gap-4 p-8 text-center">
           <p className="text-sm text-muted-foreground">{t("compareNeedTwo")}</p>
           <Link href="/careers" className={buttonVariants({})}>
             {t("backToCareers")}
           </Link>
         </Card>
-      </main>
+      </div>
     );
   }
 
@@ -50,7 +50,7 @@ export default async function ComparePage({
   ];
 
   return (
-    <main className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl">
       <Link
         href="/careers"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -128,6 +128,6 @@ export default async function ComparePage({
           {t("sharedSkills", { skills: shared.map(ct.skill).join(", ") })}
         </p>
       )}
-    </main>
+    </div>
   );
 }

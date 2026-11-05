@@ -198,6 +198,30 @@ alembic check                     # fails if models and migrations drift
   `pytest tests/test_rls.py` fails if one is missed.
 - The web app talks to Supabase only for sign-in. All data goes through the API.
 
+## Admin portal
+
+`/admin` (staff only) has an overview (learners, activity, AI usage and failures
+per feature and provider), a user list with email search and role changes,
+careers and library resources you can add, edit and switch off, announcements
+(a banner for everyone, optionally also a notification), and an audit log.
+
+- **Who is an admin:** put the first admins' sign-in emails in `ADMIN_EMAILS`
+  (comma separated, in `apps/api/.env`). An account with a listed address
+  becomes an admin the first time it signs in. After that, admins promote or
+  demote others in the portal's Users page. You cannot remove your own access.
+- **Access:** every `/admin/*` API route needs an admin and answers `403` to
+  anyone else; the web pages show the normal "not found" page, so the portal is
+  not advertised. Admin text is English only.
+- **Nothing is deleted:** careers, resources and announcements are switched
+  off instead, because roadmaps, bookmarks and notifications point at them.
+  Switching a career off hides it from learners and from new roadmaps.
+- **Careers added in the portal** work everywhere: the profile check, roadmap
+  generation and coding exercises read the database, not just
+  `data/careers.json` (which still seeds the first careers).
+- **Audit log:** every change writes a row to `audit_logs` in the same
+  transaction (who, what, which item, and before/after values). Rows are never
+  edited or removed by the app.
+
 ## Study planner
 
 `/calendar` lays the active roadmap's lessons out on the days and times the
@@ -270,3 +294,50 @@ languages: **English (`en`)**, **Urdu in Urdu script (`ur`, right to left)** and
   account (`user_settings.wording`) and in the `NEXT_WORDING` cookie.
 - **Not translated yet:** the careers catalogue text (`data/careers.json`),
   achievement titles inside notifications, and the AI's saved planner summaries.
+
+## Running it for real (platform)
+
+- **URLs:** every endpoint lives under `/api/v1` (the web reads the base from
+  `NEXT_PUBLIC_API_URL`). `GET /health` says the process is up; `GET /health/ready`
+  also checks the database (use it as the deploy health check).
+- **Errors** have one shape: `detail`, `message`, `code` (e.g. `RATE_LIMIT_001`),
+  `error_code` (see Languages) and `request_id`. Every response carries
+  `X-Request-ID`; quote it when reporting a problem and find it in the logs.
+- **Logs:** JSON lines (`LOG_FORMAT=text` for a readable terminal, `SQL_ECHO=true`
+  to print each statement). Requests slower than `SLOW_REQUEST_MS` (default 1000)
+  are logged as warnings.
+- **Rate limits** (`RATE_LIMIT_*` in `apps/api/.env`): anonymous 50/h, signed in 500/h,
+  AI chat 100/day, roadmap generation 10/day, plus a per-address cap so inventing
+  accounts does not help. Refusals are a `429` with `Retry-After`. Counters live in
+  memory; with more than one API process set `RATE_LIMIT_STORAGE_URI=redis://...`.
+  Run uvicorn with `--proxy-headers` behind a proxy so addresses are the visitor's.
+  `RATE_LIMIT_ENABLED=false` turns them off.
+- **Sign-in checks:** the API remembers a verified token for `AUTH_CACHE_SECONDS`
+  (default 60) instead of asking Supabase on every request; a sign-out is noticed
+  within that time. `0` asks every time.
+- **Monitoring:** set `SENTRY_DSN` (API) and `NEXT_PUBLIC_SENTRY_DSN` (web) for error
+  reports, and `POSTHOG_API_KEY` / `POSTHOG_HOST` for product events. Both are off
+  when unset, and neither receives names, emails or text.
+- **Lessons** are written behind the plan: the outline appears in seconds and each
+  lesson fills in as it is written; a lesson that fails shows a retry button.
+- **Testing a build beside `npm run dev`:** `NEXT_DIST_DIR=.next-test npm run build`
+  keeps it out of `.next`, so the dev server is not disturbed.
+- **Backups:** see `docs/runbooks/backup-and-restore.md` (Supabase daily backups plus
+  your own `python scripts/backup_db.py`, written to `backups/`, which git ignores).
+
+## Tests, CI and deployment
+
+- **API tests:** `cd apps/api && pytest tests` (about 630 tests; those that use the database roll back
+  or clean up after themselves). Coverage: `pytest tests --cov=app` (83% when last measured; CI fails under 75%).
+- **Web tests:** `npm test --workspace apps/web` (Vitest: components, helpers, and that the Urdu files have
+  every key and placeholder of the English ones).
+- **Browser journey:** `npm run test:e2e --workspace apps/web` signs in, builds a roadmap, opens a lesson and signs out
+  against a running app. It needs a confirmed account (`E2E_EMAIL`, `E2E_PASSWORD`) and uses real AI calls, so it is
+  run on demand. See `apps/web/playwright.config.ts` for the other variables.
+- **CI** (`.github/workflows/ci.yml`) runs on every push and pull request: API migrations on a fresh Postgres plus
+  `alembic check`, the API tests with coverage, web lint, types, unit tests and a production build, and checks that
+  the generated API files are current. `reminders.yml` sends reminders every 15 minutes once enabled.
+- **API types for the web:** after changing an endpoint, run `python scripts/dump_openapi.py` in `apps/api` and
+  `npm run gen:api` in `apps/web`, and commit both outputs.
+- **Docker:** `docker compose up --build` (see `docker-compose.yml`). **Deploying:** `docs/deployment.md`.
+- **Environment files:** copy `apps/api/.env.example` and `apps/web/.env.example`.

@@ -57,7 +57,7 @@ export default function WeekView({ schedule, weekStart, onMove, onDropLesson, on
               <Card
                 className={cn(
                   "h-full min-h-56 gap-3 p-3",
-                  isToday && "border-brand-gold/70 bg-brand-gold/5",
+                  isToday && "border-brand-violet/70 bg-brand-violet/5",
                   past && !planned && "opacity-60"
                 )}
               >
@@ -67,13 +67,13 @@ export default function WeekView({ schedule, weekStart, onMove, onDropLesson, on
                   className="group flex items-baseline justify-between gap-2 rounded-xl text-start outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
                   aria-label={t("openDay", { day: `${weekdays[i]} ${date.getDate()}` })}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground group-hover:text-foreground">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-foreground/70 group-hover:text-foreground">
                     {weekdays[i]}
                   </span>
                   <span
                     className={cn(
                       "flex size-7 items-center justify-center rounded-full text-sm font-bold",
-                      isToday ? "bg-brand-gold text-[#241a05]" : "group-hover:bg-muted"
+                      isToday ? "bg-primary text-primary-foreground" : "group-hover:bg-muted"
                     )}
                   >
                     {date.getDate()}

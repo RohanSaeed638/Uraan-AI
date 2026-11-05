@@ -1,10 +1,11 @@
 import axios from "axios";
+import { API_BASE } from "@/lib/api-base";
 import {createClient} from "@/lib/supabase/client";
 
 const supabase = createClient();
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_BASE,
 });
 
 api.interceptors.request.use(async (config) => {

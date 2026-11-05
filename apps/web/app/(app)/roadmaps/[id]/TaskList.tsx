@@ -312,7 +312,7 @@ export default function TaskList({
                     "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
                     phaseProgress === 100
                       ? "bg-emerald-500/15 text-emerald-500"
-                      : "bg-brand-gold/15 text-brand-gold-deep dark:text-brand-gold"
+                      : "bg-brand-violet/15 text-violet-700 dark:text-brand-violet-light"
                   )}
                 >
                   {index + 1}
