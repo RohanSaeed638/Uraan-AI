@@ -202,7 +202,31 @@ class InsightsService:
             }
         )
 
-        return {"weeks": weeks, "eligible_for_return": eligible, "steps": steps, "cohorts": cohorts}
+        # How long a learner takes to reach their first win: sign-up to first finished lesson, the middle value.
+        minutes = (
+            await self.db.execute(
+                text(
+                    """
+                    select percentile_cont(0.5) within group (order by extract(epoch from first.at - p.created_at) / 60)
+                    from profiles p
+                    join lateral (
+                        select min(a.created_at) as at from learning_activities a where a.profile_id = p.id
+                    ) first on first.at is not null
+                    where p.role <> 'admin'
+                      and p.created_at >= date_trunc('week', now()) - make_interval(weeks => :weeks)
+                    """
+                ),
+                {"weeks": weeks - 1},
+            )
+        ).scalar()
+
+        return {
+            "weeks": weeks,
+            "eligible_for_return": eligible,
+            "median_minutes_to_first_lesson": round(float(minutes), 1) if minutes is not None else None,
+            "steps": steps,
+            "cohorts": cohorts,
+        }
 
     # ---- AI usage and spend -----------------------------------------------------------------------------------
 

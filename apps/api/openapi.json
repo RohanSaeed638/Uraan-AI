@@ -3129,6 +3129,17 @@
             "title": "Eligible For Return",
             "type": "integer"
           },
+          "median_minutes_to_first_lesson": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Minutes To First Lesson"
+          },
           "steps": {
             "items": {
               "$ref": "#/components/schemas/FunnelStep"

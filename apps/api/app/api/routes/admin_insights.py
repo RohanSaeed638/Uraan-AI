@@ -85,6 +85,7 @@ class Cohort(BaseModel):
 class Funnel(BaseModel):
     weeks: int
     eligible_for_return: int
+    median_minutes_to_first_lesson: float | None = None
     steps: list[FunnelStep]
     cohorts: list[Cohort]
 

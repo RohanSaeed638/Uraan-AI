@@ -1137,6 +1137,7 @@ One of: `beginner`, `job_ready`, `student`, `professional`, `career_switcher`
 |---|---|---|
 | `cohorts` | list of Cohort | yes |
 | `eligible_for_return` | integer | yes |
+| `median_minutes_to_first_lesson` | number or null | no |
 | `steps` | list of FunnelStep | yes |
 | `weeks` | integer | yes |
 

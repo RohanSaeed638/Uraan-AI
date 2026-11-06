@@ -181,6 +181,8 @@ def test_the_funnel_counts_how_far_each_new_learner_got_and_leaves_staff_out():
     assert steps["roadmap"]["count"] >= 2  # Active and Stopped have a roadmap; Staff is left out
     assert steps["first_lesson"]["count"] >= 1 and steps["returned"]["count"] >= 1
     assert steps["returned"]["count"] <= result["eligible_for_return"]
+    median = result["median_minutes_to_first_lesson"]
+    assert median is None or median >= 0
     assert all(set(c) >= {"week", "signups", "onboarded", "roadmap", "first_lesson", "returned", "finished"} for c in result["cohorts"])
 
 

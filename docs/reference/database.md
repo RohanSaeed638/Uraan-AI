@@ -375,7 +375,7 @@ Also: unique together: `profile_id`, `resource_id`.
 | `created_at` | DATETIME | no | now() |  |
 | `updated_at` | DATETIME | no | now() |  |
 
-Also: check: `rating between 1 and 5`; unique together: `profile_id`, `resource_id`.
+Also: unique together: `profile_id`, `resource_id`; check: `rating between 1 and 5`.
 
 ## roadmaps
 
