@@ -21,6 +21,7 @@ export interface Cohort {
 export interface Funnel {
   weeks: number;
   eligible_for_return: number;
+  median_minutes_to_first_lesson: number | null;
   steps: FunnelStep[];
   cohorts: Cohort[];
 }

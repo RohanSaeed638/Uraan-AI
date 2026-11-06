@@ -20,7 +20,7 @@ export default function YourPlanStep({
   const o = useTranslations("options");
 
   return (
-    <OnboardingCard title={t("title")} subtitle={t("subtitle")}>
+    <OnboardingCard art="ob-plan" title={t("title")} subtitle={t("subtitle")}>
       <div className="space-y-8">
         <div className="space-y-3">
           <p className="text-sm font-medium">{t("goal")}</p>

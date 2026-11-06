@@ -10,6 +10,7 @@ import { Clock, FolderKanban } from "lucide-react";
 import Pill from "@/components/shared/Pill";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Illustration from "@/components/illustrations/Illustration";
 
 export interface Project {
   id: string;
@@ -38,9 +39,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
   if (projects.length === 0) {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
-        <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
-          <FolderKanban className="size-7 text-brand-violet" />
-        </span>
+        <Illustration name="projects" size={180} />
         <h1 className="font-heading mt-6 text-2xl font-bold">{t("emptyTitle")}</h1>
         <p className="mt-2 text-muted-foreground">
           {t("emptyText")}

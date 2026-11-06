@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/shared/PageHeader";
-import { BookOpen, CheckSquare, Clock, TrendingUp } from "lucide-react";
+import { BookOpen, CheckSquare, Clock } from "lucide-react";
 
 import { getActivity, getProgressOverview } from "@/lib/server/data";
 import ActivityChart from "@/components/shared/ActivityChart";
@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import ProgressRing from "@/components/shared/ProgressRing";
 import { buttonVariants } from "@/components/ui/button";
+import Illustration from "@/components/illustrations/Illustration";
 
 const pct = (done: number, total: number) =>
   total === 0 ? 0 : Math.round((done / total) * 100);
@@ -52,9 +53,7 @@ export default async function ProgressPage() {
   if (rows.length === 0) {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
-        <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
-          <TrendingUp className="size-7 text-brand-violet" />
-        </span>
+        <Illustration name="progress" size={180} />
         <h1 className="font-heading mt-6 text-2xl font-bold">
           {t("emptyTitle")}
         </h1>

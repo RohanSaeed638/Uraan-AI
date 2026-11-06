@@ -18,7 +18,7 @@ export default function ProfileStep({
   const t = useTranslations("onboarding.profile");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="ob-journey"
       title={t("title")}
       subtitle={t("subtitle")}
     >

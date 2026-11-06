@@ -6,13 +6,14 @@ import FilterChips from "@/components/shared/FilterChips";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { CheckSquare, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 import { api } from "@/lib/api/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Illustration from "@/components/illustrations/Illustration";
 
 export interface FlatTask {
   id: string;
@@ -71,9 +72,7 @@ export default function TasksClient({
   if (tasks.length === 0) {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
-        <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
-          <CheckSquare className="size-7 text-brand-violet" />
-        </span>
+        <Illustration name="tasks" size={180} />
         <h1 className="font-heading mt-6 text-2xl font-bold">{t("emptyTitle")}</h1>
         <p className="mt-2 text-muted-foreground">
           {t("emptyText")}

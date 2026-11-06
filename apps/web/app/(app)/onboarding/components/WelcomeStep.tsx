@@ -2,7 +2,6 @@
 
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
-import WelcomeBirdIllustration from "@/components/illustrations/WelcomeBirdIllustration";
 import { useTranslations } from "next-intl";
 import { StepProps } from "../types";
 import { Rocket, Target, Calendar, Brain, LucideIcon } from "lucide-react";
@@ -19,10 +18,9 @@ export default function WelcomeStep({ next }: StepProps) {
   const tNav = useTranslations("onboarding.nav");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="hero"
       title={t("title")}
       subtitle={t("subtitle")}
-      illustration={<WelcomeBirdIllustration />}
     >
       <div className="grid gap-5 sm:grid-cols-2">
         {features.map(({ icon: Icon, key }) => (

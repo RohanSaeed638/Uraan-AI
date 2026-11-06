@@ -90,6 +90,7 @@ export default function LoginForm() {
   return (
     <AuthCard>
       <AuthHeader
+        art="login"
         title={t("welcomeBack")}
         subtitle={t("signInSubtitle")}
       />

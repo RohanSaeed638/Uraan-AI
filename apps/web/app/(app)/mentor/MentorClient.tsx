@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bot, Code2, Loader2, MessageSquarePlus, Send, Trash2 } from "lucide-react";
+import { Code2, Loader2, MessageSquarePlus, Send, Trash2 } from "lucide-react";
+import Illustration from "@/components/illustrations/Illustration";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -170,9 +171,7 @@ export default function MentorClient({ initialConversationId = null }: { initial
         <div role="region" aria-label={t("title")} tabIndex={0} className="flex-1 space-y-4 overflow-y-auto p-6 focus-visible:outline-2 focus-visible:outline-ring">
           {messages.length === 0 && !send.isPending && (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/10">
-                <Bot className="size-6 text-brand-violet" />
-              </span>
+              <Illustration name="mentor" size={160} />
               <h1 className="font-heading mt-4 text-xl font-bold">
                 {t("title")}
               </h1>

@@ -7,6 +7,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { Scale, Sparkles } from "lucide-react";
 
+import Illustration from "@/components/illustrations/Illustration";
 import { listCareers } from "@/lib/api/careers";
 import { CareerFilters, CareerList } from "@/types/api";
 
@@ -150,6 +151,7 @@ export default function CareersClient({ initial }: { initial: CareerList | null 
         </Card>
       ) : items.length === 0 && !query.isFetching ? (
         <Card className="items-center gap-3 p-8 text-center">
+          <Illustration name="search" size={140} />
           <p className="text-sm text-muted-foreground">{t("noResults")}</p>
           <Button
             variant="outline"

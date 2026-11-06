@@ -3,7 +3,6 @@
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
 import SummaryCard from "@/components/onboarding/SummaryCard";
-import CheckIllustration from "@/components/illustrations/CheckIllustration";
 
 import { useTranslations } from "next-intl";
 
@@ -42,10 +41,9 @@ export default function ReviewStep({
   ];
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="ob-done"
       title={t("title")}
       subtitle={t("subtitle")}
-      illustration={<CheckIllustration />}
     >
       <div className="grid grid-cols-2 gap-4">
 

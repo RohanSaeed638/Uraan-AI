@@ -21,7 +21,9 @@ const PERIODS = ["7", "30", "90"] as const;
 
 const number = (n: number | null | undefined) => (n === null || n === undefined ? "-" : n.toLocaleString("en-US"));
 const percent = (n: number | null | undefined) => (n === null || n === undefined ? "-" : `${n}%`);
-const money = (n: number | null | undefined) => (n === null || n === undefined ? "unpriced" : `$${n.toFixed(2)}`);
+const formatMinutes = (m: number) =>
+  m < 60 ? `${Math.max(1, Math.round(m))} min` : m < 2880 ? `${(m / 60).toFixed(1)} h` : `${(m / 1440).toFixed(1)} days`;
+const money =(n: number | null | undefined) => (n === null || n === undefined ? "unpriced" : `$${n.toFixed(2)}`);
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -80,6 +82,12 @@ function FunnelSection() {
             </div>
           </div>
         ))}
+
+        {query.data.median_minutes_to_first_lesson !== null && (
+          <p className="border-t pt-3 text-sm text-muted-foreground">
+            {t("timeToFirstLesson", { time: formatMinutes(query.data.median_minutes_to_first_lesson) })}
+          </p>
+        )}
       </Card>
 
       {query.data.cohorts.length > 0 && (

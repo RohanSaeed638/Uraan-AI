@@ -325,7 +325,7 @@ export default function ProfileClient({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader title={t("title")} subtitle={t("subtitle")} art="profile" />
 
       <Card className="mt-6 flex-col gap-4 p-6 sm:flex-row sm:items-center sm:gap-5">
         <Avatar size="lg" className="size-16 shrink-0">

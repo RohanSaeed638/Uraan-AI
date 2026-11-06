@@ -21,7 +21,7 @@ export default function DailyHoursStep({
   const t = useTranslations("onboarding.hours");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="focus"
       title={t("title")}
       subtitle={t("subtitle")}
     >

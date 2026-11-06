@@ -33,7 +33,7 @@ export default function LanguageStep({
   }
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="chat"
       title={t("title")}
       subtitle={t("subtitle")}
     >

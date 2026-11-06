@@ -2,13 +2,13 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/shared/PageHeader";
 import FilterChips from "@/components/shared/FilterChips";
-import { Trophy } from "lucide-react";
 
 import { getLeaderboard } from "@/lib/server/data";
 import { LeaderboardPeriod } from "@/types/api";
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Illustration from "@/components/illustrations/Illustration";
 
 const periods: { key: LeaderboardPeriod; label: "weekly" | "allTime" }[] = [
   { key: "weekly", label: "weekly" },
@@ -70,9 +70,7 @@ export default async function LeaderboardPage({
 
       {!board || board.entries.length === 0 ? (
         <div className="mx-auto mt-16 flex max-w-sm flex-col items-center text-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
-            <Trophy className="size-7 text-brand-violet" />
-          </span>
+          <Illustration name="trophy" size={180} />
           <h2 className="font-heading mt-5 text-xl font-bold">
             {t("emptyTitle")}
           </h2>

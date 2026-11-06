@@ -1978,6 +1978,7 @@
       "failed": "Could not load this section.",
       "week": "Week of",
       "ofEligible": "of those who signed up a week or more ago",
+      "timeToFirstLesson": "Typical time from sign-up to a first finished lesson: {time}",
       "funnelTitle": "Sign-up funnel",
       "funnelHint": "The last eight weeks of sign-ups, and how far they got. Staff accounts are left out.",
       "steps": {

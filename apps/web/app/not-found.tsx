@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import Illustration from "@/components/illustrations/Illustration";
 import { buttonVariants } from "@/components/ui/button";
 
 export default async function NotFound() {
@@ -8,6 +9,7 @@ export default async function NotFound() {
 
   return (
     <main id="main" className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6 text-center">
+      <Illustration name="empty" size={200} className="float" />
       <p className="font-mono text-6xl font-bold text-brand-violet">404</p>
       <h1 className="font-heading text-2xl font-bold">{t("notFoundTitle")}</h1>
       <p className="max-w-md text-muted-foreground">{t("notFoundText")}</p>

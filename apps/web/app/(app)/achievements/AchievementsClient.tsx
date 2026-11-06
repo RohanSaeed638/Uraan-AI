@@ -88,7 +88,7 @@ export default function AchievementsClient({
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div>
-        <PageHeader title={t("title")} subtitle={t("subtitle")} />
+        <PageHeader title={t("title")} subtitle={t("subtitle")} art="achievement" />
       </div>
 
       {gamification && (

@@ -24,7 +24,7 @@ export default function AboutYouStep({
     data.age !== null && (data.age < 10 || data.age > 100);
 
   return (
-    <OnboardingCard title={t("title")} subtitle={t("subtitle")}>
+    <OnboardingCard art="profile" title={t("title")} subtitle={t("subtitle")}>
       <div className="space-y-8">
         <div className="space-y-2">
           <label htmlFor="age" className="block text-sm font-medium">

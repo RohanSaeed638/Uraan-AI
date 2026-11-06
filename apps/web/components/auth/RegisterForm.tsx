@@ -108,6 +108,7 @@ export default function RegisterForm() {
   return (
     <AuthCard>
       <AuthHeader
+        art="register"
         title={t("createTitle")}
         subtitle={t("createSubtitle")}
       />

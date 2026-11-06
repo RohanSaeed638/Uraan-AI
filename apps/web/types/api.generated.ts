@@ -2869,6 +2869,8 @@ export interface components {
             cohorts: components["schemas"]["Cohort"][];
             /** Eligible For Return */
             eligible_for_return: number;
+            /** Median Minutes To First Lesson */
+            median_minutes_to_first_lesson?: number | null;
             /** Steps */
             steps: components["schemas"]["FunnelStep"][];
             /** Weeks */
