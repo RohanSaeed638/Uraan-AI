@@ -488,7 +488,8 @@
     "send": "Send",
     "offTitle": "AI Mentor is turned off",
     "offText": "You switched the mentor off in Settings. Turn it back on to chat again. Your past conversations are kept.",
-    "openSettings": "Open Settings"
+    "openSettings": "Open Settings",
+    "disclaimer": "The mentor is an AI and can make mistakes. Check anything important, especially about jobs, money or law."
   },
   "mentorReview": {
     "title": "Review my work",
@@ -999,7 +1000,10 @@
     "weekXp": "{xp} XP this week",
     "today": "today",
     "dayDone": "learned",
-    "dayMissed": "no learning"
+    "dayMissed": "no learning",
+    "freezes": "{count, plural, =0 {No streak freezes} one {# streak freeze} other {# streak freezes}}",
+    "freezeHelp": "A freeze keeps your streak if you miss a day. You earn one for every 7 days in a row (up to 2).",
+    "freezeProtecting": "A freeze will keep your streak alive when you next study."
   },
   "roadmaps": {
     "title": "My Roadmaps",
@@ -1800,7 +1804,8 @@
       "careers": "Careers",
       "resources": "Resources",
       "announcements": "Announcements",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "insights": "Insights"
     },
     "overview": {
       "failed": "The numbers could not be loaded",
@@ -1967,7 +1972,65 @@
       "older": "Load older"
     },
     "unavailable": "The admin portal could not be reached",
-    "unavailableText": "The server did not answer. Refresh the page in a moment."
+    "unavailableText": "The server did not answer. Refresh the page in a moment.",
+    "insights": {
+      "intro": "How new learners move through the product, whether lessons help, what the AI costs, and whether learning links still work. Everything is worked out from the database.",
+      "failed": "Could not load this section.",
+      "week": "Week of",
+      "ofEligible": "of those who signed up a week or more ago",
+      "funnelTitle": "Sign-up funnel",
+      "funnelHint": "The last eight weeks of sign-ups, and how far they got. Staff accounts are left out.",
+      "steps": {
+        "signups": "Signed up",
+        "onboarded": "Finished onboarding",
+        "roadmap": "Created a roadmap",
+        "first_lesson": "Completed a first lesson",
+        "returned": "Came back after a week",
+        "finished": "Finished a roadmap"
+      },
+      "period": "Period",
+      "lastDays": "Last {count} days",
+      "qualityTitle": "Lesson quality",
+      "qualityHint": "Votes from the Was this lesson helpful? control. A topic marked down by several learners is the one to look at.",
+      "votes": "Votes",
+      "helpfulShare": "Found helpful",
+      "notHelpful": "Marked not helpful",
+      "noVotes": "No votes in this period yet.",
+      "whyMarkedDown": "Why lessons were marked down",
+      "byCareer": "By career (helpful, votes)",
+      "topics": "Topics marked down (not helpful / votes)",
+      "recentComments": "Recent comments",
+      "noReason": "no reason given",
+      "reasons": {
+        "wrong": "Something is wrong",
+        "unclear": "Hard to understand",
+        "too_hard": "Too hard",
+        "too_easy": "Too easy",
+        "broken_link": "A link does not work",
+        "other": "Something else"
+      },
+      "usageTitle": "AI usage and estimated cost",
+      "usageHint": "Costs are estimates from public list prices and may drift; models without a known price are counted in tokens only.",
+      "requests": "AI calls",
+      "failedCount": "{count} failed",
+      "tokens": "Tokens",
+      "estimatedCost": "Estimated cost",
+      "unpriced": "{count} tokens on unpriced models",
+      "dailyLimit": "Daily limit per learner (tokens)",
+      "off": "Off",
+      "overLimit": "{count} over the limit today",
+      "perDay": "Tokens per day",
+      "byModel": "By model",
+      "byFeature": "By feature (tokens)",
+      "heaviest": "Heaviest users",
+      "linksTitle": "Learning links",
+      "linksHint": "Checked weekly. A link is only called dead when the page is gone; sites that block robots stay unknown and are left alone.",
+      "linksOk": "Working",
+      "linksDead": "Dead",
+      "linksUnknown": "Unknown",
+      "lastChecked": "Last checked",
+      "failedChecks": "{count, plural, one {# failed check} other {# failed checks}}"
+    }
   },
   "a11y": {
     "skip": "Skip to main content",
@@ -2052,5 +2115,26 @@
     "t3": "A request to see, correct or delete your data",
     "t4": "Ideas for making Uraan AI better",
     "include": "Please include the email you signed up with and, for a problem, what you were doing and what you saw."
+  },
+  "feedback": {
+    "title": "Was this lesson helpful?",
+    "yes": "Yes",
+    "no": "No",
+    "thanks": "Thanks, that helps us improve.",
+    "detailsThanks": "Thanks for the details. We will look into it.",
+    "change": "Change my answer",
+    "whatWasWrong": "What went wrong?",
+    "reasons": {
+      "wrong": "Something is wrong",
+      "unclear": "Hard to understand",
+      "too_hard": "Too hard",
+      "too_easy": "Too easy",
+      "broken_link": "A link does not work",
+      "other": "Something else"
+    },
+    "commentPlaceholder": "Tell us more (optional)",
+    "send": "Send",
+    "skip": "Skip",
+    "failed": "We could not save your answer. Please try again."
   }
 }

@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     # A provider without an API key is skipped.
     AI_PROVIDERS: str = "openai,gemini,anthropic"
     AI_REQUEST_TIMEOUT: float = 60.0
+    # Most tokens (input plus output) one learner may use in a day across all AI features; 0 = no limit.
+    # A safety net against one heavy or abusive account running up the bill.
+    AI_DAILY_TOKENS_PER_USER: int = 0
+    # JSON {"model": [usd_per_million_input, usd_per_million_output]} to add to or override the price
+    # estimates in app/ai/pricing.py.
+    AI_PRICES: str = ""
 
     # Optional: raises GitHub's rate limit for project reviews.
     GITHUB_TOKEN: str = ""
@@ -56,11 +62,15 @@ class Settings(BaseSettings):
     # A request slower than this is logged as a warning.
     SLOW_REQUEST_MS: int = 1000
 
+    # How long a verified sign-in token is trusted without asking Supabase again (0 = always ask).
+    AUTH_CACHE_SECONDS: int = 60
+
+    # Check the AI's resource links after a roadmap is built and remove dead ones (needs outbound web access).
+    LINK_CHECK_ENABLED: bool = True
+
     # Rate limits ("count/hour" or "count/day"). Counters live in memory unless
     # RATE_LIMIT_STORAGE_URI points at Redis (redis://...), which several API
     # processes need to share them.
-    # How long a verified sign-in token is trusted without asking Supabase again (0 = always ask).
-    AUTH_CACHE_SECONDS: int = 60
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_STORAGE_URI: str = "memory://"
     RATE_LIMIT_ANONYMOUS: str = "50/hour"

@@ -40,6 +40,10 @@ export interface Gamification {
   xp_into_level: number;
   xp_per_level: number;
   streak_days: number;
+  /** Missed days the streak can survive (one is earned every 7 days of streak, up to 2). */
+  streak_freezes: number;
+  /** True while the streak is only alive because freezes will cover the missed days. */
+  streak_protected: boolean;
   active_today: boolean;
   weekly_xp: number;
 }

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import FilterChips from "@/components/shared/FilterChips";
 
-const SECTIONS = ["overview", "users", "careers", "resources", "announcements", "audit"] as const;
+const SECTIONS = ["overview", "insights", "users", "careers", "resources", "announcements", "audit"] as const;
 
 const HREF = (key: (typeof SECTIONS)[number]) => (key === "overview" ? "/admin" : `/admin/${key}`);
 

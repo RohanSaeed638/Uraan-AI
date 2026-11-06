@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Geist, Geist_Mono, Inter, Noto_Naskh_Arabic, Plus_Jakarta_Sans } from "next/font/google";
@@ -33,6 +33,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// The colour of the phone's browser bar and, once installed, the app's title bar.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0b0a1a" },
+    { media: "(prefers-color-scheme: light)", color: "#7c3aed" },
+  ],
+};
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
@@ -42,7 +50,9 @@ export const metadata: Metadata = {
     "Pick a career, get a personalised roadmap, and learn it step by step with an AI mentor. Free during beta.",
   icons: {
     icon: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png",
   },
+  appleWebApp: { capable: true, title: "Uraan AI", statusBarStyle: "black-translucent" },
   openGraph: {
     type: "website",
     siteName: "Uraan AI",

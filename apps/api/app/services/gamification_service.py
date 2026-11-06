@@ -40,20 +40,70 @@ def local_today(tz_name: str | None, now: datetime | None = None) -> date:
     return now.astimezone(tz).date()
 
 
+# One streak freeze is earned each time the streak reaches a multiple of this many days.
+FREEZE_EVERY_DAYS = 7
+MAX_FREEZES = 2
+
+
 def next_streak(
     current: int,
     last_activity: date | None,
     today: date,
 ) -> int:
-    """Streak after activity on `today`: same day keeps it, the next day
+    """Streak after activity on `today`, with no freezes: same day keeps it, the next day
     extends it, any longer gap restarts at 1."""
+    return advance_streak(current, last_activity, today, 0)[0]
+
+
+def advance_streak(
+    current: int,
+    last_activity: date | None,
+    today: date,
+    freezes: int,
+) -> tuple[int, int]:
+    """(streak, freezes) after activity on `today`.
+
+    The same day keeps the streak and the next day extends it. Missing days breaks it, unless the
+    learner has a freeze for each missed day (up to MAX_FREEZES): then the freezes are used up and the
+    streak carries on, as if they had studied. A freeze is earned every FREEZE_EVERY_DAYS days of streak."""
     if last_activity == today:
-        return max(current, 1)
+        return max(current, 1), freezes
 
-    if last_activity == today - timedelta(days=1):
-        return current + 1
+    if last_activity is None:
+        return 1, freezes
 
-    return 1
+    missed = (today - last_activity).days - 1
+
+    if missed == 0:
+        streak, left = current + 1, freezes
+    elif 0 < missed <= freezes:
+        streak, left = current + 1, freezes - missed
+    else:
+        return 1, freezes
+
+    if streak % FREEZE_EVERY_DAYS == 0:
+        left = min(MAX_FREEZES, left + 1)
+
+    return streak, left
+
+
+def streak_state(current: int, last_activity: date | None, today: date, freezes: int) -> tuple[int, bool]:
+    """(streak to show, whether it is being held up by freezes right now).
+
+    Today is not over, so a day without activity so far has not been missed yet; from the day
+    before yesterday on, each day that passed is a missed one."""
+    if last_activity is None or not current:
+        return 0, False
+
+    gap = (today - last_activity).days
+
+    if gap <= 1:
+        return current, False
+
+    if gap - 1 <= freezes:
+        return current, True
+
+    return 0, False
 
 
 class GamificationService:
@@ -95,10 +145,11 @@ class GamificationService:
         track(profile.id, "xp_earned", reason=reason, amount=amount)
 
         today = local_today(profile.timezone)
-        profile.streak_days = next_streak(
+        profile.streak_days, profile.streak_freezes = advance_streak(
             profile.streak_days or 0,
             profile.last_activity_date,
             today,
+            profile.streak_freezes or 0,
         )
         profile.last_activity_date = today
 
@@ -134,12 +185,11 @@ class GamificationService:
         xp = profile.xp or 0
         today = local_today(profile.timezone)
 
-        # A streak that wasn't extended yesterday or today has lapsed.
-        streak = profile.streak_days or 0
-        if profile.last_activity_date is None or (
-            profile.last_activity_date < today - timedelta(days=1)
-        ):
-            streak = 0
+        # A streak that wasn't extended yesterday or today has lapsed, unless freezes hold it up.
+        freezes = profile.streak_freezes or 0
+        streak, protected = streak_state(
+            profile.streak_days or 0, profile.last_activity_date, today, freezes
+        )
 
         title = career_title(xp)
 
@@ -153,6 +203,8 @@ class GamificationService:
             "xp_into_level": xp % XP_PER_LEVEL,
             "xp_per_level": XP_PER_LEVEL,
             "streak_days": streak,
+            "streak_freezes": freezes,
+            "streak_protected": protected,
             "active_today": profile.last_activity_date == today,
             "weekly_xp": await self.weekly_xp(profile),
         }

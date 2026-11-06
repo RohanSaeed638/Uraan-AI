@@ -261,6 +261,7 @@ export default function MentorClient({ initialConversationId = null }: { initial
             <Send size={16} />
           </Button>
         </form>
+        <p className="px-4 pb-3 text-center text-xs text-muted-foreground">{t("disclaimer")}</p>
       </Card>
       <ReviewDialog open={reviewOpen} onOpenChange={setReviewOpen} />
     </div>

@@ -12,10 +12,11 @@ from functools import lru_cache
 from app.ai.llm.context import current_language, current_profile, use_profile
 from app.ai.prompts.language import generation_rule
 from app.ai.llm.router import LLMRouter, build_providers
-from app.ai.llm.types import AIUnavailableError, LLMError, LLMRequest, LLMResult
+from app.ai.llm.types import AIBudgetExceeded, AIUnavailableError, LLMError, LLMRequest, LLMResult
 from app.core.config import settings
 
 __all__ = [
+    "AIBudgetExceeded",
     "AIUnavailableError",
     "LLMError",
     "LLMRequest",
@@ -34,6 +35,45 @@ async def _record_to_db(row: dict) -> None:
     async with SessionLocal() as db:
         db.add(AiRequest(**row))
         await db.commit()
+
+
+async def tokens_used_today(profile_id) -> int:
+    """Input plus output tokens this learner's AI calls have used since midnight (UTC)."""
+    from datetime import datetime, timezone
+
+    from sqlalchemy import func, select
+
+    from app.db.session import SessionLocal
+    from app.models.ai_request import AiRequest
+
+    midnight = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    async with SessionLocal() as db:
+        return int(
+            (
+                await db.execute(
+                    select(func.coalesce(func.sum(func.coalesce(AiRequest.input_tokens, 0) + func.coalesce(AiRequest.output_tokens, 0)), 0))
+                    .where(AiRequest.profile_id == profile_id, AiRequest.created_at >= midnight)
+                )
+            ).scalar_one()
+        )
+
+
+async def check_budget(profile_id) -> None:
+    """Refuses the call when the learner has spent their daily allowance. A failure to count is never
+    a reason to refuse: the limit is a safety net, not a gate."""
+    limit = settings.AI_DAILY_TOKENS_PER_USER
+
+    if not limit or profile_id is None:
+        return
+
+    try:
+        used = await tokens_used_today(profile_id)
+    except Exception:
+        return
+
+    if used >= limit:
+        raise AIBudgetExceeded("Daily AI allowance used up.")
 
 
 @lru_cache
@@ -55,6 +95,8 @@ STYLE_RULE = "Style rule: never use emoji or emoticons in any text you write."
 async def complete(request: LLMRequest) -> LLMResult:
     if request.profile_id is None:
         request.profile_id = current_profile()
+
+    await check_budget(request.profile_id)
 
     request.messages = [*request.messages, {"role": "system", "content": STYLE_RULE}]
 

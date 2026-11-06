@@ -62,6 +62,13 @@ class Profile(BaseModel):
         server_default="0",
     )
 
+    # Missed days a streak can survive: one is earned every 7 days of streak (see gamification_service).
+    streak_freezes: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+    )
+
     xp: Mapped[int] = mapped_column(
         Integer,
         default=0,

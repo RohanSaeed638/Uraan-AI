@@ -1,4 +1,4 @@
-import { Check, Flame, Zap } from "lucide-react";
+import { Check, Flame, Snowflake, Zap } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Card } from "@/components/ui/card";
@@ -82,6 +82,19 @@ export default async function WeekStrip({ activeDates, gamification, today }: Pr
             </p>
             <p className="num text-xs text-muted-foreground">{t("weekXp", { xp: gamification.weekly_xp })}</p>
           </div>
+
+          <p
+            className="flex items-start gap-2 rounded-xl bg-sky-500/10 px-3 py-2 text-xs"
+            title={t("freezeHelp")}
+          >
+            <Snowflake size={14} className="mt-0.5 shrink-0 text-sky-500" aria-hidden />
+            <span>
+              <span className="font-medium">{t("freezes", { count: gamification.streak_freezes })}</span>{" "}
+              <span className="text-muted-foreground">
+                {gamification.streak_protected ? t("freezeProtecting") : t("freezeHelp")}
+              </span>
+            </span>
+          </p>
 
           <div>
             <div className="mb-1.5 flex items-center justify-between text-xs">

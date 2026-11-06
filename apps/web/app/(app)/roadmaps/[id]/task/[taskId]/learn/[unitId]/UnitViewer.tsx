@@ -26,6 +26,7 @@ import { ExerciseDetails, ProjectDetails, RoadmapTask } from "@/types/roadmap";
 
 import ExerciseView from "@/components/lessons/ExerciseView";
 import Pill from "@/components/shared/Pill";
+import LessonFeedback from "@/components/lessons/LessonFeedback";
 import SimpleMarkdown from "@/components/shared/SimpleMarkdown";
 import WelcomeBirdIllustration from "@/components/illustrations/WelcomeBirdIllustration";
 import { Card } from "@/components/ui/card";
@@ -391,7 +392,9 @@ export default function UnitViewer({
       </div>
       )}
 
-      <div className="mt-10 flex items-center justify-between gap-3 border-t border-border pt-6">
+      <LessonFeedback key={unit.id} unitId={unit.id} />
+
+      <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-6">
         <Button
           variant="outline"
           disabled={index === 0}

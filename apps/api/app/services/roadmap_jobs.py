@@ -24,6 +24,7 @@ from app.models.profile import Profile
 from app.repositories.career_repository import CareerRepository
 from app.repositories.roadmap_content_repository import RoadmapContentRepository
 from app.repositories.roadmap_repository import RoadmapRepository
+from app.services.link_service import repair_roadmap_links
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +147,7 @@ async def run_job(
     """Runs one job to the end and records the outcome on the roadmap."""
     generator = generator or RoadmapGenerator()
     params = params or {}
+    ready = False
 
     async with session_factory() as db:
         contents = RoadmapContentRepository(db)
@@ -173,6 +175,7 @@ async def run_job(
             roadmap.status_before_job = None
             await db.commit()
             track(roadmap.profile_id, "roadmap_ready", kind=kind, career=roadmap.career_slug)
+            ready = True
 
         except Exception:
             logger.exception("Roadmap %s failed for %s", kind, roadmap_id)
@@ -187,3 +190,7 @@ async def run_job(
             except Exception:
                 logger.exception("Could not record the failure of %s", roadmap_id)
                 await db.rollback()
+
+    # The roadmap is already usable; its links are tidied a moment later (this never raises).
+    if ready:
+        await repair_roadmap_links(roadmap_id, session_factory)

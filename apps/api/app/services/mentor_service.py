@@ -30,6 +30,7 @@ from openai import OpenAIError
 from app.repositories.settings_repository import SettingsRepository
 from app.ai.llm import AIUnavailableError
 from app.ai.prompts.mentor_prompt import build_system_prompt
+from app.ai.safety import SUPPORT_REPLY, screen_message
 from app.ai.versions import prompt_version
 from app.services.mentor_ai_service import MentorAIService
 from app.services.mentor_context import MentorContext, build_context
@@ -224,6 +225,52 @@ class MentorService:
             ],
         )
 
+    async def _reply(self, profile, settings, llm_messages, screen, conversation_id) -> str:
+        """What the mentor answers. A message that suggests the learner may harm themselves gets a fixed,
+        caring reply and is never sent to a model (see app/ai/safety.py); one that tries to change the
+        mentor's rules is answered with the model told not to comply."""
+        if screen.blocked:
+            track(profile.id, "mentor_support_reply")
+
+            return SUPPORT_REPLY
+
+        if screen.injection:
+            track(profile.id, "mentor_injection_attempt")
+
+        context = await self._context(profile)
+        system_prompt = build_system_prompt(
+            getattr(settings, "ai_tone", None),
+            getattr(profile, "language", None),
+            context.text,
+            injection=screen.injection,
+        )
+
+        try:
+            assistant_content = await (
+                self.mentor_ai_service.generate_response(
+                    messages=llm_messages,
+                    system_prompt=system_prompt,
+                    profile_id=profile.id,
+                )
+            )
+        except (OpenAIError, RuntimeError, AIUnavailableError):
+            logger.exception(
+                "AI Mentor generation failed for conversation %s",
+                conversation_id,
+            )
+
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "AI Mentor is temporarily unavailable. "
+                    "Please try again."
+                ),
+            )
+
+        track(profile.id, "mentor_message_sent")
+
+        return assistant_content
+
     async def send_message(
         self,
         conversation_id: UUID,
@@ -290,35 +337,9 @@ class MentorService:
         # Generate before writing messages.
         # A failed LLM request won't leave an
         # unanswered user message in the database.
-        context = await self._context(profile)
-        system_prompt = build_system_prompt(
-            getattr(settings, "ai_tone", None), getattr(profile, "language", None), context.text
+        assistant_content = await self._reply(
+            profile, settings, llm_messages, screen_message(content), conversation_id
         )
-
-        try:
-            assistant_content = await (
-                self.mentor_ai_service.generate_response(
-                    messages=llm_messages,
-                    system_prompt=system_prompt,
-                    profile_id=profile.id,
-                )
-            )
-
-        except (OpenAIError, RuntimeError, AIUnavailableError):
-            logger.exception(
-                "AI Mentor generation failed for conversation %s",
-                conversation_id,
-            )
-
-            raise HTTPException(
-                status_code=503,
-                detail=(
-                    "AI Mentor is temporarily unavailable. "
-                "Please try again."
-                ),
-            )
-
-        track(profile.id, "mentor_message_sent")
 
         try:
             user_message = await (
