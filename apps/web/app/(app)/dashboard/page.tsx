@@ -1,9 +1,10 @@
 import { API_BASE } from "@/lib/api-base";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import Illustration from "@/components/illustrations/Illustration";
 import MotivationCard from "@/components/dashboard/MotivationCard";
 import ProgressRow from "@/components/dashboard/ProgressRow";
-import { ArrowRight, Clock, Sparkles } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
@@ -61,9 +62,7 @@ export default async function DashboardPage() {
   if (roadmaps.length === 0) {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-20 text-center">
-        <span className="flex size-16 items-center justify-center rounded-full bg-brand-violet/10">
-          <Sparkles className="size-7 text-brand-violet" />
-        </span>
+        <Illustration name="hero" size={200} className="float" />
         <h1 className="font-heading mt-6 text-2xl font-bold">
           {t("noRoadmaps")}
         </h1>

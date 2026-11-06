@@ -77,6 +77,7 @@ export default function PlannerClient({ initial, initialToken, apiUrl }: Props) 
         <PageHeader title={t("title")} subtitle={t("subtitle")} />
         <EmptyState
           icon={CalendarDays}
+          art="offline"
           title={t("loadFailed")}
           text={t("loadFailedText")}
         />
@@ -189,6 +190,7 @@ export default function PlannerClient({ initial, initialToken, apiUrl }: Props) 
       {!hasPlan ? (
         <EmptyState
           icon={CalendarDays}
+          art="path"
           title={t("noPlan")}
           text={t("noPlanText")}
           action={
@@ -287,7 +289,7 @@ export default function PlannerClient({ initial, initialToken, apiUrl }: Props) 
           </div>
 
           {nothingLeft ? (
-            <EmptyState icon={CalendarDays} title={t("allDone")} text={t("allDoneText")} />
+            <EmptyState icon={CalendarDays} art="success" title={t("allDone")} text={t("allDoneText")} />
           ) : view === "week" ? (
             <WeekView
               schedule={schedule}

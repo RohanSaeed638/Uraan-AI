@@ -146,6 +146,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/insights/ai-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Usage */
+        get: operations["ai_usage_api_v1_admin_insights_ai_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/insights/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Feedback */
+        get: operations["feedback_api_v1_admin_insights_feedback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/insights/funnel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Funnel */
+        get: operations["funnel_api_v1_admin_insights_funnel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/insights/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Links */
+        get: operations["links_api_v1_admin_insights_links_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/me": {
         parameters: {
             query?: never;
@@ -752,6 +820,28 @@ export interface paths {
         head?: never;
         /** Update Learning Unit */
         patch: operations["update_learning_unit_api_v1_learning_units__learning_unit_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/learning-units/{unit_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Feedback
+         * @description The learner's own vote on this lesson, or null.
+         */
+        get: operations["get_feedback_api_v1_learning_units__unit_id__feedback_get"];
+        /** Put Feedback */
+        put: operations["put_feedback_api_v1_learning_units__unit_id__feedback_put"];
+        post?: never;
+        /** Delete Feedback */
+        delete: operations["delete_feedback_api_v1_learning_units__unit_id__feedback_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/learning/continue": {
@@ -1997,6 +2087,35 @@ export interface components {
          * @enum {string}
          */
         AiTone: "friendly" | "genz" | "professional";
+        /** AiUsage */
+        AiUsage: {
+            /** By Model */
+            by_model: components["schemas"]["ModelUsage"][];
+            /** By Purpose */
+            by_purpose: components["schemas"]["PurposeUsage"][];
+            /** Daily */
+            daily: components["schemas"]["DayUsage"][];
+            /** Daily Limit Per User */
+            daily_limit_per_user?: number | null;
+            /** Days */
+            days: number;
+            /** Estimated Cost Usd */
+            estimated_cost_usd?: number | null;
+            /** Failed */
+            failed: number;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Requests */
+            requests: number;
+            /** Top Users */
+            top_users: components["schemas"]["UserUsage"][];
+            /** Unpriced Tokens */
+            unpriced_tokens: number;
+            /** Users Over Limit Today */
+            users_over_limit_today?: number | null;
+        };
         /** AnnouncementCreate */
         AnnouncementCreate: {
             /** Body */
@@ -2255,6 +2374,17 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** CareerQuality */
+        CareerQuality: {
+            /** Career Slug */
+            career_slug: string;
+            /** Helpful */
+            helpful: number;
+            /** Helpful Percent */
+            helpful_percent?: number | null;
+            /** Not Helpful */
+            not_helpful: number;
+        };
         /** CareerResourceIn */
         CareerResourceIn: {
             /** Difficulty */
@@ -2388,6 +2518,25 @@ export interface components {
             done: boolean;
             /** Item Id */
             item_id: string;
+        };
+        /** Cohort */
+        Cohort: {
+            /** Eligible For Return */
+            eligible_for_return: number;
+            /** Finished */
+            finished: number;
+            /** First Lesson */
+            first_lesson: number;
+            /** Onboarded */
+            onboarded: number;
+            /** Returned */
+            returned: number;
+            /** Roadmap */
+            roadmap: number;
+            /** Signups */
+            signups: number;
+            /** Week */
+            week: string;
         };
         /** CompareRequest */
         CompareRequest: {
@@ -2589,6 +2738,33 @@ export interface components {
             /** Name */
             name?: string | null;
         };
+        /** DayUsage */
+        DayUsage: {
+            /** Date */
+            date: string;
+            /** Estimated Cost Usd */
+            estimated_cost_usd: number;
+            /** Requests */
+            requests: number;
+            /** Tokens */
+            tokens: number;
+        };
+        /** DeadLink */
+        DeadLink: {
+            /**
+             * Checked At
+             * Format: date-time
+             */
+            checked_at: string;
+            /** Fail Count */
+            fail_count: number;
+            /** Http Status */
+            http_status?: number | null;
+            /** Reason */
+            reason?: string | null;
+            /** Url */
+            url: string;
+        };
         /** DocumentListResponse */
         DocumentListResponse: {
             /** Documents */
@@ -2628,6 +2804,89 @@ export interface components {
             /** Description */
             description: string;
         };
+        /** FeedbackItem */
+        FeedbackItem: {
+            /** Career Slug */
+            career_slug?: string | null;
+            /** Comment */
+            comment?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Lesson Title */
+            lesson_title?: string | null;
+            /** Lesson Type */
+            lesson_type?: string | null;
+            /** Reason */
+            reason?: string | null;
+            /** Task Title */
+            task_title?: string | null;
+        };
+        /** FeedbackOverview */
+        FeedbackOverview: {
+            /** By Career */
+            by_career: components["schemas"]["CareerQuality"][];
+            /** By Reason */
+            by_reason: components["schemas"]["ReasonCount"][];
+            /** Days */
+            days: number;
+            /** Helpful */
+            helpful: number;
+            /** Helpful Percent */
+            helpful_percent?: number | null;
+            /** Not Helpful */
+            not_helpful: number;
+            /** Recent */
+            recent: components["schemas"]["FeedbackItem"][];
+            /** Topics */
+            topics: components["schemas"]["TopicQuality"][];
+            /** Total */
+            total: number;
+        };
+        /** FeedbackRequest */
+        FeedbackRequest: {
+            /** Comment */
+            comment?: string | null;
+            /** Helpful */
+            helpful: boolean;
+            /** Reason */
+            reason?: ("wrong" | "unclear" | "too_hard" | "too_easy" | "broken_link" | "other") | null;
+        };
+        /** FeedbackResponse */
+        FeedbackResponse: {
+            /** Comment */
+            comment?: string | null;
+            /** Helpful */
+            helpful: boolean;
+            /** Reason */
+            reason?: ("wrong" | "unclear" | "too_hard" | "too_easy" | "broken_link" | "other") | null;
+        };
+        /** Funnel */
+        Funnel: {
+            /** Cohorts */
+            cohorts: components["schemas"]["Cohort"][];
+            /** Eligible For Return */
+            eligible_for_return: number;
+            /** Median Minutes To First Lesson */
+            median_minutes_to_first_lesson?: number | null;
+            /** Steps */
+            steps: components["schemas"]["FunnelStep"][];
+            /** Weeks */
+            weeks: number;
+        };
+        /** FunnelStep */
+        FunnelStep: {
+            /** Count */
+            count: number;
+            /** Key */
+            key: string;
+            /** Of Previous */
+            of_previous?: number | null;
+            /** Of Signups */
+            of_signups?: number | null;
+        };
         /** GamificationResponse */
         GamificationResponse: {
             /** Active Today */
@@ -2640,6 +2899,16 @@ export interface components {
             next_career_title?: string | null;
             /** Streak Days */
             streak_days: number;
+            /**
+             * Streak Freezes
+             * @default 0
+             */
+            streak_freezes: number;
+            /**
+             * Streak Protected
+             * @default false
+             */
+            streak_protected: boolean;
             /**
              * Title Progress
              * @default 0
@@ -2834,6 +3103,19 @@ export interface components {
          * @enum {string}
          */
         LearningUnitType: "reading" | "video" | "project" | "exercise";
+        /** LinkOverview */
+        LinkOverview: {
+            /** Dead */
+            dead: number;
+            /** Dead Links */
+            dead_links: components["schemas"]["DeadLink"][];
+            /** Last Checked */
+            last_checked?: string | null;
+            /** Ok */
+            ok: number;
+            /** Unknown */
+            unknown: number;
+        };
         /** LoginRequest */
         LoginRequest: {
             /**
@@ -2956,6 +3238,23 @@ export interface components {
         MentorSuggestionsResponse: {
             /** Chips */
             chips: components["schemas"]["MentorChip"][];
+        };
+        /** ModelUsage */
+        ModelUsage: {
+            /** Estimated Cost Usd */
+            estimated_cost_usd?: number | null;
+            /** Failed */
+            failed: number;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Model */
+            model: string;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Provider */
+            provider: string;
+            /** Requests */
+            requests: number;
         };
         /** MotivationResponse */
         MotivationResponse: {
@@ -3292,6 +3591,17 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** PurposeUsage */
+        PurposeUsage: {
+            /** Failed */
+            failed: number;
+            /** Purpose */
+            purpose: string;
+            /** Requests */
+            requests: number;
+            /** Tokens */
+            tokens: number;
+        };
         /** PushKeys */
         PushKeys: {
             /** Auth */
@@ -3422,6 +3732,13 @@ export interface components {
             href: string;
             /** Key */
             key: string;
+        };
+        /** ReasonCount */
+        ReasonCount: {
+            /** Count */
+            count: number;
+            /** Reason */
+            reason: string;
         };
         /**
          * RecommendRequest
@@ -4040,6 +4357,17 @@ export interface components {
          * @enum {string}
          */
         ThemePreference: "light" | "dark" | "system";
+        /** TopicQuality */
+        TopicQuality: {
+            /** Career Slug */
+            career_slug?: string | null;
+            /** Helpful */
+            helpful: number;
+            /** Not Helpful */
+            not_helpful: number;
+            /** Task Title */
+            task_title: string;
+        };
         /** TurnResponse */
         TurnResponse: {
             /** Answer */
@@ -4187,6 +4515,17 @@ export interface components {
             timezone: string;
             /** @default classic */
             wording: components["schemas"]["Wording"];
+        };
+        /** UserUsage */
+        UserUsage: {
+            /** Name */
+            name: string;
+            /** Profile Id */
+            profile_id: string;
+            /** Requests */
+            requests: number;
+            /** Tokens */
+            tokens: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -4578,6 +4917,119 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_usage_api_v1_admin_insights_ai_usage_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiUsage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    feedback_api_v1_admin_insights_feedback_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    funnel_api_v1_admin_insights_funnel_get: {
+        parameters: {
+            query?: {
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Funnel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    links_api_v1_admin_insights_links_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkOverview"];
                 };
             };
         };
@@ -5801,6 +6253,101 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LearningUnitResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_api_v1_learning_units__unit_id__feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackResponse"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_feedback_api_v1_learning_units__unit_id__feedback_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_feedback_api_v1_learning_units__unit_id__feedback_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

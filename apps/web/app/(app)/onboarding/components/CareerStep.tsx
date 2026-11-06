@@ -20,7 +20,7 @@ export default function CareerStep({
   const { options } = useCareerOptions();
 
   return (
-    <OnboardingCard title={t("title")} subtitle={t("subtitle")}>
+    <OnboardingCard art="ob-goal" title={t("title")} subtitle={t("subtitle")}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {options.map((career) => (
             <OptionCard

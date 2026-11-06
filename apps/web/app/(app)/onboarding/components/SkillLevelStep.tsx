@@ -19,7 +19,7 @@ export default function SkillLevelStep({
   const t = useTranslations("onboarding.skill");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="ob-skills"
       title={t("title")}
       subtitle={t("subtitle")}
     >

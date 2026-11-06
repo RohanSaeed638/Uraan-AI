@@ -41,6 +41,31 @@ and the **web app** (Vercel). Do them in this order, because each needs the addr
   `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_SENTRY_DSN`. They are fixed at build time: change one, redeploy.
 - Back on the API, add the Vercel address to `CORS_ORIGINS`.
 
+## Scheduled jobs and watching the service
+
+Two jobs run on a schedule (a cron job on the API host, or the GitHub workflows in `.github/workflows/`; use one
+way per job):
+
+| Job | Command | How often |
+|---|---|---|
+| Learning reminders | `python -m app.workers.send_reminders` | every 15 minutes |
+| Dead-link check | `python -m app.workers.check_links` | once a week |
+
+The dead-link check re-checks the resource library and the links inside learners' roadmaps, removes dead links from
+tasks (a task left with none gets a search for its topic) and switches off library resources that stay dead. The
+**Admin > Insights** page shows what it found. It needs outbound web access from wherever it runs.
+
+- **Email that reaches inboxes.** Reminders are the main way learners come back, so they must not land in spam. In
+  your domain's DNS set the records Resend asks for: **SPF**, **DKIM** (both are shown when you verify the domain) and a
+  **DMARC** record (start with `v=DMARC1; p=none; rua=mailto:you@yourdomain`, tighten to `quarantine` once reports look
+  clean). Send yourself a test to Gmail and Outlook and check it is not in spam. Watch the bounce rate in Resend.
+- **Know when it is down before learners do.** Add an uptime monitor (UptimeRobot, Better Stack or similar, most have
+  a free plan) on `<api>/health/ready` and on the web address, with email or phone alerts, and optionally a public
+  status page. Sentry reports errors but cannot tell you the site is unreachable.
+- **Keep an eye on AI spend.** **Admin > Insights** shows calls, tokens and an estimated cost per day, model and
+  feature, and the heaviest users. To stop one account running up the bill set `AI_DAILY_TOKENS_PER_USER` (0 = off).
+  Cost figures are estimates from public list prices; add or correct a price with `AI_PRICES`.
+
 ## Before you open to the public
 
 - **Read the Terms (`/terms`) and Privacy Policy (`/privacy`) and have them checked** by someone who can advise on

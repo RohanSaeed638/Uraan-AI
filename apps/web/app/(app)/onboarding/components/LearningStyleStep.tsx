@@ -22,7 +22,7 @@ export default function LearningStyleStep({
   const t = useTranslations("onboarding.style");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="ob-ai"
       title={t("title")}
       subtitle={t("subtitle")}
     >

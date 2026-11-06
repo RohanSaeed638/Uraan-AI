@@ -14,6 +14,11 @@ class AIUnavailableError(Exception):
     """No provider could answer (none configured, or every one failed)."""
 
 
+class AIBudgetExceeded(AIUnavailableError):
+    """The learner has used their daily allowance of AI (AI_DAILY_TOKENS_PER_USER). Treated like an
+    outage by the features, so they show their usual "try again later" message."""
+
+
 @dataclass
 class LLMRequest:
     """What every generator asks for, whichever provider answers.

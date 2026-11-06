@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Compass } from "lucide-react";
+import Illustration from "@/components/illustrations/Illustration";
 import GenerateRoadmapButton from "./GenerateRoadmapButton";
 
 export default function EmptyState() {
@@ -7,10 +7,8 @@ export default function EmptyState() {
 
   return (
     <div className="flex flex-col items-center rounded-3xl border border-dashed border-border p-14 text-center">
-      <span className="flex size-14 items-center justify-center rounded-full bg-brand-violet/10">
-        <Compass className="size-6 text-brand-violet" />
-      </span>
-      <h2 className="font-heading mt-5 text-2xl font-bold">
+      <Illustration name="path" size={190} className="float" />
+      <h2 className="font-heading mt-4 text-2xl font-bold">
         {t("emptyTitle")}
       </h2>
       <p className="mt-2 max-w-sm text-muted-foreground">

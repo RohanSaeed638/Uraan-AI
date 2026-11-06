@@ -33,4 +33,6 @@ from .ai_request import AiRequest
 from .daily_motivation import DailyMotivation
 from .planner import ScheduleOverride, SchedulePreference, ScheduleSnapshot
 from .admin import AuditLog, Announcement
+from .feedback import LessonFeedback
+from .link_check import LinkCheck
 from . import indexes  # noqa: F401  (registers the composite indexes)

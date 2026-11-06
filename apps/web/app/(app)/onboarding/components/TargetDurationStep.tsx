@@ -2,7 +2,6 @@
 
 import OnboardingCard from "@/components/onboarding/OnboardingCard";
 import NavigationButtons from "@/components/onboarding/NavigationButtons";
-import TargetIllustration from "@/components/illustrations/TargetIllustration";
 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -22,10 +21,9 @@ export default function TargetDurationStep({
   const t = useTranslations("onboarding.duration");
 
   return (
-    <OnboardingCard
+    <OnboardingCard art="milestone"
       title={t("title")}
       subtitle={t("subtitle")}
-      illustration={<TargetIllustration />}
     >
       <div className="space-y-8">
         <div className="text-center">

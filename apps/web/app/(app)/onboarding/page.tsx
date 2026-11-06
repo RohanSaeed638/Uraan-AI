@@ -261,7 +261,7 @@ export default function OnboardingPage() {
   const activeStage = STEP_TO_STAGE[step];
 
   return (
-    <div className="mx-auto max-w-5xl p-8">
+    <div className="mx-auto max-w-5xl p-4 sm:p-8">
       {activeStage !== null && (
         <StageIndicator stages={STAGES} activeStage={activeStage} />
       )}

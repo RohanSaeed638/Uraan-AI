@@ -26,6 +26,8 @@ from app.api.routes.careers import router as careers_router
 from app.api.routes.library import router as library_router
 from app.api.routes.achievements import router as achievements_router
 from app.api.routes.search import router as search_router
+from app.api.routes.feedback import router as feedback_router
+from app.api.routes.admin_insights import router as admin_insights_router
 from app.api.routes.email import router as email_router
 from app.api.routes.admin import public as announcements_router, router as admin_router
 from app.core.config import settings
@@ -74,6 +76,7 @@ for router in (
     notifications_router, calendar_router, documents_router, portfolio_router,
     interviews_router, account_router, careers_router, library_router,
     achievements_router, email_router, admin_router, announcements_router, search_router,
+    feedback_router, admin_insights_router,
 ):
     api_v1.include_router(router)
 

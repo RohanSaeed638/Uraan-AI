@@ -22,3 +22,5 @@ from app.core.config import settings as _settings  # noqa: E402
 
 _settings.RATE_LIMIT_ENABLED = False
 _settings.AUTH_CACHE_SECONDS = 0
+# Tests never reach out to real websites.
+_settings.LINK_CHECK_ENABLED = False

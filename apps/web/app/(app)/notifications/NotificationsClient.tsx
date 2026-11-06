@@ -106,6 +106,7 @@ export default function NotificationsClient() {
         <EmptyState
           className="mt-6"
           icon={Bell}
+          art="offline"
           title={t("loadFailed")}
           action={
             <Button variant="outline" onClick={() => query.refetch()}>
@@ -117,6 +118,7 @@ export default function NotificationsClient() {
         <EmptyState
           className="mt-6"
           icon={Bell}
+          art="bell"
           title={filter === "unread" ? t("noUnread") : t("none")}
           text={filter === "unread" ? undefined : t("noneText")}
         />

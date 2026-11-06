@@ -4,6 +4,8 @@ AI-powered career learning. Users onboard with a career goal, get a generated
 roadmap (phases → tasks → daily learning units), track progress, take
 AI-generated quizzes and chat with an AI mentor.
 
+**Documentation:** start at [docs/README.md](docs/README.md) (architecture, user and admin guides, development, testing, security, operations, and generated API/database/configuration reference).
+
 ## Layout
 
 | Path | What |
@@ -341,3 +343,20 @@ languages: **English (`en`)**, **Urdu in Urdu script (`ur`, right to left)** and
   `npm run gen:api` in `apps/web`, and commit both outputs.
 - **Docker:** `docker compose up --build` (see `docker-compose.yml`). **Deploying:** `docs/deployment.md`.
 - **Environment files:** copy `apps/api/.env.example` and `apps/web/.env.example`.
+
+## Product quality tools
+
+- **Lesson feedback:** every lesson ends with "Was this lesson helpful?" (yes, or no with a reason and an optional
+  comment). **Admin > Insights** shows the share helpful, why lessons were marked down, by career and by topic.
+- **Funnel:** the same page shows how each week's sign-ups moved through onboarding, a first roadmap, a first lesson,
+  coming back after a week, and finishing a roadmap.
+- **Dead-link check:** the AI's resource links are checked after each roadmap is built and weekly
+  (`python -m app.workers.check_links`); dead ones are removed. Private and internal addresses are never visited.
+- **AI usage and cost:** calls, tokens and estimated cost in **Admin > Insights**; optional per-learner daily limit
+  (`AI_DAILY_TOKENS_PER_USER`).
+- **Streak freezes:** one is earned for every 7 days in a row (keep up to 2). A freeze keeps the streak alive when a day
+  is missed.
+- **Mentor safety:** the mentor's rules decline harmful or off-topic requests, ignore instructions hidden in pasted
+  material, and add care around money, jobs and law. A message that suggests self-harm gets a fixed, caring reply and is
+  never sent to a model (`app/ai/safety.py`).
+- **Installable:** the web app has a manifest and icons, so phones offer "Add to Home Screen".

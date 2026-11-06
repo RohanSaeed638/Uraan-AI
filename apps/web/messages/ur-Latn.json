@@ -488,7 +488,8 @@
     "send": "Send karein",
     "offTitle": "AI Mentor band hai",
     "offText": "Aapne Settings mein mentor band kiya hai. Dobara chat karne ke liye on karein. Pehle ki conversations saved hain.",
-    "openSettings": "Settings kholen"
+    "openSettings": "Settings kholen",
+    "disclaimer": "Mentor AI hai aur galti kar sakta hai. Koi bhi zaroori baat, khaas tor par jobs, paise ya kanoon ke baare mein, zaroor check karein."
   },
   "mentorReview": {
     "title": "Mera kaam review karein",
@@ -999,7 +1000,10 @@
     "weekXp": "Is haftay {xp} XP",
     "today": "aaj",
     "dayDone": "seekha",
-    "dayMissed": "seekhne ka waqt nahin"
+    "dayMissed": "seekhne ka waqt nahin",
+    "freezes": "{count, plural, =0 {Koi streak freeze nahin} one {# streak freeze} other {# streak freezes}}",
+    "freezeHelp": "Freeze aapke streak ko bachata hai agar aap ek din miss kar dein. Har 7 din lagataar padhai par aapko ek milta hai (max 2).",
+    "freezeProtecting": "Freeze aapka streak zinda rakhega jab aap agla sabaq karein."
   },
   "roadmaps": {
     "title": "Mere Roadmaps",
@@ -1873,5 +1877,26 @@
     "t3": "Aapke data ko dekhne, durust karne ya delete karne ki darkhwast",
     "t4": "Uraan AI ko behtar banane ke ideas",
     "include": "Barah-e-karam wo email shamil karein jis se aapne sign up kiya aur agar masla hai to batayein ke aap kya kar rahe thay aur kya dekha."
+  },
+  "feedback": {
+    "title": "Kya yeh sabaq madadgar tha?",
+    "yes": "Haan",
+    "no": "Nahin",
+    "thanks": "Shukriya, is se humein behtari milegi.",
+    "detailsThanks": "Shukriya tafseelat ke liye. Hum is par gaur karenge.",
+    "change": "Mera jawab badlein",
+    "whatWasWrong": "Kya ghalat hua?",
+    "reasons": {
+      "wrong": "Kuch ghalat hai",
+      "unclear": "Samajhna mushkil hai",
+      "too_hard": "Bohat mushkil hai",
+      "too_easy": "Bohat asaan hai",
+      "broken_link": "Link kaam nahin kar raha",
+      "other": "Kuch aur"
+    },
+    "commentPlaceholder": "Zyada batain (optional)",
+    "send": "Bhejain",
+    "skip": "Chhor dein",
+    "failed": "Aapka jawab save nahin ho saka. Barah-e-karam dobara koshish karein."
   }
 }

@@ -12,6 +12,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
+import Illustration from "@/components/illustrations/Illustration";
+import RoadmapBuilding from "@/components/roadmap/RoadmapBuilding";
+
 import GenerateRoadmapForm from "./GenerateRoadmapForm";
 
 import { api } from "@/lib/api/client";
@@ -73,34 +76,31 @@ export default function GenerateRoadmapDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {t("dialogTitle")}
-          </DialogTitle>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+        {loading && <RoadmapBuilding compact title={t("dialogTitle")} />}
 
-          <DialogDescription>
-            {t("dialogText")}
-          </DialogDescription>
-        </DialogHeader>
+        {/* Kept mounted while building, so the answers are still there if it fails. */}
+        <div hidden={loading} className="space-y-4">
+          <>
+            <DialogHeader className="sm:flex-row sm:items-center sm:gap-4">
+              <Illustration name="path" size={96} className="hidden sm:block" />
 
-        {error && (
-          <p role="alert" className="rounded-2xl bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
-          </p>
-        )}
+              <div className="min-w-0 space-y-1.5">
+                <DialogTitle>{t("dialogTitle")}</DialogTitle>
 
-        {loading && (
-          <p role="status" className="text-sm text-muted-foreground">
-            {t("building")}
-          </p>
-        )}
+                <DialogDescription>{t("dialogText")}</DialogDescription>
+              </div>
+            </DialogHeader>
 
-        <GenerateRoadmapForm
-          loading={loading}
-          onSubmit={handleSubmit}
-          defaultCareer={defaultCareer}
-        />
+            {error && (
+              <p role="alert" className="rounded-2xl bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+
+            <GenerateRoadmapForm loading={loading} onSubmit={handleSubmit} defaultCareer={defaultCareer} />
+          </>
+        </div>
       </DialogContent>
     </Dialog>
   );
