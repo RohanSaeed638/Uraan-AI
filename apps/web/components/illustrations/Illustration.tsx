@@ -8,7 +8,7 @@ export type IllustrationName =
   | "certificate" | "trophy" | "flame" | "milestone" | "empty" | "search" | "bell"
   | "offline" | "chart" | "chat" | "crown" | "success"
   | "ob-goal" | "ob-plan" | "ob-ai" | "ob-skills" | "ob-mentor" | "ob-journey" | "ob-continue" | "ob-done"
-  | "login" | "register" | "dashboard" | "roadmaps" | "explore" | "learning" | "tasks" | "projects"
+  | "dashboard" | "roadmaps" | "explore" | "learning" | "tasks" | "projects"
   | "progress" | "achievement" | "mentor" | "profile" | "settings";
 
 /**
@@ -37,7 +37,7 @@ export default function Illustration({
         src={`/illustrations/${name}.light.webp`}
         className="object-contain mix-blend-multiply dark:hidden"
       />
-      <Image {...common} alt="" src={`/illustrations/${name}.dark.webp`} className="hidden object-contain [mask-image:radial-gradient(ellipse_at_center,#000_58%,transparent_98%)] dark:block" />
+      <Image {...common} alt="" src={`/illustrations/${name}.dark.webp`} className="hidden object-contain dark:block" />
     </div>
   );
 }

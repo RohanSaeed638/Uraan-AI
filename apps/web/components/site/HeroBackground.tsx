@@ -1,12 +1,35 @@
+import Image from "next/image";
+
 /**
- * The landing page's backdrop: soft violet light from above, two slow glows (violet and
+ * The landing page's backdrop: a painted landscape (light and dark versions) with a wash over
+ * it for legibility, then soft violet light from above, two slow glows (violet and
  * gold, the brand colours), a dot pattern that fades out towards the edges, and a dashed
- * "flight path" climbing across the hero ("Uraan" means flight). Pure CSS and SVG, no
- * images, and decorative only. Put it inside a `relative isolate` section.
+ * "flight path" climbing across the hero ("Uraan" means flight). Decorative only. Put it
+ * inside a `relative isolate` section.
  */
 export default function HeroBackground() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {/* the painted landscape, one per theme, under everything else */}
+      <Image
+        src="/backgrounds/hero.light.webp"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[50%_60%] dark:hidden"
+      />
+      <Image
+        src="/backgrounds/hero.dark.webp"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="hidden object-cover object-[50%_60%] dark:block"
+      />
+      {/* a wash over it so the headline stays easy to read */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_42%,rgba(255,255,255,0.88),rgba(255,255,255,0.55)_70%,rgba(255,255,255,0.25))] dark:bg-[radial-gradient(ellipse_70%_60%_at_50%_42%,rgba(11,10,26,0.82),rgba(11,10,26,0.50)_70%,rgba(11,10,26,0.20))]" />
+
       {/* light from above */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-10%,rgba(124,58,237,0.20),transparent_70%)] dark:bg-[radial-gradient(ellipse_90%_70%_at_50%_-10%,rgba(124,58,237,0.42),transparent_70%)]" />
 
