@@ -10,7 +10,9 @@ from app.ai.schemas.learning_plan_schema import (
     LearningPlan,
     PlanUnit,
     READING_FLOOR_WORDS,
+    READING_MAX_WORDS,
     READING_TARGET_WORDS,
+    estimate_reading_minutes,
     normalize_order,
     validate_plan,
     word_count,
@@ -20,6 +22,7 @@ from app.ai.services.learning_unit_generator import (
     LearningUnitGenerator,
     build_body_prompt,
     build_outline_prompt,
+    minutes_for,
     strip_fence,
 )
 from app.ai.services.video_resolver import (
@@ -481,3 +484,79 @@ def test_unknown_or_foreign_task_is_404():
         asyncio.run(service.ensure_plan(uuid4(), uuid4()))
 
     assert exc.value.status_code == 404
+
+
+# ---- study time follows the content ----------------------------------------
+
+
+def lesson_text(words, code_blocks=0, check=True):
+    text = "word " * words
+
+    for _ in range(code_blocks):
+        text += "\n```python\nprint('hi')\n```\n"
+
+    return text + ("\n## Check yourself\n- one\n" if check else "")
+
+
+def test_a_longer_lesson_takes_longer():
+    assert estimate_reading_minutes(lesson_text(900)) > estimate_reading_minutes(lesson_text(300))
+
+
+def test_code_blocks_and_the_self_check_add_time():
+    plain = estimate_reading_minutes(lesson_text(600, check=False))
+
+    assert estimate_reading_minutes(lesson_text(600, check=False, code_blocks=4)) >= plain + 5
+    assert estimate_reading_minutes(lesson_text(600, check=True)) >= plain + 2
+
+
+def test_reading_time_has_a_floor_and_a_ceiling():
+    assert estimate_reading_minutes("") == 3
+    assert estimate_reading_minutes(None) == 3
+    assert estimate_reading_minutes("word " * 50) == 3
+    assert estimate_reading_minutes("word " * 20000) == 60
+
+
+def test_a_normal_lesson_is_a_believable_length():
+    # about the target length: several minutes, not half an hour
+    assert 5 <= estimate_reading_minutes(lesson_text(READING_TARGET_WORDS)) <= 12
+
+
+def test_only_reading_time_is_worked_out_from_the_text():
+    reading = PlanUnit(**unit(1, estimated_minutes=40))
+    project = PlanUnit(**unit(2, type="project", estimated_minutes=90))
+    video = PlanUnit(**unit(3, type="video", estimated_minutes=15, search_query="q"))
+
+    assert minutes_for(reading, lesson_text(READING_TARGET_WORDS)) < 40
+    assert minutes_for(reading, None) == 40  # nothing written yet
+    assert minutes_for(project, lesson_text(200)) == 90
+    assert minutes_for(video, "notes") == 15
+
+
+def test_a_written_lesson_is_saved_with_its_real_time(monkeypatch):
+    chat = Chat(outline_json(unit(1, estimated_minutes=45)), LONG)
+    patch_chat(monkeypatch, chat)
+
+    rows = asyncio.run(LearningUnitGenerator().generate(roadmap("reading"), TASK))
+
+    assert rows[0]["estimated_minutes"] == estimate_reading_minutes(rows[0]["content"])
+    assert rows[0]["estimated_minutes"] < 45
+
+
+def test_the_outline_keeps_a_waiting_reading_lesson_within_a_believable_range(monkeypatch):
+    chat = Chat(outline_json(unit(1, estimated_minutes=90), unit(2, estimated_minutes=2)))
+    patch_chat(monkeypatch, chat)
+
+    rows = asyncio.run(LearningUnitGenerator().generate_outline(roadmap("reading"), TASK))
+
+    assert [r["status"] for r in rows] == ["pending", "pending"]
+    assert [r["estimated_minutes"] for r in rows] == [25, 8]
+
+
+def test_the_prompts_ask_for_honest_minutes_and_fuller_lessons():
+    units = normalize_order(plan(unit(1)))
+    outline = build_outline_prompt(roadmap("reading"), TASK)
+    body = build_body_prompt(units[0], units, roadmap("reading"), TASK)
+
+    assert "honest" in outline
+    assert f"at most {READING_MAX_WORDS}" in body
+    assert READING_TARGET_WORDS >= 500

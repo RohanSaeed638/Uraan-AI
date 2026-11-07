@@ -21,7 +21,13 @@ from app.models.roadmap import Roadmap
 from app.models.roadmap_phase import RoadmapPhase
 from app.models.roadmap_task import RoadmapTask
 from app.models.task_learning_unit import LearningUnitType, TaskLearningUnit
-from app.services.lesson_writer import needs_writer, plan_of, requeue_failed, write_pending_lessons
+from app.services.lesson_writer import (
+    hours_for_minutes,
+    needs_writer,
+    plan_of,
+    requeue_failed,
+    write_pending_lessons,
+)
 
 FK_SQL = text(
     "select c.conrelid::regclass::text, a.attname from pg_constraint c "
@@ -274,3 +280,56 @@ def test_the_saved_outline_is_read_back_and_finished_lessons_get_a_bare_one():
 
     assert plan_of(waiting).outline == ["verbs"] and plan_of(waiting).title == "HTTP"
     assert (plan_of(done).day, plan_of(done).title, plan_of(done).type) == (3, "Build it", "project")
+
+
+class LongWriter(Writer):
+    """Writes real-length reading lessons, so the study time can be checked."""
+
+    async def write_unit(self, unit, units, roadmap, task):
+        content, details = await super().write_unit(unit, units, roadmap, task)
+
+        if unit.type == "reading":
+            content = "word " * 600 + "\n## Check yourself\n- a question\n"
+
+        return content, details
+
+
+async def task_hours(task_id):
+    async with SessionLocal() as db:
+        return (await db.execute(select(RoadmapTask.estimated_hours).where(RoadmapTask.id == task_id))).scalar_one()
+
+
+def test_a_written_reading_lesson_is_timed_from_its_text_not_its_plan():
+    async def check(task_id):
+        await write_pending_lessons(task_id, generator=LongWriter())
+
+        return [(r.type.value, r.estimated_minutes) for r in await rows(task_id)]
+
+    saved = with_task(check)
+    readings = [m for kind, m in saved if kind == "reading"]
+    others = [m for kind, m in saved if kind != "reading"]
+
+    assert all(5 <= m <= 12 for m in readings)  # not the 20 minutes that was planned
+    assert others == [20, 20]  # the project and the exercise keep their planned time
+
+
+def test_the_task_hours_follow_the_lessons_once_they_are_written():
+    async def check(task_id):
+        before = await task_hours(task_id)
+        await write_pending_lessons(task_id, generator=LongWriter())
+        minutes = sum(r.estimated_minutes for r in await rows(task_id))
+
+        return before, minutes, await task_hours(task_id)
+
+    before, minutes, after = with_task(check)
+
+    assert before is None
+    assert after == hours_for_minutes(minutes)
+    assert after >= 1
+
+
+def test_hours_are_to_the_nearest_hour_and_at_least_one():
+    assert hours_for_minutes(10) == 1
+    assert hours_for_minutes(80) == 1
+    assert hours_for_minutes(100) == 2
+    assert hours_for_minutes(240) == 4

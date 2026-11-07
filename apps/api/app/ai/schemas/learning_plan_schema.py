@@ -18,10 +18,19 @@ PROJECT_LEVELS = {"beginner", "intermediate", "advanced"}
 
 # A written lesson shorter than this is sent back once for expansion; below
 # the floor after that it is rejected.
-READING_TARGET_WORDS = 250
-READING_FLOOR_WORDS = 180
+READING_TARGET_WORDS = 600
+READING_FLOOR_WORDS = 420
+READING_MAX_WORDS = 1000
 PROJECT_TARGET_WORDS = 150
 PROJECT_FLOOR_WORDS = 100
+
+# How long a written lesson takes to study. Technical text is read slowly (and
+# re-read), code is worth stopping over, and the closing questions take thinking.
+STUDY_WORDS_PER_MINUTE = 130
+MINUTES_PER_CODE_BLOCK = 1.5
+MINUTES_FOR_SELF_CHECK = 2
+MIN_READING_MINUTES = 3
+MAX_READING_MINUTES = 60
 
 
 class PlanUnit(BaseModel):
@@ -89,6 +98,20 @@ def style_key(learning_style) -> str:
 
 def word_count(text: str | None) -> int:
     return len((text or "").split())
+
+
+def estimate_reading_minutes(text: str | None) -> int:
+    """How long a written lesson really takes to study, from its content: the
+    words at a study pace, a little extra for each code block, and time for the
+    "Check yourself" questions when the lesson has them."""
+    body = text or ""
+    code_blocks = body.count("```") // 2
+    minutes = word_count(body) / STUDY_WORDS_PER_MINUTE + code_blocks * MINUTES_PER_CODE_BLOCK
+
+    if "check yourself" in body.lower():
+        minutes += MINUTES_FOR_SELF_CHECK
+
+    return max(MIN_READING_MINUTES, min(MAX_READING_MINUTES, round(minutes)))
 
 
 def validate_plan(plan: LearningPlan, learning_style, coding: bool = False) -> None:

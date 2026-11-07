@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Clock, ExternalLink, BookOpen, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 
 import {
   Dialog,
@@ -37,8 +37,6 @@ export default function TaskDetailsDialog({
     return null;
   }
 
-  const hasResources = task.resource_links && task.resource_links.length > 0;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -72,40 +70,6 @@ export default function TaskDetailsDialog({
                   {t("hours", { count: task.estimated_hours })}
                 </p>
               </div>
-            </div>
-          )}
-
-          {hasResources && (
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-brand-violet" />
-                <h3 className="text-sm font-semibold">{t("resources")}</h3>
-              </div>
-
-              <div className="space-y-2">
-                {task.resource_links!.map((url, index) => (
-                  <a
-                    key={`${url}-${index}`}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm transition-colors hover:bg-muted"
-                  >
-                    <span className="min-w-0 truncate text-brand-violet">
-                      {t("resource", { number: index + 1 })}
-                    </span>
-                    <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!hasResources && (
-            <div className="rounded-xl border border-dashed border-border p-4">
-              <p className="text-sm text-muted-foreground">
-                {t("noResources")}
-              </p>
             </div>
           )}
 

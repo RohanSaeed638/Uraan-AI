@@ -25,8 +25,10 @@ from app.ai.schemas.learning_plan_schema import (
     PROJECT_TARGET_WORDS,
     PlanUnit,
     READING_FLOOR_WORDS,
+    READING_MAX_WORDS,
     READING_TARGET_WORDS,
     allowed_types,
+    estimate_reading_minutes,
     normalize_order,
     style_key,
     trim_exercises,
@@ -40,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 OUTLINE_ATTEMPTS = 2
 OUTLINE_TOKENS = 4500
-BODY_TOKENS = 2200
+BODY_TOKENS = 3200
 PARALLEL_WRITERS = 4
 
 SYSTEM_JSON = "You are an expert teacher and course planner. You output only JSON."
@@ -96,7 +98,19 @@ def build_body_prompt(unit: PlanUnit, units: list[PlanUnit], roadmap, task) -> s
             [f"Day {u.day}: {u.title}" for u in units if u is not unit]
         ),
         target=target,
+        max_words=READING_MAX_WORDS,
     )
+
+
+def minutes_for(unit: PlanUnit, content: str | None) -> int:
+    """The study time for a written lesson. A reading lesson's time follows its
+    actual text, so a short lesson is never shown as a long one; videos,
+    exercises and projects keep the planned time, since that time goes on
+    watching or doing, not on reading."""
+    if unit.type == "reading" and content:
+        return estimate_reading_minutes(content)
+
+    return unit.estimated_minutes
 
 
 def project_details(unit: PlanUnit) -> dict:
@@ -256,6 +270,14 @@ class LearningUnitGenerator:
 
     @staticmethod
     def _row(unit: PlanUnit, content, details, url, status: str) -> dict:
+        if status == "ready":
+            minutes = minutes_for(unit, content)
+        elif unit.type == "reading":
+            # Not written yet: the planned time, kept within what a reading lesson takes.
+            minutes = max(8, min(25, unit.estimated_minutes))
+        else:
+            minutes = unit.estimated_minutes
+
         return {
             "day": unit.day,
             "order": unit.order,
@@ -266,7 +288,7 @@ class LearningUnitGenerator:
             "details": details,
             "prompt_version": prompt_version("lessons"),
             "resource_url": url,
-            "estimated_minutes": unit.estimated_minutes,
+            "estimated_minutes": minutes,
             "status": status,
         }
 

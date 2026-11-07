@@ -46,6 +46,15 @@ function embedUrl(url: string): string | null {
   return null;
 }
 
+/** A short name for a link: the site it points to. */
+function referenceLabel(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 export default function UnitViewer({
   roadmapId,
   task,
@@ -87,6 +96,8 @@ export default function UnitViewer({
   const isLast = index === units.length - 1;
   const percent = Math.round((done.size / units.length) * 100);
   const totalMinutes = units.reduce((s, u) => s + (u.estimated_minutes ?? 0), 0);
+  // The task's reference links, shown under the lesson text for further reading.
+  const references = [...new Set((task.resource_links ?? []).filter(Boolean))];
 
   function goTo(next: number) {
     setIndex(next);
@@ -390,6 +401,27 @@ export default function UnitViewer({
           </p>
         )}
       </div>
+      )}
+
+      {ready && references.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-border p-5">
+          <h2 className="text-sm font-semibold">{t("furtherReading")}</h2>
+          <ul className="mt-3 space-y-2">
+            {references.map((url) => (
+              <li key={url}>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 break-all text-sm text-violet-700 hover:underline dark:text-brand-violet-light"
+                >
+                  {referenceLabel(url)}
+                  <ExternalLink size={13} className="shrink-0" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <LessonFeedback key={unit.id} unitId={unit.id} />

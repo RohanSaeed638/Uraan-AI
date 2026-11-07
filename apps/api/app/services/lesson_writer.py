@@ -11,11 +11,11 @@ import asyncio
 import logging
 from uuid import UUID
 
-from sqlalchemy import select, text, update
+from sqlalchemy import func, select, text, update
 
 from app.ai.llm import use_profile
 from app.ai.schemas.learning_plan_schema import PlanUnit
-from app.ai.services.learning_unit_generator import LearningUnitGenerator
+from app.ai.services.learning_unit_generator import LearningUnitGenerator, minutes_for
 from app.core.analytics import track
 from app.db.session import SessionLocal
 from app.models.profile import Profile
@@ -116,7 +116,11 @@ async def write_pending_lessons(task_id: UUID, generator=None, session_factory=S
                     values = {"status": new_status}
 
                     if new_status == "ready":
-                        values.update(content=content, details=details)
+                        values.update(
+                            content=content,
+                            details=details,
+                            estimated_minutes=minutes_for(unit, content),
+                        )
 
                     await db.execute(update(TaskLearningUnit).where(TaskLearningUnit.id == unit_id).values(**values))
                     await db.commit()
@@ -126,11 +130,40 @@ async def write_pending_lessons(task_id: UUID, generator=None, session_factory=S
         await asyncio.gather(*(write_one(unit_id) for unit_id in waiting))
 
         if counts["written"]:
+            async with session_factory() as db:
+                await refresh_task_hours(db, task_id)
+                await db.commit()
+
             track(profile_id, "lessons_written", count=counts["written"], failed=counts["failed"])
     except Exception:
         logger.exception("Writing the lessons of task %s failed", task_id)
 
     return counts
+
+
+async def refresh_task_hours(db, task_id: UUID) -> int | None:
+    """Sets the task's estimated hours from its lessons, so the figure shown on
+    the task matches the content that was actually written. Returns the hours."""
+    total = (
+        await db.execute(
+            select(func.coalesce(func.sum(TaskLearningUnit.estimated_minutes), 0)).where(
+                TaskLearningUnit.task_id == task_id
+            )
+        )
+    ).scalar_one()
+
+    if not total:
+        return None
+
+    hours = hours_for_minutes(int(total))
+    await db.execute(update(RoadmapTask).where(RoadmapTask.id == task_id).values(estimated_hours=hours))
+
+    return hours
+
+
+def hours_for_minutes(minutes: int) -> int:
+    """Whole hours for a task, to the nearest hour and never less than one."""
+    return max(1, round(minutes / 60))
 
 
 def needs_writer(units) -> bool:

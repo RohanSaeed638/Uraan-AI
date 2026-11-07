@@ -20,12 +20,18 @@ Reference links already attached to the task: {resource_links}
 
 WHAT TO PRODUCE
 
-Split the task over as many days as the study time per day and the estimated
-total time need (days numbered 1, 2, 3 with no gaps). Each day holds a few
-lessons whose minutes add up to roughly the daily study time. Start with
-fundamentals and move toward practice. Do not assume knowledge beyond the
-learner's skill level. Every lesson must directly support this task, with no
-filler and no overlap between lessons.
+Plan enough lessons to teach this task properly, so that the lessons together
+take about the estimated total time (at most 20 lessons). Never pad: if the
+topic is covered in less, stop. Spread the lessons over days (numbered 1, 2, 3
+with no gaps) of about the learner's daily study time; a day holds 2 to 6
+lessons. Start with fundamentals and move toward practice. Do not assume
+knowledge beyond the learner's skill level. Every lesson must directly support
+this task, with no filler and no overlap between lessons.
+
+"estimated_minutes" must be honest, not rounded up to fill the day. A reading
+lesson is written as 600 to 1000 words and takes 8 to 25 minutes to study;
+videos, exercises and projects take as long as the learner really needs to
+watch or do them.
 
 Lesson types you may use: {allowed_types}
 
@@ -55,7 +61,7 @@ RETURN ONLY VALID JSON in this shape (no markdown fences):
 """
 
 READING_RULES = """READING lessons ("type": "reading"):
-- "outline": 4 to 7 specific points the lesson must teach, in teaching order.
+- "outline": 5 to 8 specific points the lesson must teach, in teaching order.
 - "notes" is null, "video_urls" is [] and "search_query" is null."""
 
 VIDEO_RULES = """VIDEO lessons ("type": "video"):
@@ -128,7 +134,9 @@ The other lessons in this task (do not repeat them, build on earlier ones):
 {siblings}
 
 Requirements:
-- Markdown, {target}+ words, at most 700.
+- Markdown, {target}+ words, at most {max_words}. Teach each point in the
+  list properly, with explanation and at least one concrete example; do not
+  just name it.
 - Begin with a short intro on why this matters. Use "##" headings for the
   sections. Give concrete examples, with fenced code blocks when the topic
   involves code or commands. Explain terms the first time you use them.
